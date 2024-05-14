@@ -5,7 +5,6 @@ const {
   DisconnectOracleDB,
 } = require("./DBConn.cjs");
 
-
 module.exports.login = async (req, res) => {
   try {
     const { User, Password } = req.body;
@@ -27,5 +26,16 @@ module.exports.login = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
     console.log(err);
+  }
+};
+
+module.exports.getIPaddress = async (req, res) => {
+  try {
+    const clientIp = req.connection.remoteAddress;
+    const ip = clientIp.includes(":") ? clientIp.split(":").pop() : clientIp;
+
+    res.status(200).send({ ip: ip });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

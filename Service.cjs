@@ -5,8 +5,8 @@ const oracledb = require("oracledb");
 const LoginService = require("./Conncetion/LoginService.cjs");
 const serialmaster = require("./WorkService/serialMaster.cjs");
 const MenuService = require("./Conncetion/munuService.cjs");
-
 const ScanSMTRollSht = require("./Conncetion/ScanSMTRoollSht.cjs");
+
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -16,11 +16,10 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.get("/api/current-date", MenuService.getCurrentDate);
+app.get("/api/getIPaddress", LoginService.getIPaddress);
 app.post("/api/login", LoginService.login);
 app.post("/api/MenuName", MenuService.Menuname);
-
 app.post("/api/CheckrunCode", serialmaster.SerialCodeName);
 
 app.post("/api/getLot", ScanSMTRollSht.getLot);
