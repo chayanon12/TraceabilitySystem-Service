@@ -1,14 +1,14 @@
 const {
-    ConnectPG_DB,
-    DisconnectPG_DB,
-    ConnectOracleDB,
-    DisconnectOracleDB,
-  } = require("./DBConn.cjs");
+  ConnectPG_DB,
+  DisconnectPG_DB,
+  ConnectOracleDB,
+  DisconnectOracleDB,
+} = require("../Conncetion/DBConn.cjs");
 
-  module.exports.SerialCodeName = async function (req, res) { 
-    const { Code, Name } = req.body;
-    if (Code != undefined && Name != undefined) {
-      const searchQuery = `
+module.exports.SerialCodeName = async function (req, res) {
+  const { Code, Name } = req.body;
+  if (Code != undefined && Name != undefined) {
+    const searchQuery = `
       select
       tssm_sn_struc_code,
       tssm_sn_struc_name,
@@ -51,16 +51,23 @@ const {
       tssm_sn_struc_code,
       tssm_sn_struc_name
     `;
-  
-      try {
-        const client = await ConnectPG_DB();
-        const result = await client.query(searchQuery);
-        const foundDataArray = result.rows;
-        await DisconnectPG_DB(client);
-        res.status(200).json(foundDataArray);
-      } catch (error) {
-        res.status(500) .json({ message: "An error occurred while searching data" });
-        await DisconnectPG_DB(client);
-      }
+
+    try {
+      const client = await ConnectPG_DB();
+      const result = await client.query(searchQuery, [Code, Name]);
+      const foundDataArray = result.rows;
+      await DisconnectPG_DB(client);
+      res.status(200).json(foundDataArray);
+    } catch (error) {
+      console.error("Error occurred while searching data:", error);
+      res
+        .status(500)
+        .json({
+          message: "An error occurred while searching data",
+          error: error.message,
+        });
     }
-  };
+  } else {
+    res.status(400).json({ message: "Code and Name parameters are required" });
+  }
+};

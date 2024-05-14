@@ -14,8 +14,8 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 
-app.post("/login", LoginService.login);
-app.post("/CheckrunCode", serialmaster.runningCode);
+app.post("/api/login", LoginService.login);
+app.post("/api/CheckrunCode", serialmaster.SerialCodeName);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
