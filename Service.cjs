@@ -4,8 +4,7 @@ const port = 3001;
 const oracledb = require("oracledb");
 const LoginService = require("./Conncetion/LoginService.cjs");
 const serialmaster = require("./WorkService/serialMaster.cjs");
-const MenuService = require("./Conncetion/munuService.cjs");
-
+const MenuService = require("./Conncetion/menuService.cjs");
 app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -14,11 +13,10 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.get("/api/current-date", MenuService.getCurrentDate);
+app.get("/api/getIPaddress", LoginService.getIPaddress);
 app.post("/api/login", LoginService.login);
 app.post("/api/MenuName", MenuService.Menuname);
-
 app.post("/api/CheckrunCode", serialmaster.SerialCodeName);
 
 app.listen(port, () => {
