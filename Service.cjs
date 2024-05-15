@@ -4,7 +4,7 @@ const port = 3001;
 const oracledb = require("oracledb");
 const LoginService = require("./Conncetion/LoginService.cjs");
 const serialmaster = require("./WorkService/serialMaster.cjs");
-const MenuService = require("./Conncetion/munuService.cjs");
+const MenuService = require("./Conncetion/menuService.cjs");
 const ScanSMTRollSht = require("./Conncetion/ScanSMTRoollSht.cjs");
 
 
