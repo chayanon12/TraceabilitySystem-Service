@@ -25,6 +25,8 @@ app.post("/api/getLot", ScanSMTRollSht.getLot);
 
 app.get("/api/GetProductData", ScanSMTFIN.GetProductData);
 app.post("/api/GetProductDataByLot", ScanSMTFIN.GetProductDataByLot);
+app.post("/api/GetLotSerialCountData", ScanSMTFIN.GetLotSerialCountData);
+app.post("/api/GetSerialProductByProduct", ScanSMTFIN.GetSerialProductByProduct);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
