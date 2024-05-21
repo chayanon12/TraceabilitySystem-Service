@@ -42,6 +42,7 @@ app.post("/api/delSerial_Master", serialmaster.delSerial_Master);
 app.post("/api/CheckrunCode", serialmaster.runningCode);
 
 //Product Master
+app.post("/api/searchFactory", productmaster.searchFactory);
 app.post("/api/Factory", productmaster.getFactory);
 app.post("/api/SerialStructure", productmaster.getSerialStructure);
 app.post("/api/SheetStructure", productmaster.getSheetStructure);
