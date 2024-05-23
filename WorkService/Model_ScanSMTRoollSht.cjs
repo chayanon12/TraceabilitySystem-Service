@@ -3,7 +3,7 @@ const {
     DisconnectPG_DB,
     ConnectOracleDB,
     DisconnectOracleDB,
-  } = require("./DBConn.cjs");
+  } = require("../Conncetion/DBConn.cjs");
 
   module.exports.getLot = async function (req, res) {
     try {

@@ -7,7 +7,7 @@ const MenuService = require("./Conncetion/menuService.cjs");
 const sheetmaster = require("./WorkService/sheetmaster.cjs");
 const serialmaster = require("./WorkService/serialMaster.cjs");
 const productmaster = require("./WorkService/productmaster.cjs");
-const ScanSMTRollSht = require("./Conncetion/ScanSMTRoollSht.cjs");
+const ScanSMTRollSht = require("./WorkService/Model_ScanSMTRoollSht.cjs");
 const ScanSMTFIN = require("./WorkService/Model_ScanSMTSerialShtFINManySht.cjs");
 
 
