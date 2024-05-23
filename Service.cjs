@@ -28,6 +28,7 @@ app.get("/api/GetProductData", ScanSMTFIN.GetProductData);
 app.post("/api/GetProductDataByLot", ScanSMTFIN.GetProductDataByLot);
 app.post("/api/GetLotSerialCountData", ScanSMTFIN.GetLotSerialCountData);
 app.post("/api/GetSerialProductByProduct", ScanSMTFIN.GetSerialProductByProduct);
+app.get("/api/GetConnectShtMasterCheckResult", ScanSMTFIN.GetConnectShtMasterCheckResult);
 
 //Sheet Structure Master
 app.post("/api/searchCodeName", sheetmaster.postCodeName);
