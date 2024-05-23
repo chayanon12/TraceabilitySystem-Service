@@ -7,8 +7,9 @@ const MenuService = require("./Conncetion/menuService.cjs");
 const sheetmaster = require("./WorkService/sheetmaster.cjs");
 const serialmaster = require("./WorkService/serialMaster.cjs");
 const productmaster = require("./WorkService/productmaster.cjs");
-const ScanSMTRollSht = require("./Conncetion/ScanSMTRoollSht.cjs");
+const ScanSMTRollSht = require("./WorkService/Model_ScanSMTRoollSht.cjs");
 const ScanSMTFIN = require("./WorkService/Model_ScanSMTSerialShtFINManySht.cjs");
+
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -23,6 +24,10 @@ app.get("/api/getIPaddress", LoginService.getIPaddress);
 app.post("/api/login", LoginService.login);
 app.post("/api/MenuName", MenuService.Menuname);
 app.post("/api/getLot", ScanSMTRollSht.getLot);
+app.post("/api/getProduct", ScanSMTRollSht.getProduct);
+app.post("/api/GetSerialProductByProduct", ScanSMTRollSht.GetSerialProductByProduct);
+app.post("/api/GetRollLeafTotalByLot", ScanSMTRollSht.GetRollLeafTotalByLot);
+
 
 app.get("/api/GetProductData", ScanSMTFIN.GetProductData);
 app.post("/api/GetProductDataByLot", ScanSMTFIN.GetProductDataByLot);
