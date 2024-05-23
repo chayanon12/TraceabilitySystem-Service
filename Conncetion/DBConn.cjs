@@ -32,7 +32,6 @@ const ConnectOracleDB = async (ConnType) => {
             password: process.env.FPC_PASSWORD,
             connectString : process.env.FPC_CONNECTION_STRING,
         };
-        console.log(process.env.FPC_USER,process.env.FPC_PASSWORD,process.env.FPC_CONNECTION_STRING)
         const connection = await oracledb.getConnection(FPC);
         return connection;
     }else if (ConnType === "SMT"){
@@ -41,6 +40,7 @@ const ConnectOracleDB = async (ConnType) => {
             password: process.env.SMT_PASSWORD,
             connectString : process.env.SMT_CONNECTION_STRING,
         };
+        console.log(process.env.SMT_USER,process.env.SMT_PASSWORD,process.env.SMT_CONNECTION_STRING)
         const connection = await oracledb.getConnection(SMT);
         return connection;
     }
