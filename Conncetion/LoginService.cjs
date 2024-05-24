@@ -22,7 +22,6 @@ module.exports.login = async (req, res) => {
       res.status(200).json(result.rows);
       DisconnectOracleDB(Conn);
     } else {
-      writeLogError("Invalid User or Password",query);
       res.status(401).json({ message: "Invalid User or Password" });
       DisconnectOracleDB(Conn);
     }
@@ -40,6 +39,7 @@ module.exports.getIPaddress = async (req, res) => {
 
     res.status(200).send({ ip: ip });
   } catch (error) {
+    writeLogError(err.message,'Cannot get IP address');
     res.status(500).json({ message: error.message });
   }
 };
