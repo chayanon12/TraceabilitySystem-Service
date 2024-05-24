@@ -4,12 +4,14 @@ const {
   ConnectOracleDB,
   DisconnectOracleDB,
 } = require("./DBConn.cjs");
+const { writeLogError } = require("../Common/LogFuction.cjs");
 
 module.exports.login = async (req, res) => {
+  var query = "";
   try {
     const { User, Password } = req.body;
     const Conn = await ConnectOracleDB("FPC");
-    const query = `
+    query = `
         SELECT NUL.LOGIN_ID ,NUL.FACTORY_CODE ,NUL.ID_CODE ,INITCAP(NUL.USER_NAME) AS USER_NAME,INITCAP(NUL.USER_SURNAME) AS USER_SURNAME,NUL.EMAIL_ADD 		
         FROM NAP_USER_LOGIN NUL		
         WHERE UPPER(NUL.USER_LOGIN) = UPPER('${User}')		
@@ -20,10 +22,12 @@ module.exports.login = async (req, res) => {
       res.status(200).json(result.rows);
       DisconnectOracleDB(Conn);
     } else {
+      writeLogError("Invalid User or Password",query);
       res.status(401).json({ message: "Invalid User or Password" });
       DisconnectOracleDB(Conn);
     }
   } catch (err) {
+    writeLogError(err.message,query);
     res.status(500).json({ message: err.message });
     console.log(err);
   }
