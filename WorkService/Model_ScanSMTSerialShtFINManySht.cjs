@@ -100,7 +100,25 @@ module.exports.GetLotSerialCountData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
+  try {
+    var query = "";
+    var strResult = "NG";
+    var FINAL_GATE_MASTER_FLG = "0";
+    if (FINAL_GATE_MASTER_FLG == "1") {
+      query += "";
+      const client = await ConnectPG_DB();
+      const { rows } = await client.query(query);
+      res.json(rows);
+      await DisconnectPG_DB(client);
+    } else {
+      strResult = "OK";
+    }
+    res.status(200).json({ Result: strResult });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports.GetSerialProductByProduct = async function (req, res) {
   try {
     let query = "";
@@ -206,9 +224,7 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
     query += `AND PRD.PRM_PLANT_CODE = 'THA'`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-      res
-        .status(200)
-        .json(result.rows);
+      res.status(200).json(result.rows);
       DisconnectOracleDB(Conn);
     } else {
       return;
