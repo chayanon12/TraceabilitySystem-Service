@@ -57,6 +57,9 @@ app.post("/api/SerialStructure", productmaster.getSerialStructure);
 app.post("/api/SheetStructure", productmaster.getSheetStructure);
 app.post("/api/SheetType", productmaster.getSheetType);
 app.post("/api/ProceesControl", productmaster.getProceesControl);
+app.post("/api/insProduct_Master", productmaster.insertProduct_Master);
+app.post("/api/updateProduct_Master", productmaster.updateProduct_Master);
+app.post("/api/delProduct_Master", productmaster.deleteProduct_Master);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
