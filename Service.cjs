@@ -23,6 +23,7 @@ app.get("/api/current-date", MenuService.getCurrentDate);
 app.get("/api/getIPaddress", LoginService.getIPaddress);
 app.post("/api/login", LoginService.login);
 app.post("/api/MenuName", MenuService.Menuname);
+app.post("/api/MenuHome", MenuService.MenuHome);
 app.post("/api/getLot", ScanSMTRollSht.getLot);
 app.post("/api/getProduct", ScanSMTRollSht.getProduct);
 app.post("/api/GetSerialProductByProduct", ScanSMTRollSht.GetSerialProductByProduct);

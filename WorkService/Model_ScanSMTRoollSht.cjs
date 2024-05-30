@@ -46,18 +46,12 @@ const {
 
   module.exports.getProduct = async function (req, res) {
     try {
-      const connect = await ConnectOracleDB("SMT");
+      const client = await ConnectPG_DB();
       let query = "";
-      query += `SELECT P.PRM_PRODUCT_NAME AS PRD_NAME`;
-      query += ` FROM SMT_PRODUCT_MST P`;
-      query += ` WHERE P.PRM_PLANT_CODE = 'THA'`;
-      query += ` AND NVL(P.PRM_PRODUCT_STATUS,'ACTIVE') = 'ACTIVE'`;
-      query += ` AND NVL(P.PRM_CONN_ROLL_LEAF_FLG,'N') = 'Y'`;
-      query += ` ORDER BY P.PRM_PRODUCT_NAME ASC`;
-      console.log('query:', query);
-  
-      const result = await connect.execute(query);
-      DisconnectOracleDB(connect);
+      query += `SELECT "Traceability".trc_001_getproductrollleafdata()`;
+      const result = await client.query(query);
+      console.log(result)
+      await DisconnectPG_DB(client);
       res.json(result.rows);
     } catch (error) {
       console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
@@ -65,74 +59,6 @@ const {
     }
   };
 
-  // module.exports.GetSerialProductByProduct = async function (req, res) {
-  //   try {
-  //     console.log('เข้า2')
-  //     const { strPrdName } = req.body;
-  //     const connect = await ConnectOracleDB("SMT");
-  //     let query = `   
-  //     SELECT PRD.PRM_PRODUCT_NAME  AS SLM_PRD_NAME  
-  //     ,'' AS SLM_CUST_PART_NAME 
-  //     ,NVL(PRD.PRM_SERIAL_LENGTH ,0) AS SLM_SERIAL_LENGTH 
-  //     ,'Y' AS SLM_FIX_FLAG 
-  //     ,NVL(PRD.PRM_ENG_CODE ||PRM_REV ,' ') AS SLM_FIX_DIGIT 
-  //     ,NVL(PRD.PRM_START_DIGIT ,0) AS SLM_FIX_START_DIGIT  
-  //     ,NVL(PRD.PRM_END_DIGIT ,0) AS SLM_FIX_END_DIGIT 
-  //     ,'N' AS SLM_TRAY_FLAG 
-  //     ,0 AS SLM_TRAY_LENGTH 
-  //     ,'Y' AS SLM_TEST_RESULT_FLAG 
-  //     ,NVL(PRD.PRM_PCS_SCAN ,0) AS SLM_SERIAL_COUNT 
-  //     ,'Y' AS SLM_AUTO_SCAN 
-  //     ,PRD.PRM_LAMINATION_SIDE  AS SLM_BARCODE_SIDE 
-  //     ,NVL(PRD.PRM_PCS_SHT ,0) AS SLM_SERIAL_SHT 
-  //     ,NVL(PRD.PRM_SHEET_SCAN ,1) AS SLM_SHT_SCAN 
-  //     ,NVL(PRD.PRM_BARCODE_REQ_CONFIG ,'N') AS PRM_BARCODE_REQ_CONFIG 
-  //     ,NVL(PRD.PRM_CONFIG_CODE ,' ') AS PRM_CONFIG_CODE 
-  //     ,NVL(PRD.PRM_START_CONFIG ,0) AS PRM_START_CONFIG 
-  //     ,NVL(PRD.PRM_END_CONFIG ,0) AS PRM_END_CONFIG 
-  //     ,NVL(PRD.PRM_RUNNING_REQ_CONFIG ,'N') AS PRM_RUNNING_REQ_CONFIG 
-  //     ,NVL(PRD.PRM_DUPLICATE_START ,0) AS PRM_DUPLICATE_START 
-  //     ,NVL(PRD.PRM_DUPLICATE_END ,0) AS PRM_DUPLICATE_END 
-  //     ,NVL(PRD.PRM_REQ_CHECK_PRD_SHT ,'N') AS PRM_REQ_CHECK_PRD_SHT 
-  //     ,NVL(PRD.PRM_CHECK_PRD_SHT_START ,0) AS PRM_CHECK_PRD_SHT_START 
-  //     ,NVL(PRD.PRM_CHECK_PRD_SHT_END ,0) AS PRM_CHECK_PRD_SHT_END
-  //     ,NVL(PRD.PRM_ABBR ,' ') AS PRM_ABBR 
-  //     ,NVL(PRD.PRM_REQ_CHECK_LOT_SHT ,'N') AS PRM_REQ_CHECK_LOT_SHT 
-  //     ,NVL(PRD.PRM_CHECK_LOT_SHT_START ,0) AS PRM_CHECK_LOT_SHT_START 
-  //     ,NVL(PRD.PRM_CHECK_LOT_SHT_END ,0) AS PRM_CHECK_LOT_SHT_END
-  //     ,NVL(PRD.PRM_CHECK_CHIP_ID_FLG ,'N') AS PRM_CHECK_CHIP_ID_FLG
-  //     ,NVL(PRD.PRM_PLASMA_TIME_FLG ,'N') AS PRM_PLASMA_TIME_FLG
-  //     ,NVL(PRD.PRM_PLASMA_TIME ,0) AS PRM_PLASMA_TIME 
-  //     ,NVL(PRM_REQ_START_SEQ_FLG ,'N') AS PRM_REQ_START_SEQ_FLG 
-  //     ,NVL(PRM_START_SEQ_CODE ,' ') AS PRM_START_SEQ_CODE 
-  //     ,NVL(PRM_START_SEQ_START ,0) AS PRM_START_SEQ_START 
-  //     ,NVL(PRM_START_SEQ_END ,0) AS PRM_START_SEQ_END 
-  //     ,NVL(PRM_SHEET_ELT_FLG ,'N') AS PRM_SHEET_ELT_FLG 
-  //     ,NVL(PRM_FINAL_AOI_SPI_FLG ,'N') AS PRM_FINAL_AOI_SPI_FLG 
-  //     ,NVL(PRM_CONN_ROLL_SHT_FLG ,'N') AS PRM_CONN_ROLL_SHT_FLG 
-  //     ,NVL(PRM_CONN_ROLL_SHT_LENGTH ,0) AS PRM_CONN_ROLL_SHT_LENGTH 
-  //     ,NVL(PRM_CONN_ROLL_LEAF_FLG ,'N') AS PRM_CONN_ROLL_LEAF_FLG 
-  //     ,NVL(PRM_CONN_ROLL_LENGTH ,0) AS PRM_CONN_ROLL_LENGTH 
-  //     ,NVL(PRM_CONN_LEAF_LENGTH ,0) AS PRM_CONN_LEAF_LENGTH 
-  //     ,NVL(PRM_DATE_INPROC_FLG ,'N') AS PRM_DATE_INPROC_FLG 
-  //     ,NVL(PRM_DATE_INPROC ,' ') AS PRM_DATE_INPROC 
-  //     ,NVL(PRM_DATE_TYPE ,' ') AS PRM_DATE_TYPE 
-  //     ,NVL(PRM_SERIAL_START_CODE ,' ') AS PRM_SERIAL_START_CODE 
-  //     ,NVL(PRM_SHEET_TYPE,'D') AS PRM_SHEET_TYPE
-  //     ,NVL(PRM_PCS_TRAY,0) AS PRM_PCS_TRAY 
-  //     ,NVL(PRM_ADDITIONAL_INFO,' ') AS PRM_ADDITIONAL_INFO 
-  //     FROM SMT_PRODUCT_MST PRD 
-  //     WHERE PRD.PRM_PRODUCT_NAME = '${strPrdName}'
-  //         AND PRD.PRM_PLANT_CODE = 'THA'`;
-  //     // console.log('query:', query);
-  //     const result = await connect.execute(query);
-  //     DisconnectOracleDB(connect);
-  //     res.json(result.rows);
-  //   } catch (error) {
-  //     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
-  //     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
-  //   }
-  // };
 
 
   module.exports.GetSerialProductByProduct = async function (req, res) {
@@ -234,7 +160,7 @@ const {
       ,NVL(PRM_SHT_XRAY_1_TIME_FLG ,'N') AS PRM_SHT_XRAY_1_TIME_FLG 
       ,NVL(PRM_FIN_GATE_INSPECT_FLG ,'N') AS PRM_FIN_GATE_INSPECT_FLG 
       ,NVL(PRM_FIN_GATE_INSPECT_PROC ,' ') AS PRM_FIN_GATE_INSPECT_PROC 
-FROM SMT_PRODUCT_MST PRD 
+      FROM SMT_PRODUCT_MST PRD 
       WHERE PRD.PRM_PRODUCT_NAME = '${strPrdName}'
           AND PRD.PRM_PLANT_CODE = 'THA'`;
       console.log('query3:', query);

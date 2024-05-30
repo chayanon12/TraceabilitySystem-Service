@@ -102,3 +102,21 @@ module.exports.Menuname = async function (req, res) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
   }
 };
+
+
+module.exports.MenuHome = async function (req, res) {
+  try {
+    const { login_id } = req.body;
+    const connect = await ConnectOracleDB("FPC");
+    const query = `
+    SELECT  PARENT_ID , MENU_NAME  
+    FROM NAP_MENU 
+    WHERE APP_ID = '16' 
+    AND PARENT_ID IS NOT null`;
+    const result = await connect.execute(query);
+    DisconnectOracleDB(connect);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+  }
+};
