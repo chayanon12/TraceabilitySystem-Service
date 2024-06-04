@@ -177,24 +177,24 @@ module.exports.insertProduct_Master = async function (req, res) {
       p_tpm_update_by,
       p_tpm_update_program,
     } = req.body;
-    console.log("มาา", p_tpm_factory)
+    // console.log("มาา", p_tpm_factory)
     query = ` CALL "Traceability".trc_002_product_master_insert(
     '${p_tpm_factory}', -- character varying
     '${p_tpm_product_name}', -- character varying
     ${p_tpm_update_count}, -- integer
     '${p_tpm_config_code}', -- character varying
     ${p_tpm_start_seq_serial}, -- integer
-    ${p_tpm_start_seq_code}, -- integer
+    '${p_tpm_start_seq_code}', -- character varying
     '${p_tpm_product_status}', -- character varying
     '${p_tpm_date_inproc_flg}', -- character varying
-    ${p_tpm_date_inproc}, -- character varying
+    ${p_tpm_date_inproc ? `'${p_tpm_date_inproc}'` : null},
     ${p_tpm_pcs_per_sht_efpc}, -- integer
     ${p_tpm_pcs_per_sht_smt}, -- integer
     '${p_tpm_serial_file_format}', -- character varying
     '${p_tpm_serial_side}', -- character varying
     '${p_tpm_serial_structure}', -- character varying
     '${p_tpm_barcode_req_lot}', -- character varying
-    ${p_tpm_barcode_grade}, -- character varying
+    ${p_tpm_barcode_grade ? `'${p_tpm_barcode_grade}'` : null},
     '${p_tpm_sht_file_format}', -- character varying
     '${p_tpm_sht__structure}', -- character varying
     '${p_tpm_sht_type}', -- character varyingFF
@@ -356,17 +356,17 @@ module.exports.updateProduct_Master = async function (req, res) {
     ${p_tpm_update_count}, 
     '${p_tpm_config_code}', 
     ${p_tpm_start_seq_serial}, 
-    ${p_tpm_start_seq_code}, 
+    '${p_tpm_start_seq_code}', 
     '${p_tpm_product_status}', 
     '${p_tpm_date_inproc_flg}', 
-    '${p_tpm_date_inproc}', 
+    ${p_tpm_date_inproc ? `'${p_tpm_date_inproc}'` : null},
     ${p_tpm_pcs_per_sht_efpc}, 
     ${p_tpm_pcs_per_sht_smt}, 
     '${p_tpm_serial_file_format}', 
     '${p_tpm_serial_side}', 
     '${p_tpm_serial_structure}', 
     '${p_tpm_barcode_req_lot}', 
-    '${p_tpm_barcode_grade}', 
+    ${p_tpm_barcode_grade ? `'${p_tpm_barcode_grade}'` : null},
     '${p_tpm_sht_file_format}', 
     '${p_tpm_sht__structure}', 
     '${p_tpm_sht_type}',
