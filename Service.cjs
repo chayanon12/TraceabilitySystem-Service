@@ -9,6 +9,7 @@ const serialmaster = require("./WorkService/serialMaster.cjs");
 const productmaster = require("./WorkService/productmaster.cjs");
 const ScanSMTRollSht = require("./WorkService/Model_ScanSMTRoollSht.cjs");
 const ScanSMTFIN = require("./WorkService/Model_ScanSMTSerialShtFINManySht.cjs");
+const ScanSheetMOTTime = require("./WorkService/Model_ScanSheetMOTTime.cjs");
 
 
 app.use(express.json());
@@ -61,6 +62,10 @@ app.post("/api/insProduct_Master", productmaster.insertProduct_Master);
 app.post("/api/updateProduct_Master", productmaster.updateProduct_Master);
 app.post("/api/delProduct_Master", productmaster.deleteProduct_Master);
 
+//ScanSheetMOTTime
+app.post("/api/GetProductNameByLot", ScanSheetMOTTime.GetProductNameByLot);
+app.post("/api/GetMOTRecordTimeData", ScanSheetMOTTime.GetMOTRecordTimeData);
+app.post("/api/CallFPCSheetLeadTimeResult", ScanSheetMOTTime.CallFPCSheetLeadTimeResult);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

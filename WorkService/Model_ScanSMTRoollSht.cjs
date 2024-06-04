@@ -65,13 +65,13 @@ const {
     try {
       console.log('เข้า2')
       const { strPrdName } = req.body;
-      const connect = await ConnectOracleDB("SMT");
+      const connect = await ConnectOracleDB("SMT"); //sn_length serial  //shm_end_code trc_cheet_eng_mst
       let query = `   
       SELECT PRD.PRM_PRODUCT_NAME  AS SLM_PRD_NAME 
       ,'' AS SLM_CUST_PART_NAME 
       ,NVL(PRD.PRM_SERIAL_LENGTH ,0) AS SLM_SERIAL_LENGTH 
       ,'Y' AS SLM_FIX_FLAG 
-      ,NVL(PRD.PRM_ENG_CODE ||PRM_REV,' ') AS SLM_FIX_DIGIT 
+      ,NVL(PRD.PRM_ENG_CODE ||PRM_REV,' ') AS SLM_FIX_DIGIT  
       ,NVL(PRD.PRM_START_DIGIT ,0) AS SLM_FIX_START_DIGIT  
       ,NVL(PRD.PRM_END_DIGIT  ,0) AS SLM_FIX_END_DIGIT 
       ,'N' AS SLM_TRAY_FLAG 
@@ -153,7 +153,7 @@ const {
       ,NVL(PRM_CHECK_EFPC_AOI_FLG ,'N') AS PRM_CHECK_EFPC_AOI_FLG 
       ,NVL(PRM_CHECK_EFPC_OST_FLG ,'N') AS PRM_CHECK_EFPC_OST_FLG 
       ,NVL(PRM_CHECK_EFPC_AVI_FLG ,'N') AS PRM_CHECK_EFPC_AVI_FLG 
-      ,NVL(PRM_CHECK_EFPC_AVI_FLG  ,'N') AS PRM_CHECK_EFPC_AVI_FLG 
+      ,NVL(PRM_CHECK_EFPC_AVI_FLG ,'N') AS PRM_CHECK_EFPC_AVI_FLG 
       ,NVL(PRM_ADDITIONAL_INFO ,' ') AS PRM_ADDITIONAL_INFO 
       ,NVL(PRM_SHT_XRAY_F ,'N') AS PRM_SHT_XRAY_F 
       ,NVL(PRM_SHT_XRAY_B ,'N') AS PRM_SHT_XRAY_B 
