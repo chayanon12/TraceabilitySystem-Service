@@ -7,6 +7,7 @@ const {
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
 module.exports.searchFactory = async function (req, res) {
+  
   try {
     const p_datasearch = JSON.stringify(req.body);
     let query = "";
@@ -277,9 +278,9 @@ module.exports.getProceesControl = async function (req, res) {
 
 module.exports.insertProduct_Master = async function (req, res) {
   try {
-
-    const p_data = JSON.stringify(req.body);
+    
     let query = "";
+    const p_data = JSON.stringify(req.body);
     query = `CALL "Traceability".trc_002_product_master_insert('${p_data}');`;
 
     const client = await ConnectPG_DB();
@@ -466,11 +467,10 @@ module.exports.insertProduct_Master = async function (req, res) {
 
 module.exports.updateProduct_Master = async function (req, res) {
   try {
-
-    const p_data = JSON.stringify(req.body);
     let query = "";
+    const p_data = JSON.stringify(req.body);
     query = `CALL "Traceability".trc_002_product_master_update('${p_data}');`;
-
+    
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
@@ -483,8 +483,8 @@ module.exports.updateProduct_Master = async function (req, res) {
 
 module.exports.deleteProduct_Master = async function (req, res) {
   try {
-    const p_datadel = JSON.stringify(req.body);
     let query = "";
+    const p_datadel = JSON.stringify(req.body);
     query = `
        CALL "Traceability".trc_002_product_master_delete('${p_datadel}')
     `;
