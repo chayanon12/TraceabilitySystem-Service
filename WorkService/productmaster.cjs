@@ -7,9 +7,9 @@ const {
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
 module.exports.searchFactory = async function (req, res) {
+  let query = "";
   try {
     const p_datasearch = JSON.stringify(req.body);
-    let query = "";
     query = ` SELECT * FROM "Traceability".trc_002_product_master_search('${p_datasearch}'); `;
     const client = await ConnectPG_DB();
     const result = await client.query(query);
@@ -22,10 +22,10 @@ module.exports.searchFactory = async function (req, res) {
 };
 
 module.exports.getFactory = async function (req, res) {
+  let query = "";
   try {
     
     const p_factory = JSON.stringify(req.body);
-    let query = "";
     query = ` SELECT * FROM "Traceability".trc_000_common_getfactory('${p_factory}'); `;
 
     const client = await ConnectPG_DB();
@@ -40,9 +40,9 @@ module.exports.getFactory = async function (req, res) {
 
 
 module.exports.getSerialStructure = async function (req, res) {
+  let query = "";
   try {
     const p_serial = JSON.stringify(req.body);
-    let query = "";
     query = ` SELECT * FROM "Traceability".trc_002_product_master_getserialstructure('${p_serial}'); `;
 
     const client = await ConnectPG_DB();
@@ -57,9 +57,9 @@ module.exports.getSerialStructure = async function (req, res) {
 
 
 module.exports.getSheetStructure = async function (req, res) {
+  let query = "";
   try {
     const p_sheetstruc = JSON.stringify(req.body);
-    let query = "";
     query = ` SELECT * FROM "Traceability".trc_002_product_master_getsheetstructure('${p_sheetstruc}'); `;
 
     const client = await ConnectPG_DB();
@@ -73,9 +73,9 @@ module.exports.getSheetStructure = async function (req, res) {
 };
 
 module.exports.getSheetType = async function (req, res) {
+  let query = "";
   try {
     const p_sheettype = JSON.stringify(req.body);
-    let query = "";
     query = ` SELECT * FROM "Traceability".trc_002_product_master_getsheettype('${p_sheettype}'); `;
 
     const client = await ConnectPG_DB();
@@ -89,9 +89,9 @@ module.exports.getSheetType = async function (req, res) {
 };
 
 module.exports.getProceesControl = async function (req, res) {
+  let query = "";
   try {
     const p_process = JSON.stringify(req.body);
-    let query = "";
     query = ` SELECT * FROM "Traceability".trc_002_product_master_getprocesscontroltime('${p_process}'); `;
 
     const client = await ConnectPG_DB();
@@ -276,6 +276,7 @@ module.exports.getProceesControl = async function (req, res) {
 // };
 
 module.exports.insertProduct_Master = async function (req, res) {
+  let query = "";
   try {
 
     const p_data = JSON.stringify(req.body);
@@ -465,6 +466,7 @@ module.exports.insertProduct_Master = async function (req, res) {
 // };
 
 module.exports.updateProduct_Master = async function (req, res) {
+  let query = "";
   try {
 
     const p_data = JSON.stringify(req.body);
@@ -482,6 +484,7 @@ module.exports.updateProduct_Master = async function (req, res) {
 };
 
 module.exports.deleteProduct_Master = async function (req, res) {
+  let query = "";
   try {
     const p_datadel = JSON.stringify(req.body);
     query = `
