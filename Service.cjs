@@ -10,7 +10,7 @@ const productmaster = require("./WorkService/productmaster.cjs");
 const ScanSMTRollSht = require("./WorkService/Model_ScanSMTRoollSht.cjs");
 const ScanSMTFIN = require("./WorkService/Model_ScanSMTSerialShtFINManySht.cjs");
 const ScanSheetMOTTime = require("./WorkService/Model_ScanSheetMOTTime.cjs");
-
+const Common = require("./WorkService/Model_Common.cjs");
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -19,6 +19,10 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+
+//Common
+app.get("/api/Common/GetProductData",Common.GetProductData);
+app.get("/api/Common/getconnectshtmastercheckresult",Common.getconnectshtmastercheckresult);
 
 app.get("/api/current-date", MenuService.getCurrentDate);
 app.get("/api/getIPaddress", LoginService.getIPaddress);
