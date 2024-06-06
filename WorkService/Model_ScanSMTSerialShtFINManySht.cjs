@@ -73,16 +73,25 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
     var SHT_PCS_MASTER_TIME = process.env.SHT_PCS_MASTER_TIME;
 
     const client = await ConnectPG_DB();
-    query += `SELECT * from "Traceability".trc_000_common_getconnectshtmastercheckresult('${strPrdname}','${SHT_PCS_MASTER_CODE}','${WORKING_START_TIME}','${SHT_PCS_MASTER_TIME}')`;
+    const jsondata = {
+      strProduct: strPrdname,
+      strPcsmasterCode: SHT_PCS_MASTER_CODE,
+      strWorkstartime: WORKING_START_TIME,
+      strShtPcsmastertime: SHT_PCS_MASTER_TIME,
+    };
+    const json_convertdata = JSON.stringify(jsondata);    
+    console.log(json_convertdata);
+    query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtmastercheckresult('[${json_convertdata}]');`;
+    console.log(query);
     const result = await client.query(query);
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
+    console.log(error)
     res.status(500).json({ message: error.message });
   }
 };
-
 
 module.exports.GetWeekCodebyLot = async function (req, res) {
   var query = "";
@@ -90,14 +99,14 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
     const Conn = await ConnectOracleDB("FPC");
     const { strLot, strProc } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetWeekCodebyLot('${strLot}','${strProc}') FROM DUAL`;
-    const result = await Conn.execute(query); 
-    
+    const result = await Conn.execute(query);
+
     DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 module.exports.GetSerialProductByProduct = async function (req, res) {
   try {
