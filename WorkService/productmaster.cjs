@@ -273,11 +273,8 @@ module.exports.getProceesControl = async function (req, res) {
 
 module.exports.insertProduct_Master = async function (req, res) {
   try {
-
     const p_data = JSON.stringify(req.body);
-
     query = `CALL "Traceability".trc_002_product_master_insert('${p_data}');`;
-
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);

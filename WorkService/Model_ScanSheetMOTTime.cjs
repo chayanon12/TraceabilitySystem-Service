@@ -5,7 +5,9 @@ const {
     DisconnectOracleDB,
   } = require("../Conncetion/DBConn.cjs");
   const oracledb = require('oracledb');
+  
   module.exports.GetProductNameByLot = async function (req, res) {
+    console.log('g-hkkkk')
     try {
       const { LotNo } = req.body;
       const connect = await ConnectOracleDB("FPC");

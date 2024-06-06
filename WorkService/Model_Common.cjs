@@ -23,10 +23,11 @@ module.exports.xxxxxx = async function (req, res) {
 ///------Example
 
 module.exports.GetProductData = async function (req, res) {
+    console.log('เข้า')
   try {
     var query = "";
     const client = await ConnectPG_DB();
-    query = ``;
+    query = `SELECT "Traceability".trc_001_getproductrollleafdata()`;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     res.status(200).json({ Result: result });
