@@ -23,7 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 
-//Common
+
 app.use("/api/Common", commonRoutes);
 app.use("/api", LoginService);
 app.use("/api", MenuService);
@@ -34,7 +34,7 @@ app.use("/api", sheetmaster);
 app.use("/api", productmaster);
 app.use("/api", serialmaster);
 
-// app.get("/api/test", ScanSMTFIN.test);
+
 
 
 app.listen(port, () => {
