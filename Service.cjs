@@ -30,12 +30,14 @@ app.post("/api/getProduct", ScanSMTRollSht.getProduct);
 app.post("/api/GetSerialProductByProduct", ScanSMTRollSht.GetSerialProductByProduct);
 app.post("/api/GetRollLeafTotalByLot", ScanSMTRollSht.GetRollLeafTotalByLot);
 
+// app.get("/api/test", ScanSMTFIN.test);
 
-app.get("/api/GetProductData", ScanSMTFIN.GetProductData);
+app.post("/api/GetProductData", ScanSMTFIN.GetProductData);
 app.post("/api/GetProductDataByLot", ScanSMTFIN.GetProductDataByLot);
 app.post("/api/GetLotSerialCountData", ScanSMTFIN.GetLotSerialCountData);
 app.post("/api/GetSerialProductByProduct", ScanSMTFIN.GetSerialProductByProduct);
-app.get("/api/GetConnectShtMasterCheckResult", ScanSMTFIN.GetConnectShtMasterCheckResult);
+app.post("/api/GetConnectShtMasterCheckResult", ScanSMTFIN.GetConnectShtMasterCheckResult); 
+app.post("/api/GetWeekCodebyLot", ScanSMTFIN.GetWeekCodebyLot);
 
 //Sheet Structure Master
 app.post("/api/searchCodeName", sheetmaster.postCodeName);

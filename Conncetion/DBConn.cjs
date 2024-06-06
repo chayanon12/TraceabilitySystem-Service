@@ -48,7 +48,7 @@ const ConnectOracleDB = async (ConnType) => {
 
 const DisconnectOracleDB = async (connection) => {
     await connection.close();
-    console.log("Disconnected from Oracle");
+    // console.log("Disconnected from Oracle");
 }
 
 

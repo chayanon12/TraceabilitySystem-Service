@@ -6,119 +6,99 @@ const {
   DisconnectOracleDB,
 } = require("../Conncetion/DBConn.cjs");
 const { queueRequests } = require("oracledb");
+const { writeLogError } = require("../Common/LogFuction.cjs");
 
 module.exports.GetProductData = async function (req, res) {
+  var query = "";
+  var Fac = process.env.FacA1;
   try {
-    let query = "";
-    const Conn = await ConnectOracleDB("SMT");
-    query += `SELECT P.PRM_PRODUCT_NAME AS PRD_NAME `;
-    query += `FROM SMT_PRODUCT_MST P `;
-    query += `WHERE P.PRM_PLANT_CODE = 'THA' `;
-    query += `AND NVL(P.PRM_PRODUCT_STATUS,'ACTIVE') = 'ACTIVE' `;
-    query += `ORDER BY P.PRM_PRODUCT_NAME ASC `;
-    const result = await Conn.execute(query);
+    const client = await ConnectPG_DB();
+    query += `SELECT * from "Traceability".trc_000_common_getproductdata('${Fac}')`;
+    const result = await client.query(query);
+
     if (result.rows.length > 0) {
-      res.status(200).json({ Product: result.rows });
-      DisconnectOracleDB(Conn);
-    } else {
-      res.status(401).json({ message: "Not Found Data" });
-      DisconnectOracleDB(Conn);
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
     }
   } catch (error) {
+    writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
 
 module.exports.GetProductDataByLot = async function (req, res) {
+  let query = "";
   try {
-    let query = "";
     const Conn = await ConnectOracleDB("FPC");
     const { strLot } = req.body;
-    query += `SELECT NVL(L.LOT_PRD_NAME,' ') AS PRD_NAME`;
-    query += `, NVL(L.LOT_ROLL_NO,' ') AS ROLL_NO `;
-    query += `, DECODE(L.LOT_PRIORITY,'14','Y','N') AS LOT_EN `;
-    query += `, TO_CHAR(LISTAGG(L.LOT||DECODE(T1.LTR_FROM_LOT,NULL,'',','||T1.LTR_FROM_LOT)||DECODE(T2.LTR_FROM_LOT,NULL,'',','||T2.LTR_FROM_LOT)||DECODE(T3.LTR_FROM_LOT,NULL,'',','||T3.LTR_FROM_LOT)||DECODE(T4.LTR_FROM_LOT,NULL,'',','||T4.LTR_FROM_LOT)||DECODE(T5.LTR_FROM_LOT,NULL,'',','||T5.LTR_FROM_LOT),',') WITHIN GROUP (ORDER BY L.LOT ASC )) AS LOT_ALL `;
-    query += `FROM  FPC.FPC_LOT L `;
-    query += `, FPC_LOT_TRANSFER T1 `;
-    query += `, FPC_LOT_TRANSFER T2 `;
-    query += `, FPC_LOT_TRANSFER T3 `;
-    query += `, FPC_LOT_TRANSFER T4 `;
-    query += `, FPC_LOT_TRANSFER T5 `;
-    query += `WHERE L.LOT =  '${strLot}' `;
-    query += `AND L.LOT = T1.LTR_LOT(+) `;
-    query += `AND T1.LTR_FROM_LOT = T2.LTR_LOT(+) `;
-    query += `AND T2.LTR_FROM_LOT = T3.LTR_LOT(+) `;
-    query += `AND T3.LTR_FROM_LOT = T4.LTR_LOT(+) `;
-    query += `AND T4.LTR_FROM_LOT = T5.LTR_LOT(+) `;
-    query += `GROUP BY NVL(L.LOT_PRD_NAME,' ') `;
-    query += `, NVL(L.LOT_ROLL_NO,' ') `;
-    query += `, DECODE(L.LOT_PRIORITY,'14','Y','N')`;
+    var FINAL_GATE_LOT_PRIORITY_SKIP = process.env.FINAL_GATE_LOT_PRIORITY_SKIP;
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductDataByLot('${strLot}','${FINAL_GATE_LOT_PRIORITY_SKIP}') AS x FROM dual`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-      res.status(200).json({
-        PRD_NAME: result.rows[0][0],
-        ROLL_NO: result.rows[0][1],
-        LOT_EN: result.rows[0][2],
-        LOT_ALL: result.rows[0][3],
-      });
+      var resultx = result.rows[0][0][0];
+      var products = {
+        PRD_NAME: resultx[0],
+        ROLL_NO: resultx[1],
+        LOT_EN: resultx[2],
+        LOT_ALL: resultx[3],
+      };
+      res.status(200).json(products);
       DisconnectOracleDB(Conn);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 module.exports.GetLotSerialCountData = async function (req, res) {
   let query = "";
   try {
-    const Conn = await ConnectOracleDB("SMT");
     const { strLot } = req.body;
-    query += `SELECT NVL((SELECT COUNT(*) `;
-    query += `FROM ( `;
-    query += `     SELECT DISTINCT S.LSS_FRONT_SHEET_NO, S.LSS_BACK_SHEET_NO `;
-    query += `     FROM SMT_LOT_SHT_SERIAL S `;
-    query += `     WHERE S.LSS_PLANT_CODE = 'THA' `;
-    query += `           AND S.LSS_LOT_NO = '${strLot}' `;
-    query += `     ) S `;
-    query += `), 0) AS COUNT_SHT `;
-    query += `, NVL(( `;
-    query += `    SELECT COUNT(*) `;
-    query += `    FROM SMT_LOT_SHT_SERIAL S `;
-    query += `    WHERE S.LSS_PLANT_CODE = 'THA' `;
-    query += `          AND S.LSS_LOT_NO = '${strLot}' `;
-    query += `), 0) COUNT_PCS `;
-    query += `FROM DUAL`;
+    const client = await ConnectPG_DB();
+    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('${strLot}')`;
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
 
-    const result = await Conn.execute(query);
-    if (result.rows.length > 0) {
-      res
-        .status(200)
-        .json({ COUNT_SHT: result.rows[0][0], COUNT_PCS: result.rows[0][1] });
-      DisconnectOracleDB(Conn);
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
+  let query = "";
   try {
-    var query = "";
-    var strResult = "NG";
-    var FINAL_GATE_MASTER_FLG = "0";
-    if (FINAL_GATE_MASTER_FLG == "1") {
-      query += "";
-      const client = await ConnectPG_DB();
-      const { rows } = await client.query(query);
-      res.json(rows);
-      await DisconnectPG_DB(client);
-    } else {
-      strResult = "OK";
-    }
-    res.status(200).json({ Result: strResult });
+    const { strPrdname } = req.body;
+    var SHT_PCS_MASTER_CODE = process.env.SHT_PCS_MASTER_CODE;
+    var WORKING_START_TIME = process.env.WORKING_START_TIME;
+    var SHT_PCS_MASTER_TIME = process.env.SHT_PCS_MASTER_TIME;
+
+    const client = await ConnectPG_DB();
+    query += `SELECT * from "Traceability".trc_000_common_getconnectshtmastercheckresult('${strPrdname}','${SHT_PCS_MASTER_CODE}','${WORKING_START_TIME}','${SHT_PCS_MASTER_TIME}')`;
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
   } catch (error) {
+    writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
+
+
+module.exports.GetWeekCodebyLot = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("FPC");
+    const { strLot, strProc } = req.body;
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetWeekCodebyLot('${strLot}','${strProc}') FROM DUAL`;
+    const result = await Conn.execute(query); 
+    
+    DisconnectOracleDB(Conn);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports.GetSerialProductByProduct = async function (req, res) {
   try {
     let query = "";
