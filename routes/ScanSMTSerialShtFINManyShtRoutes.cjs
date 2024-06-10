@@ -7,5 +7,11 @@ router.post("/GetProductDataByLot", ScanSMTFIN.GetProductDataByLot);
 router.post("/GetLotSerialCountData", ScanSMTFIN.GetLotSerialCountData);
 router.post("/GetSerialProductByProduct", ScanSMTFIN.GetSerialProductByProduct);
 router.post("/GetConnectShtMasterCheckResult", ScanSMTFIN.GetConnectShtMasterCheckResult);
+router.post("/GetRollLeafDuplicate", ScanSMTFIN.GetRollLeafDuplicate);
+router.post("/GetConnectShtPlasmaTime", ScanSMTFIN.GetConnectShtPlasmaTime);
+router.post("/GetSheetDuplicateConnectShtType", ScanSMTFIN.GetSheetDuplicateConnectShtType);
+router.post("/GetRollLeafScrapRBMP", ScanSMTFIN.GetRollLeafScrapRBMP);
+
+
 
 module.exports = router;
