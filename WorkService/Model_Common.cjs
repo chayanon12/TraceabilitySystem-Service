@@ -20,17 +20,38 @@ module.exports.xxxxxx = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
 ///------Example
+ 
+module.exports.GetProductNameByLot = async function (req, res) {
+  console.log('g-hkkkk')
+  try {
+    const { Lotno } = req.body;
+    const priority ='14'
+    const connect = await ConnectOracleDB("FPC");
+    let query = "";
+    query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETPRODUCTDATABYLOT('${Lotno}', '${priority}') AS data1 FROM dual`;
+    const result = await connect.execute(query);
+    console.log(query)
+    await DisconnectOracleDB(connect);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
+  }
+};
+
 
 module.exports.GetProductData = async function (req, res) {
-    console.log('เข้า')
   try {
+    var strplantcode ='G'
     var query = "";
     const client = await ConnectPG_DB();
-    query = `SELECT "Traceability".trc_001_getproductrollleafdata()`;
+    query = `SELECT * from "Traceability".trc_000_common_getproductdata('${strplantcode}')`;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
+    res.status(200).json( result.rows );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
