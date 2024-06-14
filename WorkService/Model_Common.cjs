@@ -342,10 +342,12 @@ module.exports.getworkingdate = async function (req, res) {
   try {
     var query = "";
     const client = await ConnectPG_DB();
-    query = ``;
+    query = ` SELECT * FROM "Traceability".trc_000_common_getworkingdate(); `;
     const result = await client.query(query);
+
+    console.log(result.rows);
     await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
+    res.status(200).json({ Result: result});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
