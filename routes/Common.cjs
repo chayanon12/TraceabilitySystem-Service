@@ -5,5 +5,7 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.get("/GetProductData", Common.GetProductData);
  router.post("/getProductDataByLot", Common.GetProductNameByLot);
  router.post("/getlotserialcountdata", Common.getlotserialcountdata);
+ router.post("/getWeekCodebyLot", Common.getWeekCodebyLot);
+ router.post("/getserialduplicateconnectsht", Common.getserialduplicateconnectsht);
  
 module.exports = router;
