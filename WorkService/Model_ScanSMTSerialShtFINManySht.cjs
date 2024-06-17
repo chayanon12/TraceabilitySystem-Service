@@ -5,7 +5,6 @@ const {
   ConnectOracleDB,
   DisconnectOracleDB,
 } = require("../Conncetion/DBConn.cjs");
-const { queueRequests } = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
 //Function
@@ -280,7 +279,7 @@ module.exports.GetProductData = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     query += `SELECT * from "Traceability".trc_000_common_getproductdata('${Fac}')`;
-    
+
     const result = await client.query(query);
 
     if (result.rows.length > 0) {
@@ -494,22 +493,22 @@ module.exports.GetSerialDuplicateConnectSht = async function (req, res) {
 
 module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   let query = "";
-  let json_convertdata = '';
+  let json_convertdata = "";
   try {
     const dataList = req.body;
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query = `CALL "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'')`;
-    console.log(json_convertdata, "json_convertdata")
-    console.log(dataList.length, "json_convertdata")
-    const result = await client.query(query, [json_convertdata]);    
+    const result = await client.query(query, [json_convertdata]);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
-      return;   
-    }    
-    await DisconnectPG_DB(client);
+      await DisconnectPG_DB(client);
+      return;
+    } else {
+      await DisconnectPG_DB(client);
+    }
   } catch (error) {
-    query += `${json_convertdata}`
+    query += `${json_convertdata}`;
     writeLogError(error.message, query);
     console.log(error, "error");
     res.status(500).json({ message: error.message });
@@ -518,20 +517,20 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
 
 module.exports.SetSerialLotShtTable = async function (req, res) {
   let query = "";
-  let json_convertdata = '';
+  let json_convertdata = "";
   try {
     const dataList = req.body;
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query = `CALL "Traceability".trc_000_common_SetSerialLotShtTable($1::jsonb,'')`;
-    const result = await client.query(query, [json_convertdata]);    
+    const result = await client.query(query, [json_convertdata]);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
-      return;   
-    }    
+      return;
+    }
     await DisconnectPG_DB(client);
   } catch (error) {
-    query += `${json_convertdata}`
+    query += `${json_convertdata}`;
     writeLogError(error.message, query);
     console.log(error, "error");
     res.status(500).json({ message: error.message });

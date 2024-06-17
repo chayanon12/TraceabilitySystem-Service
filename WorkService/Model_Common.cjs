@@ -23,18 +23,17 @@ module.exports.xxxxxx = async function (req, res) {
   }
 };
 
-
 ///------Example
 
 module.exports.GetProductData = async function (req, res) {
   try {
-    var strplantcode ='G'
+    var strplantcode = "G";
     var query = "";
     const client = await ConnectPG_DB();
     query = `SELECT * from "Traceability".trc_000_common_getproductdata('${strplantcode}')`;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json( result.rows );
+    res.status(200).json(result.rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -79,7 +78,6 @@ module.exports.getfactory = async function (req, res) {
   }
 };
 
-
 module.exports.getlotserialcountdata = async function (req, res) {
   var query = "";
   try {
@@ -99,11 +97,11 @@ module.exports.getlotserialcountdata = async function (req, res) {
 };
 
 module.exports.getWeekCodebyLot = async function (req, res) {
-  console.log('เข้า')
+  console.log("เข้า");
   var query = "";
   try {
     const connect = await ConnectOracleDB("FPC");
-    const { STRLOT,STRPROC } = req.body;
+    const { STRLOT, STRPROC } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${STRLOT}', '${STRPROC}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -336,8 +334,71 @@ module.exports.getworkingdate = async function (req, res) {
 
     console.log(result.rows);
     await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result});
+    res.status(200).json({ Result: result });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetReflowRecordTimeData = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { strSheetNo } = req.body;
+    query = `select * from "Traceability".trc_000_common_GetReflowRecordTimeData('${strSheetNo}');`;
+    const result = await client.query(query);
+    if (result.rows !== "") {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.CallSMTReflowRecordTimeResult = async function (req, res) {
+  var query = "";
+  var json_convertdata = "";
+  try {
+    const client = await ConnectPG_DB();
+    const {dataList} = req.body;
+    json_convertdata = JSON.stringify(dataList);
+    query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult($1::jsonb,'');`;
+    const result = await client.query(query, [json_convertdata]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+      return;
+    } else {
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    query += `${json_convertdata}`;
+    writeLogError(error.message, query);
+    console.log(error, "error");
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.DeleteReflowRecordTimeData = async function (req, res) {
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    const {strSheetNo} = req.body;
+    query = `call "Traceability".trc_000_common_DeleteReflowRecordTimeData('${strSheetNo}','');`;
+    const result = await client.query(query);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+      return;
+    } else {
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    console.log(error, "error");
     res.status(500).json({ message: error.message });
   }
 };
