@@ -109,3 +109,19 @@ module.exports.SetLotSheetIns = async function (req, res) {
         res.status(500).json({ message: err.message });
     }
 };
+
+module.exports.getProductShtInspectByLot = async function (req, res) {
+    let query = "";
+    try {
+        const data = JSON.stringify(req.body);
+        query = ` SELECT * FROM "Traceability".trc_003_scansheetinspect_getproductshtinspectbylot('${data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
