@@ -80,8 +80,25 @@ module.exports.getProductShtInspect = async function (req, res) {
     let query = "";
     try {
         const p_data = JSON.stringify(req.body);
-        console.log('ProductShtIn:', p_data);
+        // console.log('ProductShtIn:', p_data);
         query = ` SELECT * FROM "Traceability".trc_003_scansheetinspect_getproductshtinspect('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.SetLotSheetIns = async function (req, res) {
+    let query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        // console.log('SetLotSheetIns:', p_data);
+        query = ` CALL "Traceability".trc_003_scansheetinspect_setlotsheetins('${p_data}'); `;
 
         const client = await ConnectPG_DB();
         const result = await client.query(query);

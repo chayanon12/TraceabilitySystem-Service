@@ -6,5 +6,6 @@ router.post("/getLotNo", ScanShtInspect.getLotNo);
 router.post("/getProductShtGroup", ScanShtInspect.getProductShtGroup);
 router.post("/getProductShtInspect", ScanShtInspect.getProductShtInspect);
 router.post("/getProductShtBIN", ScanShtInspect.getProductShtBIN);
+router.post("/SetLotSheetIns", ScanShtInspect.SetLotSheetIns);
 
 module.exports = router;

@@ -186,7 +186,8 @@ module.exports.getproductshtinspectdup = async function (req, res) {
   try {
     var query = "";
     const client = await ConnectPG_DB();
-    query = ``;
+    const json_data = JSON.stringify(req.body);
+    query = `SELECT * FROM "Traceability".trc_000_common_getproductshtinspectdup('${json_data}');`;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     res.status(200).json({ Result: result });
