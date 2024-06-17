@@ -241,9 +241,12 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("FPC");
     const { strLot, strProc } = req.body;
-    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetWeekCodebyLot('${strLot}','${strProc}') FROM DUAL`;
+    console.log(strLot, strProc);
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetWeekCodebyLot('${strLot}','${strProc}') as PRN_DATE  FROM DUAL`;
     const result = await Conn.execute(query);
-
+    if (result.rows.length > 0) {
+      res.status(200).json({ WEEK_CODE: result.rows[0][0] });
+    }
     DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -277,6 +280,7 @@ module.exports.GetProductData = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     query += `SELECT * from "Traceability".trc_000_common_getproductdata('${Fac}')`;
+    
     const result = await client.query(query);
 
     if (result.rows.length > 0) {
@@ -296,38 +300,88 @@ module.exports.GetLotSerialCountData = async function (req, res) {
     const client = await ConnectPG_DB();
     query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('${strLot}')`;
     const result = await client.query(query);
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
-
-module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
-  let query = "";
+module.exports.SetRollLeafTrayTable = async function (req, res) {
+  var query = "";
   try {
-    const { strPrdname } = req.body;
-    var SHT_PCS_MASTER_CODE = process.env.SHT_PCS_MASTER_CODE;
-    var WORKING_START_TIME = process.env.WORKING_START_TIME;
-    var SHT_PCS_MASTER_TIME = process.env.SHT_PCS_MASTER_TIME;
-
     const client = await ConnectPG_DB();
+    const {
+      strOperator,
+      strRowUpdate,
+      strUpdateFlg,
+      strRollNo,
+      strLotNo,
+      strRollLeaf,
+      strSheetNo,
+      strShtSeq,
+      strIntRow,
+      strProduct,
+      strMachine,
+      strUserID,
+    } = req.body;
     const jsondata = {
-      strProduct: strPrdname,
-      strPcsmasterCode: SHT_PCS_MASTER_CODE,
-      strWorkstartime: WORKING_START_TIME,
-      strShtPcsmastertime: SHT_PCS_MASTER_TIME,
+      strRowUpdate: strRowUpdate,
+      strUpdateFlg: strUpdateFlg,
+      strRollNo: strRollNo,
+      strLotNo: strLotNo,
+      strRollLeaf: strRollLeaf,
+      strSheetNo: strSheetNo,
+      strShtSeq: strShtSeq,
+      strIntRow: strIntRow,
+      strProduct: strProduct,
+      strMachine: strMachine,
+      strUserID: strUserID,
+      strOperator: strOperator,
     };
     const json_convertdata = JSON.stringify(jsondata);
-    query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtmastercheckresult('[${json_convertdata}]');`;
+    query += `CALL "Traceability".trc_000_common_SetRollLeafTrayTable('[${json_convertdata}]');`;
     const result = await client.query(query);
-    res.status(200).json(result.rows);
-    await DisconnectPG_DB(client);
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
+    }
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
+  }
+};
+module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
+  let query = "";
+  var SHT_PCS_MASTER_FLG = process.env.SHT_PCS_MASTER_FLG;
+  if (SHT_PCS_MASTER_FLG == "1 ") {
+    try {
+      const { strPrdname } = req.body;
+
+      var SHT_PCS_MASTER_CODE = process.env.SHT_PCS_MASTER_CODE;
+      var WORKING_START_TIME = process.env.WORKING_START_TIME;
+      var SHT_PCS_MASTER_TIME = process.env.SHT_PCS_MASTER_TIME;
+
+      const client = await ConnectPG_DB();
+      const jsondata = {
+        strProduct: strPrdname,
+        strPcsmasterCode: SHT_PCS_MASTER_CODE,
+        strWorkstartime: WORKING_START_TIME,
+        strShtPcsmastertime: SHT_PCS_MASTER_TIME,
+      };
+      const json_convertdata = JSON.stringify(jsondata);
+      query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtmastercheckresult('[${json_convertdata}]');`;
+      const result = await client.query(query);
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    } catch (error) {
+      writeLogError(error.message, query);
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  } else {
+    res.status(200).json({ prd_name: "OK" });
   }
 };
 
@@ -339,36 +393,11 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('${strRollLeaf}')`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows);
+      res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
     }
   } catch (error) {
     writeLogError(error.message, query);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-module.exports.GetConnectShtPlasmaTime = async function (req, res) {
-  let query = "";
-  try {
-    const { strSheetnoF, strSheetnoB } = req.body;
-    const client = await ConnectPG_DB();
-    const jsondata = {
-      strSheetnoF: strSheetnoF,
-      strSheetnoB: strSheetnoB,
-    };
-    const json_convertdata = JSON.stringify(jsondata);
-    query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtplasmatime('[${json_convertdata}]');`;
-    const result = await client.query(query);
-    if (result.rows.length > 0) {
-      data = result.rows;
-      res.status(200).json(data.lot_no);
-      await DisconnectPG_DB(client);
-    }
-    await DisconnectPG_DB(client);
-  } catch (error) {
-    writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -406,4 +435,106 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
   }
 };
 
+module.exports.GetConnectShtPlasmaTime = async function (req, res) {
+  let query = "";
+  let _strError = "";
+  try {
+    const { strSheetnoF, strSheetnoB, lot_no, dblPlasmaTime } = req.body;
+    const client = await ConnectPG_DB();
+    const jsondata = {
+      strSheetnoF: strSheetnoF,
+      strSheetnoB: strSheetnoB,
+    };
+    const json_convertdata = JSON.stringify(jsondata);
+    query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtplasmatime('[${json_convertdata}]');`;
+    const result = await client.query(query);
+    if (result.rows.length > 0) {
+      data = result.rows[0];
+      if (data.lot_no !== "") {
+        console.log(parseFloat(data.plasma_time));
+        if (lot_no !== data.lot_no) {
+          _strError = "Sheet mix lot";
+        } else if (parseFloat(data.plasma_time) > dblPlasmaTime) {
+          _strError = `Sheet over control plasma time ${dblPlasmaTime} hrs.`;
+        }
+      } else {
+        _strError = "Sheet no record plasma time";
+      }
+    } else {
+      _strError = "Sheet no record plasma time";
+    }
+    if (_strError) {
+      res.status(200).json({ error: _strError });
+    }
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetSerialDuplicateConnectSht = async function (req, res) {
+  let query = "";
+  try {
+    const { strSerial } = req.body;
+    const client = await ConnectPG_DB();
+    query += `select * from "Traceability".trc_000_common_getserialduplicateconnectsht('${strSerial}')`;
+    const result = await client.query(query);
+    if (result.rows.length > 0) {
+      var intRow = 1;
+      res.status(200).json({ intRow: intRow });
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
+  let query = "";
+  let json_convertdata = '';
+  try {
+    const dataList = req.body;
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query = `CALL "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'')`;
+    console.log(json_convertdata, "json_convertdata")
+    console.log(dataList.length, "json_convertdata")
+    const result = await client.query(query, [json_convertdata]);    
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+      return;   
+    }    
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    query += `${json_convertdata}`
+    writeLogError(error.message, query);
+    console.log(error, "error");
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SetSerialLotShtTable = async function (req, res) {
+  let query = "";
+  let json_convertdata = '';
+  try {
+    const dataList = req.body;
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query = `CALL "Traceability".trc_000_common_SetSerialLotShtTable($1::jsonb,'')`;
+    const result = await client.query(query, [json_convertdata]);    
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+      return;   
+    }    
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    query += `${json_convertdata}`
+    writeLogError(error.message, query);
+    console.log(error, "error");
+    res.status(500).json({ message: error.message });
+  }
+};
 // new function api

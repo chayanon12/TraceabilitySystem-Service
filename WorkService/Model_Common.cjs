@@ -5,6 +5,7 @@ const {
   DisconnectOracleDB,
 } = require("../Conncetion/DBConn.cjs");
 const oracledb = require("oracledb");
+const { writeLogError } = require("../Common/LogFuction.cjs");
 
 ///------Example
 module.exports.xxxxxx = async function (req, res) {
@@ -21,6 +22,30 @@ module.exports.xxxxxx = async function (req, res) {
   }
 };
 ///------Example
+
+
+module.exports.Get_SPI_AOI_RESULT = async function (req, res) {
+  var result ='OK';
+  var strPreAOIF;
+  var strPreAOIB;
+  var strAOIF;
+  var strAOIB;
+  var strSPIF;
+  var strSPIB;
+  var strAOICoatF;
+  var strAOICoatB;
+  var strXrayF;
+  var strXrayB;
+  var strXrayOneTime;
+  var strReflowF;
+  var strReflowB;
+  try {
+    
+  } catch (error) {
+    
+  }
+}
+
 
 module.exports.GetProductData = async function (req, res) {
     console.log('เข้า')
