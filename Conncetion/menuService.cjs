@@ -106,7 +106,6 @@ module.exports.Menuname = async function (req, res) {
 
 module.exports.MenuHome = async function (req, res) {
   try {
-    const { login_id } = req.body;
     const connect = await ConnectOracleDB("FPC");
     const query = `
     SELECT  PARENT_ID , MENU_NAME  
