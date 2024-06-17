@@ -79,19 +79,6 @@ module.exports.getfactory = async function (req, res) {
   }
 };
 
-// module.exports.getlotserialcountdata = async function (req, res) {
-//   try {
-//     const { Lotno } = req.body;
-//     var query = "";
-//     const client = await ConnectPG_DB();
-//     query = `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('${Lotno}')`;
-//     const result = await client.query(query);
-//     await DisconnectPG_DB(client);
-//     res.status(200).json(result.rows);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 module.exports.getlotserialcountdata = async function (req, res) {
   var query = "";

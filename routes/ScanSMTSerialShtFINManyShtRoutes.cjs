@@ -17,7 +17,4 @@ router.post("/SetSerialRecordTimeTrayTable", ScanSMTFIN.SetSerialRecordTimeTrayT
 router.post("/SetSerialLotShtTable", ScanSMTFIN.SetSerialLotShtTable);
 
 
-
-
-
 module.exports = router;
