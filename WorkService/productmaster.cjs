@@ -14,7 +14,7 @@ module.exports.searchFactory = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -31,7 +31,7 @@ module.exports.getFactory = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -47,7 +47,7 @@ module.exports.getSerialStructure = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -63,7 +63,7 @@ module.exports.getSheetStructure = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -78,7 +78,7 @@ module.exports.getSheetType = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -93,7 +93,7 @@ module.exports.getProceesControl = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -264,7 +264,7 @@ module.exports.getProceesControl = async function (req, res) {
 //     const client = await ConnectPG_DB();
 //     const result = await client.query(query);
 //     await DisconnectPG_DB(client);
-//     res.json(result.rows);
+//     res.status(200).json(result.rows);
 //   } catch (err) {
 //     writeLogError(err.message, query);
 //     res.status(500).json({ message: err.message });
@@ -278,7 +278,7 @@ module.exports.insertProduct_Master = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -450,7 +450,7 @@ module.exports.insertProduct_Master = async function (req, res) {
 //     const client = await ConnectPG_DB();
 //     const result = await client.query(query);
 //     await DisconnectPG_DB(client);
-//     res.json(result.rows);
+//     res.status(200).json(result.rows);
 //   } catch (err) {
 //     writeLogError(err.message, query);
 //     res.status(500).json({ message: err.message });
@@ -467,7 +467,7 @@ module.exports.updateProduct_Master = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -483,7 +483,7 @@ module.exports.deleteProduct_Master = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.json(result.rows);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
