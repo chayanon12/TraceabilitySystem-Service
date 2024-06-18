@@ -115,6 +115,24 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   }
 };
 
+module.exports.GetProductDataByLot = async function (req, res) {
+  console.log('เข้า')
+  var query = "";
+  try {
+    const connect = await ConnectOracleDB("FPC");
+    const { strLot} = req.body;
+    console.log(strLot)
+    query += `SELECT  FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETPRODUCTDATABYLOT('${strLot}','${process.env.priority}') AS data1 FROM dual`;
+    const result = await connect.execute(query);
+    await DisconnectOracleDB(connect);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    writeLogError(error.message, query);
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports.getlotsheetcountdata = async function (req, res) {
   try {
     var query = "";
@@ -212,10 +230,12 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { Serial } = req.body;
-    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}); --THA92770P53J17J5B`;
+    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`;  //--THA92770P53J17J5B
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows);
+    const data = JSON.parse(dataJsonString);
+    console.log(data);
+    res.status(200).json(result.rows.flat());
   } catch (error) {
     writeLogError(error.message, query);
     console.log(error);
