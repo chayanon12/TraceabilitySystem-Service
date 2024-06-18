@@ -9,6 +9,9 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/getserialduplicateconnectsht", Common.getserialduplicateconnectsht);
  router.post("/getworkingdate", Common.getworkingdate);
  router.post("/getproductshtinspectdup", Common.getproductshtinspectdup);
+ router.post("/getreflowrecordtimedata", Common.GetReflowRecordTimeData);
+ router.post("/callSMTReflowRecordTimeResult", Common.CallSMTReflowRecordTimeResult);
+ router.post("/deleteReflowRecordTimeData", Common.DeleteReflowRecordTimeData);
 
  
 module.exports = router;

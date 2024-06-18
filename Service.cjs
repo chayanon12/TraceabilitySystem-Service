@@ -13,7 +13,7 @@ const productmaster = require("./routes/productMasterRoutes.cjs");
 const ScanSMTRollSht = require("./routes/ScanSMTRoollShtRoutes.cjs");
 const ScanSMTFIN = require("./routes/ScanSMTSerialShtFINManyShtRoutes.cjs");
 const ScanSheetMOTTime = require("./routes/ScanSheetMOTTimeRoutes.cjs");
-const ScanShtInspect = require("./routes/ScanSheetInspect.cjs");
+const ScanShtInspect = require("./routes/ScanSheetInspectRoutes.cjs");
 
 app.use(express.json());
 
