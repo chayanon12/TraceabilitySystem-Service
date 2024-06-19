@@ -5,7 +5,6 @@ const {
   DisconnectOracleDB,
 } = require("../Conncetion/DBConn.cjs");
 const oracledb = require("oracledb");
-const { queueRequests } = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
 ///------Example
@@ -22,7 +21,25 @@ module.exports.xxxxxx = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+//FPC
+module.exports.GetProductNameByLot = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("FPC");
+    const strPrdname = req.body;
+    console.log(strLot, strProc);
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strPrdname}') as PRD_NAME  FROM DUAL`;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {
+      // res.status(200).json({ WEEK_CODE: result.rows[0][0] });
+      res.status(200).json(result.rows);
+    }
+    DisconnectOracleDB(Conn);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+}
 ///------Example
 
 module.exports.GetProductData = async function (req, res) {
