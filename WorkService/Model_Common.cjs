@@ -26,13 +26,11 @@ module.exports.GetProductNameByLot = async function (req, res) {
   var query = "";
   try {
     const Conn = await ConnectOracleDB("FPC");
-    const strPrdname = req.body;
-    console.log(strLot, strProc);
-    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strPrdname}') as PRD_NAME  FROM DUAL`;
+    const {strLot} = req.body;
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strLot}') as PRD_NAME  FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-      // res.status(200).json({ WEEK_CODE: result.rows[0][0] });
-      res.status(200).json(result.rows);
+      res.status(200).json({prdName : result.rows[0]});
     }
     DisconnectOracleDB(Conn);
   } catch (error) {
@@ -52,6 +50,26 @@ module.exports.GetProductData = async function (req, res) {
     await DisconnectPG_DB(client);
     res.status(200).json(result.rows);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.GetMOTRecordTimeData = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
+    console.log(query)
+    const result = await client.query(query);
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };

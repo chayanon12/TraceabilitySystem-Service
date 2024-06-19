@@ -14,6 +14,7 @@ const ScanSMTRollSht = require("./routes/ScanSMTRoollShtRoutes.cjs");
 const ScanSMTFIN = require("./routes/ScanSMTSerialShtFINManyShtRoutes.cjs");
 const ScanSheetMOTTime = require("./routes/ScanSheetMOTTimeRoutes.cjs");
 const ScanShtInspect = require("./routes/ScanSheetInspectRoutes.cjs");
+const ScanSheetBakeTime = require("./routes/ScanSheetBaketime.cjs");
 
 app.use(express.json());
 
@@ -37,6 +38,7 @@ app.use("/api", sheetmaster);
 app.use("/api", productmaster);
 app.use("/api", serialmaster);
 app.use("/api", ScanShtInspect);
+app.use('/api',ScanSheetBakeTime)
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

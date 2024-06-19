@@ -12,6 +12,8 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/getreflowrecordtimedata", Common.GetReflowRecordTimeData);
  router.post("/callSMTReflowRecordTimeResult", Common.CallSMTReflowRecordTimeResult);
  router.post("/deleteReflowRecordTimeData", Common.DeleteReflowRecordTimeData);
+ router.post("/getProductNameByLot", Common.GetProductNameByLot);
+ router.post("/getMOTRecordTimeData", Common.GetMOTRecordTimeData);
 
  
 module.exports = router;

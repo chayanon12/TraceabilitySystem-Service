@@ -208,8 +208,13 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
       });
       console.log(result.rows[0][0]);
       DisconnectOracleDB(Conn);
+    }else{
+      res.status(404).json({ message: "No Data" });
     }
-  } catch (error) {}
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
 };
 module.exports.GetProductDataByLot = async function (req, res) {
   let query = "";
