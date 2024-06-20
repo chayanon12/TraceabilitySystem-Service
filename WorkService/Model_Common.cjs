@@ -118,7 +118,13 @@ module.exports.getlotserialcountdata = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { Lotno } = req.body;
-    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('${Lotno}')`;
+    let data={
+      strLotNo:Lotno,
+      strPlantCode:'G'
+    }
+    const json_convertdata = JSON.stringify(data);
+    console.log(json_convertdata,'json_convertdata')
+    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('[${json_convertdata}]')`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
@@ -264,7 +270,12 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { Serial } = req.body;
-    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`;  //--THA92770P53J17J5B
+    let datajson={
+      strLssSerialNo:Serial,
+      strPlantCode:'G'
+    }
+    const json_convertdata = JSON.stringify(datajson);
+    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('[${json_convertdata}]')`;  //--THA92770P53J17J5B
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     const data = JSON.parse(dataJsonString);

@@ -53,6 +53,10 @@ const {
         P_STATUS: result.outBinds.P_STATUS,
         P_ERROR: result.outBinds.P_ERROR
       });
+      console.log({
+        P_STATUS: result.outBinds.P_STATUS,
+        P_ERROR: result.outBinds.P_ERROR
+      })
     } catch (error) {
       console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
       res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");

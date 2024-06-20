@@ -189,29 +189,60 @@ module.exports.GetRollLeafTotalByLot = async function (req, res) {
   try {
     console.log('เข้า2')
     const { LotNo } = req.body;
-    const connect = await ConnectOracleDB("SMT");
+    const client = await ConnectPG_DB();
     let query = `   
-      SELECT COUNT(L.SHR_ROLL_LEAF ) AS ROLL_LEAF
-      FROM SMT_SHEET_ROLL_NO L  
-      WHERE L.SHR_PLANT_CODE = 'THA' 
-      AND L.SHR_LOT_NO = '${LotNo}'
-      ORDER BY L.SHR_ROLL_LEAF`;
+    SELECT COUNT(L.SHR_ROLL_LEAF ) AS ROLL_LEAF
+    FROM "Traceability".trc_SHEET_ROLL_NO L  
+         WHERE L.SHR_PLANT_CODE = 'THA' 
+         AND L.SHR_LOT_NO = '${LotNo}'`;
     console.log('query4:', query);
 
-    const result = await connect.execute(query);
-    DisconnectOracleDB(connect);
+    const result = await client.query(query);
+      console.log(result)
+      await DisconnectPG_DB(client);
+      res.json(result.rows);
 
-    const columnNames = result.metaData.map(column => column.name);
-    const rows = result.rows.map(row => {
-        let rowData = {};
-        columnNames.forEach((columnName, index) => {
-            rowData[columnName] = row[index];
-        });
-        return rowData;
-    });
-    res.json(rows);
+    // const columnNames = result.metaData.map(column => column.name);
+    // const rows = result.rows.map(row => {
+    //     let rowData = {};
+    //     columnNames.forEach((columnName, index) => {
+    //         rowData[columnName] = row[index];
+    //     });
+    //     return rowData;
+    // });
+    // res.json(rows);
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
   }
 };
+
+
+module.exports.GetRollLeafDuplicate = async function (req, res) {
+  console.log("เข้า");
+  var query = "";
+  try {
+    const connect = await ConnectOracleDB("FPC");
+    const { ROLL_LEAF, PLANT_CODE } = req.body;
+    query += `         SELECT L.SHR_LOT_NO AS LOT_NO 
+                            , L.SHR_ROLL_NO AS ROLL_NO 
+                            , L.SHR_ROLL_LEAF AS ROLL_LEAF 
+                            , L.SHR_SHEET_SEQ AS SHEET_SEQ 
+                            , L.SHR_SHEET_NO AS SHEET_NO  
+                            ,SHR_PLANT_CODE as Plant
+                      FROM "Traceability".trc_SHEET_ROLL_NO L   
+                      WHERE L.SHR_PLANT_CODE = '${PLANT_CODE}'
+                           AND L.SHR_ROLL_LEAF = '${ROLL_LEAF}'
+                      ORDER BY L.SHR_SHEET_SEQ `;
+    const result = await connect.execute(query);
+    await DisconnectOracleDB(connect);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    writeLogError(error.message, query);
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// GetWeekCodebyLot
