@@ -400,8 +400,10 @@ module.exports.GetReflowRecordTimeData = async function (req, res) {
 
   try {
     const client = await ConnectPG_DB();
-    const { strSheetNo } = req.body;
-    query = `select * from "Traceability".trc_000_common_GetReflowRecordTimeData('${strSheetNo}');`;
+    const {dataList} = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+
+    query = `select * from "Traceability".trc_000_common_GetReflowRecordTimeData('[${json_convertdata}]');`;
     const result = await client.query(query);
     if (result.rows !== "") {
       res.status(200).json(result.rows[0]);
@@ -418,9 +420,14 @@ module.exports.CallSMTReflowRecordTimeResult = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const {dataList} = req.body;
+    console.log(dataList)
     json_convertdata = JSON.stringify(dataList);
+    console.log(json_convertdata);
     query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult($1::jsonb,'');`;
+    // query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult('[${json_convertdata}]','');`;
+
     const result = await client.query(query, [json_convertdata]);
+    // const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
@@ -441,8 +448,10 @@ module.exports.DeleteReflowRecordTimeData = async function (req, res) {
   var query = "";
   try {
     const client = await ConnectPG_DB();
-    const {strSheetNo} = req.body;
-    query = `call "Traceability".trc_000_common_DeleteReflowRecordTimeData('${strSheetNo}','');`;
+    const {strSheetNo,strPlantCode} = req.body;
+    const dataList = {strSheetNo:strSheetNo,strPlantCode:strPlantCode}
+    json_convertdata = JSON.stringify(dataList);
+    query = `call "Traceability".trc_000_common_DeleteReflowRecordTimeData('[${json_convertdata}]','');`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
