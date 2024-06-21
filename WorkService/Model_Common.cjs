@@ -60,7 +60,7 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]')`;
+    query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
     console.log(query)
     const result = await client.query(query);
 
@@ -118,13 +118,7 @@ module.exports.getlotserialcountdata = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { Lotno } = req.body;
-    let data={
-      strLotNo:Lotno,
-      strPlantCode:'G'
-    }
-    const json_convertdata = JSON.stringify(data);
-    console.log(json_convertdata,'json_convertdata')
-    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('[${json_convertdata}]')`;
+    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('${Lotno}')`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
@@ -215,11 +209,10 @@ module.exports.getproductshtinspectbylot = async function (req, res) {
   try {
     var query = "";
     const client = await ConnectPG_DB();
-    const json_data = JSON.stringify(req.body);
-    query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtinspectbylot('${json_data}'); `;
+    query = ``;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows);
+    res.status(200).json({ Result: result });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -239,7 +232,18 @@ module.exports.getproductshtinspectdup = async function (req, res) {
   }
 };
 
-
+module.exports.getrollleafduplicate = async function (req, res) {
+  try {
+    var query = "";
+    const client = await ConnectPG_DB();
+    query = ``;
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json({ Result: result });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports.getserialduplicate = async function (req, res) {
   try {
@@ -259,12 +263,7 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { Serial } = req.body;
-    let datajson={
-      strLssSerialNo:Serial,
-      strPlantCode:'G'
-    }
-    const json_convertdata = JSON.stringify(datajson);
-    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('[${json_convertdata}]')`;  //--THA92770P53J17J5B
+    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`;  //--THA92770P53J17J5B
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     const data = JSON.parse(dataJsonString);
