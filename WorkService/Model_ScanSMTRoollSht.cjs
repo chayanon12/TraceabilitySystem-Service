@@ -1,72 +1,69 @@
 const {
-    ConnectPG_DB,
-    DisconnectPG_DB,
-    ConnectOracleDB,
-    DisconnectOracleDB,
-  } = require("../Conncetion/DBConn.cjs");
+  ConnectPG_DB,
+  DisconnectPG_DB,
+  ConnectOracleDB,
+  DisconnectOracleDB,
+} = require("../Conncetion/DBConn.cjs");
 
-  module.exports.getLot = async function (req, res) {
-    try {
-      const { txt_lotno } = req.body;
-      console.log('txt_lotno:', txt_lotno);
-  
-      const connect = await ConnectOracleDB("FPC");
-      let query = "";
-      query += `SELECT NVL(L.LOT_PRD_NAME, ' ') AS PRD_NAME, `;
-      query += `NVL(L.LOT_ROLL_NO, ' ') AS ROLL_NO, `;
-      query += `TO_CHAR(LISTAGG(L.LOT || `;
-      query += `DECODE(T1.LTR_FROM_LOT, NULL, '', ',' || T1.LTR_FROM_LOT) || `;
-      query += `DECODE(T2.LTR_FROM_LOT, NULL, '', ',' || T2.LTR_FROM_LOT) || `;
-      query += `DECODE(T3.LTR_FROM_LOT, NULL, '', ',' || T3.LTR_FROM_LOT) || `;
-      query += `DECODE(T4.LTR_FROM_LOT, NULL, '', ',' || T4.LTR_FROM_LOT) || `;
-      query += `DECODE(T5.LTR_FROM_LOT, NULL, '', ',' || T5.LTR_FROM_LOT), ',') `;
-      query += `WITHIN GROUP (ORDER BY L.LOT ASC)) AS LOT_ALL `;
-      query += `FROM FPC.FPC_LOT L `;
-      query += `LEFT JOIN FPC_LOT_TRANSFER T1 ON L.LOT = T1.LTR_LOT `;
-      query += `LEFT JOIN FPC_LOT_TRANSFER T2 ON T1.LTR_FROM_LOT = T2.LTR_LOT `;
-      query += `LEFT JOIN FPC_LOT_TRANSFER T3 ON T2.LTR_FROM_LOT = T3.LTR_LOT `;
-      query += `LEFT JOIN FPC_LOT_TRANSFER T4 ON T3.LTR_FROM_LOT = T4.LTR_LOT `;
-      query += `LEFT JOIN FPC_LOT_TRANSFER T5 ON T4.LTR_FROM_LOT = T5.LTR_LOT `;
-      query += `WHERE L.LOT = '${txt_lotno}' `;
-      query += `GROUP BY NVL(L.LOT_PRD_NAME, ' '), `;
-      query += `NVL(L.LOT_ROLL_NO, ' '), `;
-      query += `DECODE(L.LOT_PRIORITY, 'FINAL_GATE_LOT_PRIORITY_SKIP', 'Y', 'N') `;
-  
-      console.log('query1:', query);
-  
-      const result = await connect.execute(query);
-      DisconnectOracleDB(connect);
-      res.json(result.rows);
-    } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
-      res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
-    }
-  };
-  
+module.exports.getLot = async function (req, res) {
+  try {
+    const { txt_lotno } = req.body;
+    console.log("txt_lotno:", txt_lotno);
 
-  module.exports.getProduct = async function (req, res) {
-    try {
-      const client = await ConnectPG_DB();
-      let query = "";
-      query += `SELECT "Traceability".trc_001_getproductrollleafdata()`;
-      const result = await client.query(query);
-      console.log(result)
-      await DisconnectPG_DB(client);
-      res.json(result.rows);
-    } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
-      res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
-    }
-  };
+    const connect = await ConnectOracleDB("FPC");
+    let query = "";
+    query += `SELECT NVL(L.LOT_PRD_NAME, ' ') AS PRD_NAME, `;
+    query += `NVL(L.LOT_ROLL_NO, ' ') AS ROLL_NO, `;
+    query += `TO_CHAR(LISTAGG(L.LOT || `;
+    query += `DECODE(T1.LTR_FROM_LOT, NULL, '', ',' || T1.LTR_FROM_LOT) || `;
+    query += `DECODE(T2.LTR_FROM_LOT, NULL, '', ',' || T2.LTR_FROM_LOT) || `;
+    query += `DECODE(T3.LTR_FROM_LOT, NULL, '', ',' || T3.LTR_FROM_LOT) || `;
+    query += `DECODE(T4.LTR_FROM_LOT, NULL, '', ',' || T4.LTR_FROM_LOT) || `;
+    query += `DECODE(T5.LTR_FROM_LOT, NULL, '', ',' || T5.LTR_FROM_LOT), ',') `;
+    query += `WITHIN GROUP (ORDER BY L.LOT ASC)) AS LOT_ALL `;
+    query += `FROM FPC.FPC_LOT L `;
+    query += `LEFT JOIN FPC_LOT_TRANSFER T1 ON L.LOT = T1.LTR_LOT `;
+    query += `LEFT JOIN FPC_LOT_TRANSFER T2 ON T1.LTR_FROM_LOT = T2.LTR_LOT `;
+    query += `LEFT JOIN FPC_LOT_TRANSFER T3 ON T2.LTR_FROM_LOT = T3.LTR_LOT `;
+    query += `LEFT JOIN FPC_LOT_TRANSFER T4 ON T3.LTR_FROM_LOT = T4.LTR_LOT `;
+    query += `LEFT JOIN FPC_LOT_TRANSFER T5 ON T4.LTR_FROM_LOT = T5.LTR_LOT `;
+    query += `WHERE L.LOT = '${txt_lotno}' `;
+    query += `GROUP BY NVL(L.LOT_PRD_NAME, ' '), `;
+    query += `NVL(L.LOT_ROLL_NO, ' '), `;
+    query += `DECODE(L.LOT_PRIORITY, 'FINAL_GATE_LOT_PRIORITY_SKIP', 'Y', 'N') `;
 
+    console.log("query1:", query);
 
+    const result = await connect.execute(query);
+    DisconnectOracleDB(connect);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
+  }
+};
 
-  module.exports.GetSerialProductByProduct = async function (req, res) {
-    try {
-      console.log('เข้า2')
-      const { strPrdName } = req.body;
-      const connect = await ConnectOracleDB("SMT"); //sn_length serial  //shm_end_code trc_cheet_eng_mst
-      let query = `   
+module.exports.getProduct = async function (req, res) {
+  try {
+    const client = await ConnectPG_DB();
+    let query = "";
+    query += `SELECT "Traceability".trc_001_getproductrollleafdata()`;
+    const result = await client.query(query);
+    console.log(result);
+    await DisconnectPG_DB(client);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
+  }
+};
+
+module.exports.GetSerialProductByProduct = async function (req, res) {
+  try {
+    console.log("เข้า2");
+    const { strPrdName } = req.body;
+    const connect = await ConnectOracleDB("SMT"); //sn_length serial  //shm_end_code trc_cheet_eng_mst
+    let query = `   
       SELECT PRD.PRM_PRODUCT_NAME  AS SLM_PRD_NAME 
       ,'' AS SLM_CUST_PART_NAME 
       ,NVL(PRD.PRM_SERIAL_LENGTH ,0) AS SLM_SERIAL_LENGTH 
@@ -163,55 +160,86 @@ const {
       FROM SMT_PRODUCT_MST PRD 
       WHERE PRD.PRM_PRODUCT_NAME = '${strPrdName}'
           AND PRD.PRM_PLANT_CODE = 'THA'`;
-      console.log('query3:', query);
-  
-      const result = await connect.execute(query);
-      DisconnectOracleDB(connect);
-
-      // เพิ่มชื่อคอลัมน์ลงใน JSON ที่ส่งกลับ
-      const columnNames = result.metaData.map(column => column.name);
-      const rows = result.rows.map(row => {
-          let rowData = {};
-          columnNames.forEach((columnName, index) => {
-              rowData[columnName] = row[index];
-          });
-          return rowData;
-      });
-      
-      res.json(rows);
-    } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
-      res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
-    }
-};
-
-module.exports.GetRollLeafTotalByLot = async function (req, res) {
-  try {
-    console.log('เข้า2')
-    const { LotNo } = req.body;
-    const connect = await ConnectOracleDB("SMT");
-    let query = `   
-      SELECT COUNT(L.SHR_ROLL_LEAF ) AS ROLL_LEAF
-      FROM SMT_SHEET_ROLL_NO L  
-      WHERE L.SHR_PLANT_CODE = 'THA' 
-      AND L.SHR_LOT_NO = '${LotNo}'
-      ORDER BY L.SHR_ROLL_LEAF`;
-    console.log('query4:', query);
+    console.log("query3:", query);
 
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
 
-    const columnNames = result.metaData.map(column => column.name);
-    const rows = result.rows.map(row => {
-        let rowData = {};
-        columnNames.forEach((columnName, index) => {
-            rowData[columnName] = row[index];
-        });
-        return rowData;
+    // เพิ่มชื่อคอลัมน์ลงใน JSON ที่ส่งกลับ
+    const columnNames = result.metaData.map((column) => column.name);
+    const rows = result.rows.map((row) => {
+      let rowData = {};
+      columnNames.forEach((columnName, index) => {
+        rowData[columnName] = row[index];
+      });
+      return rowData;
     });
+
     res.json(rows);
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
   }
 };
+
+module.exports.GetRollLeafTotalByLot = async function (req, res) {
+  try {
+    
+    const { LotNo } = req.body;
+    let data = {
+      strLotno: LotNo,
+      strPlantCode: "G",
+    };
+    
+    const json_data = JSON.stringify(data);
+    console.log("เข้า2",json_data);
+    const client = await ConnectPG_DB();
+    let query = `SELECT * from "Traceability".trc_000_common_getrollleaftotalbylot('[${json_data}]')`;
+   
+    const result = await client.query(query);
+   
+    await DisconnectPG_DB(client);
+    res.json(result.rows.length);
+
+    // const columnNames = result.metaData.map(column => column.name);
+    // const rows = result.rows.map(row => {
+    //     let rowData = {};
+    //     columnNames.forEach((columnName, index) => {
+    //         rowData[columnName] = row[index];
+    //     });
+    //     return rowData;
+    // });
+    // res.json(rows);
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
+  }
+};
+
+module.exports.GetRollLeafDuplicate = async function (req, res) {
+  console.log("เข้า");
+  var query = "";
+  try {
+    const connect = await ConnectOracleDB("FPC");
+    const { ROLL_LEAF, PLANT_CODE } = req.body;
+    query += `         SELECT L.SHR_LOT_NO AS LOT_NO 
+                            , L.SHR_ROLL_NO AS ROLL_NO 
+                            , L.SHR_ROLL_LEAF AS ROLL_LEAF 
+                            , L.SHR_SHEET_SEQ AS SHEET_SEQ 
+                            , L.SHR_SHEET_NO AS SHEET_NO  
+                            ,SHR_PLANT_CODE as Plant
+                      FROM "Traceability".trc_SHEET_ROLL_NO L   
+                      WHERE L.SHR_PLANT_CODE = '${PLANT_CODE}'
+                           AND L.SHR_ROLL_LEAF = '${ROLL_LEAF}'
+                      ORDER BY L.SHR_SHEET_SEQ `;
+    const result = await connect.execute(query);
+    await DisconnectOracleDB(connect);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    writeLogError(error.message, query);
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GetWeekCodebyLot

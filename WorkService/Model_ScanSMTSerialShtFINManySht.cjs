@@ -208,13 +208,8 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
       });
       console.log(result.rows[0][0]);
       DisconnectOracleDB(Conn);
-    }else{
-      res.status(404).json({ message: "No Data" });
     }
-  } catch (error) {
-    writeLogError(error.message, query);
-    res.status(500).json({ message: error.message });
-  }
+  } catch (error) {}
 };
 module.exports.GetProductDataByLot = async function (req, res) {
   let query = "";
@@ -393,8 +388,13 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
   let query = "";
   try {
     const { strRollLeaf } = req.body;
+    let data={
+      strRollLeaf:strRollLeaf,
+      strPlantCode:'G'
+    }
+    const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
-    query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('${strRollLeaf}')`;
+    query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);

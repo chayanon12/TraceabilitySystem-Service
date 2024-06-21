@@ -53,6 +53,10 @@ const {
         P_STATUS: result.outBinds.P_STATUS,
         P_ERROR: result.outBinds.P_ERROR
       });
+      console.log({
+        P_STATUS: result.outBinds.P_STATUS,
+        P_ERROR: result.outBinds.P_ERROR
+      })
     } catch (error) {
       console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
       res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
@@ -61,22 +65,25 @@ const {
 
 
   module.exports.GetMOTRecordTimeData = async function (req, res) {
+    let query = "";
     try {
       console.log('เข้าาา1')
       const { SheetNo } = req.body;
-      const connect = await ConnectOracleDB("SMT");
-      let query = "";
-      query += `SELECT NVL(COUNT(*),0) AS ROW_COUNT `;
-      query += `FROM SMT_MOT_RECORD_TIME S `;
-      query += `WHERE S.MOT_PLANT_CODE = 'THA' `;
-      query += `AND S.MOT_SHEET_NO = '${SheetNo}' `;
-      query += `AND S.MOT_PROC_ID = '1840' `;
+      let data={
+        strSheetNo:SheetNo,
+        strProcId:'1640',
+        strPlantCode:'5'
+      }
+      const json_convertdata = JSON.stringify(data);
+      const client = await ConnectPG_DB();
+      query += `SELECT * from "Traceability".trc_000_common_getmotrecordtimedata('[${json_convertdata}]')`;
       const result = await connect.execute(query);
-      console.log(result)
-      await DisconnectOracleDB(connect);
-      res.json(result.rows);
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
+      
     } catch (error) {
       console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
-      res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
     }
   };

@@ -6,6 +6,7 @@ router.post("/getLot", ScanSMTRollSht.getLot);
 router.post("/getProduct", ScanSMTRollSht.getProduct);
 // router.post("/GetSerialProductByProduct", ScanSMTRollSht.GetSerialProductByProduct);
 router.post("/GetRollLeafTotalByLot", ScanSMTRollSht.GetRollLeafTotalByLot);
+// router.post("/GetRollLeafDuplicate", ScanSMTRollSht.GetRollLeafDuplicate);
 
 
 
