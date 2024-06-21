@@ -388,8 +388,13 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
   let query = "";
   try {
     const { strRollLeaf } = req.body;
+    let data={
+      strRollLeaf:strRollLeaf,
+      strPlantCode:'G'
+    }
+    const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
-    query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('${strRollLeaf}')`;
+    query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
