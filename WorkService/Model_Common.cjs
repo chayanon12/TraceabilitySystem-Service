@@ -233,6 +233,20 @@ module.exports.getproductshtinspectXOutbylot = async function (req, res) {
   }
 };
 
+module.exports.getproductshtinspectXOut = async function (req, res) {
+  try {
+    var query = "";
+    const client = await ConnectPG_DB();
+    const p_data = JSON.stringify(req.body);
+    query = `SELECT * FROM "Traceability".trc_000_common_getproductshtinspectxout('${p_data}');`;
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports.getproductshtinspectdup = async function (req, res) {
   try {
     var query = "";
