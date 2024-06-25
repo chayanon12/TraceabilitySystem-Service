@@ -298,7 +298,7 @@ module.exports.GetLotSerialCountData = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     const client = await ConnectPG_DB();
-    console.log(json_convertdata)
+    console.log(json_convertdata);
     query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('[${json_convertdata}]')`;
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
@@ -340,7 +340,7 @@ module.exports.SetRollLeafTrayTable = async function (req, res) {
       strMachine: strMachine,
       strUserID: strUserID,
       strOperator: strOperator,
-      strPlantCode:'G'
+      strPlantCode: "G",
     };
     const json_convertdata = JSON.stringify(jsondata);
     query += `CALL "Traceability".trc_000_common_SetRollLeafTrayTable('[${json_convertdata}]');`;
@@ -373,7 +373,7 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
         strPcsmasterCode: SHT_PCS_MASTER_CODE,
         strWorkstartime: WORKING_START_TIME,
         strShtPcsmastertime: SHT_PCS_MASTER_TIME,
-        strPlantCode:'G'
+        strPlantCode: "G",
       };
       const json_convertdata = JSON.stringify(jsondata);
       query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtmastercheckresult('[${json_convertdata}]');`;
@@ -392,20 +392,32 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
 //ok
 module.exports.GetRollLeafDuplicate = async function (req, res) {
   let query = "";
+  let intCount = "";
   try {
-    const { strRollLeaf } = req.body;
-    let data={
-      strRollLeaf:strRollLeaf,
-      strPlantCode:'G'
-    }
+    const { strRollLeaf, _dtRollLeaf } = req.body;
+    let data = {
+      strRollLeaf: strRollLeaf,
+      strPlantCode: "G",
+    };
+    console.log("datagggggg", data, "----", _dtRollLeaf);
     const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0]);
-      await DisconnectPG_DB(client);
+    console.log("result.rows.length", result.rows[1].sheet_no, "--", _dtRollLeaf.length);
+    if (result.rows.length > 0 && _dtRollLeaf.length) {
+      if (result.rows.length > 0 != _dtRollLeaf.length) {
+        intCount = 1;
+      } else {
+        for (let i = 0; i < result.rows.length; i++) {
+          if(result.rows[i].sheet_no!=_dtRollLeaf[i].SHT_NO){
+            intCount = 1;
+          }
+        }
+      }
     }
+    res.status(200).json(intCount);
+    await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
@@ -420,7 +432,7 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
     const jsondata = {
       strSheetnoF: strSheetnoF,
       strSheetnoB: strSheetnoB,
-      strPlantCode:'G'
+      strPlantCode: "G",
     };
     if (strSheetType == "D") {
       const json_convertdata = JSON.stringify(jsondata);
@@ -455,7 +467,7 @@ module.exports.GetConnectShtPlasmaTime = async function (req, res) {
     const jsondata = {
       strSheetnoF: strSheetnoF,
       strSheetnoB: strSheetnoB,
-      strPlantCode :'G'
+      strPlantCode: "G",
     };
     const json_convertdata = JSON.stringify(jsondata);
     query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtplasmatime('[${json_convertdata}]');`;
