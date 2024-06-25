@@ -205,6 +205,40 @@ module.exports.getproductdata = async function (req, res) {
   }
 };
 
+module.exports.getProductShtGroup = async function (req, res) {
+  var query = "";
+  try {
+      const _data = JSON.stringify(req.body);
+      console.log('prdName:', _data);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtgroup('${_data}'); `;
+
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.getProductShtBIN = async function (req, res) {
+  var query = "";
+  try {
+      const bingroup = JSON.stringify(req.body);
+      console.log('bingroup:', bingroup);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtbin('${bingroup}'); `;
+
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports.getproductshtinspectbylot = async function (req, res) {
   try {
     var query = "";
@@ -256,6 +290,20 @@ module.exports.getproductshtinspectdup = async function (req, res) {
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     res.status(200).json({ Result: result });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.setLotSheetInsXOut = async function (req, res) {
+  try {
+    var query = "";
+    const client = await ConnectPG_DB();
+    const p_data = JSON.stringify(req.body);
+    query = `CALL "Traceability".trc_000_common_setlotsheetinsxout('${p_data}');`;
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
