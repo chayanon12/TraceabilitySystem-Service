@@ -291,13 +291,15 @@ module.exports.GetProductData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+//ok
 module.exports.GetLotSerialCountData = async function (req, res) {
   let query = "";
   try {
-    const { strLot } = req.body;
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
     const client = await ConnectPG_DB();
-    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('${strLot}')`;
+    console.log(json_convertdata)
+    query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('[${json_convertdata}]')`;
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
@@ -306,6 +308,7 @@ module.exports.GetLotSerialCountData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+//ok
 module.exports.SetRollLeafTrayTable = async function (req, res) {
   var query = "";
   try {
@@ -337,6 +340,7 @@ module.exports.SetRollLeafTrayTable = async function (req, res) {
       strMachine: strMachine,
       strUserID: strUserID,
       strOperator: strOperator,
+      strPlantCode:'G'
     };
     const json_convertdata = JSON.stringify(jsondata);
     query += `CALL "Traceability".trc_000_common_SetRollLeafTrayTable('[${json_convertdata}]');`;
@@ -351,6 +355,7 @@ module.exports.SetRollLeafTrayTable = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+//ok
 module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
   let query = "";
   var SHT_PCS_MASTER_FLG = process.env.SHT_PCS_MASTER_FLG;
@@ -368,6 +373,7 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
         strPcsmasterCode: SHT_PCS_MASTER_CODE,
         strWorkstartime: WORKING_START_TIME,
         strShtPcsmastertime: SHT_PCS_MASTER_TIME,
+        strPlantCode:'G'
       };
       const json_convertdata = JSON.stringify(jsondata);
       query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtmastercheckresult('[${json_convertdata}]');`;
@@ -383,7 +389,7 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
     res.status(200).json({ prd_name: "OK" });
   }
 };
-
+//ok
 module.exports.GetRollLeafDuplicate = async function (req, res) {
   let query = "";
   try {
@@ -405,7 +411,7 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+//ok
 module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
   let query = "";
   try {
@@ -414,6 +420,7 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
     const jsondata = {
       strSheetnoF: strSheetnoF,
       strSheetnoB: strSheetnoB,
+      strPlantCode:'G'
     };
     if (strSheetType == "D") {
       const json_convertdata = JSON.stringify(jsondata);
@@ -438,7 +445,7 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+//ok
 module.exports.GetConnectShtPlasmaTime = async function (req, res) {
   let query = "";
   let _strError = "";
@@ -448,6 +455,7 @@ module.exports.GetConnectShtPlasmaTime = async function (req, res) {
     const jsondata = {
       strSheetnoF: strSheetnoF,
       strSheetnoB: strSheetnoB,
+      strPlantCode :'G'
     };
     const json_convertdata = JSON.stringify(jsondata);
     query += `SELECT * FROM "Traceability".trc_000_common_getconnectshtplasmatime('[${json_convertdata}]');`;
@@ -477,13 +485,14 @@ module.exports.GetConnectShtPlasmaTime = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+//ok
 module.exports.GetSerialDuplicateConnectSht = async function (req, res) {
   let query = "";
   try {
-    const { strSerial } = req.body;
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
     const client = await ConnectPG_DB();
-    query += `select * from "Traceability".trc_000_common_getserialduplicateconnectsht('${strSerial}')`;
+    query += `select * from "Traceability".trc_000_common_getserialduplicateconnectsht('[${json_convertdata}]')`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
       var intRow = 1;
