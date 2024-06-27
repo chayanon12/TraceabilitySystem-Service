@@ -35,7 +35,7 @@ module.exports.getLotNo = async function (req, res) {
 
         const result = await connect.execute(query);
         DisconnectOracleDB(connect);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (error) {
         console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
         res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
@@ -52,7 +52,7 @@ module.exports.getProductShtGroup = async function (req, res) {
         const client = await ConnectPG_DB();
         const result = await client.query(query);
         await DisconnectPG_DB(client);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (err) {
         writeLogError(err.message, query);
         res.status(500).json({ message: err.message });
@@ -69,7 +69,7 @@ module.exports.getProductShtBIN = async function (req, res) {
         const client = await ConnectPG_DB();
         const result = await client.query(query);
         await DisconnectPG_DB(client);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (err) {
         writeLogError(err.message, query);
         res.status(500).json({ message: err.message });
@@ -86,7 +86,7 @@ module.exports.getProductShtInspect = async function (req, res) {
         const client = await ConnectPG_DB();
         const result = await client.query(query);
         await DisconnectPG_DB(client);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (err) {
         writeLogError(err.message, query);
         res.status(500).json({ message: err.message });
@@ -103,7 +103,7 @@ module.exports.SetLotSheetIns = async function (req, res) {
         const client = await ConnectPG_DB();
         const result = await client.query(query);
         await DisconnectPG_DB(client);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (err) {
         writeLogError(err.message, query);
         res.status(500).json({ message: err.message });
@@ -119,7 +119,7 @@ module.exports.getProductShtInspectByLot = async function (req, res) {
         const client = await ConnectPG_DB();
         const result = await client.query(query);
         await DisconnectPG_DB(client);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (err) {
         writeLogError(err.message, query);
         res.status(500).json({ message: err.message });
