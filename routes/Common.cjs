@@ -21,5 +21,6 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/getProductShtBIN", Common.getProductShtBIN);
  router.post("/getProductShtBIN", Common.getProductShtBIN);
  router.post("/setLotSheetInsXOut", Common.setLotSheetInsXOut);
+ router.post('/setseriallotshtelttable', Common.SetSerialLotShtELTTable)
  
 module.exports = router;

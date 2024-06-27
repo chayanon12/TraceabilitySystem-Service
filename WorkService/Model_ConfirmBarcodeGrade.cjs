@@ -30,7 +30,7 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     let { data } = req.body;
-    console.log(data.length);
+    // console.log(data.length);
 
     console.log(data);
     if (data && Array.isArray(data)) {

@@ -73,6 +73,27 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+module.exports.SetSerialLotShtELTTable = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','');`;
+    
+    const result = await client.query(query);
+    console.log(result,'result')
+    if (result.rows !='') {
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 module.exports.getconnectshtmastercheckresult = async function (req, res) {
   try {
