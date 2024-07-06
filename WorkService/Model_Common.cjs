@@ -571,3 +571,48 @@ module.exports.DeleteReflowRecordTimeData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.getLotSerialRecordTimeData = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const json_data = JSON.stringify(req.body);
+    query = `select * from "Traceability".trc_000_common_GetLotSerialRecordTimeData('[${json_data}]');`;
+    const result = await client.query(query);
+    if (result.rows !== "") {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
+  var query = "";
+  var json_convertdata = "";
+  try {
+    const client = await ConnectPG_DB();
+    const {dataList} = req.body;
+    console.log(dataList)
+    json_convertdata = JSON.stringify(dataList);
+    console.log(json_convertdata);
+    query = `call "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'');`;
+
+    const result = await client.query(query, [json_convertdata]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+      return;
+    } else {
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    query += `${json_convertdata}`;
+    writeLogError(error.message, query);
+    console.log(error, "error");
+    res.status(500).json({ message: error.message });
+  }
+};
+
