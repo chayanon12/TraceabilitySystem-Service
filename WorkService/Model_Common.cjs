@@ -42,7 +42,7 @@ module.exports.GetProductNameByLot = async function (req, res) {
 
 module.exports.GetProductData = async function (req, res) {
   try {
-    var strplantcode = "G";
+    var strplantcode = "5";
     var query = "";
     const client = await ConnectPG_DB();
     query = `SELECT * from "Traceability".trc_000_common_getproductdata('${strplantcode}')`;
@@ -613,6 +613,28 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
     writeLogError(error.message, query);
     console.log(error, "error");
     res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
+  var query = "";
+  try {
+    const data = JSON.stringify(req.body); 
+    console.log('Data:', data);
+
+    query = `SELECT * FROM "Traceability".trc_000_common_getserialrecordtimetraytable('[${data}]');`;
+
+    const client = await ConnectPG_DB(); 
+    const result = await client.query(query); 
+
+    if (result.rows !== "") {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (err) {
+    console.error(err.message);
+    writeLogError(err.message, query); 
+    res.status(500).json({ message: err.message }); 
   }
 };
 
