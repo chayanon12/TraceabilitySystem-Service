@@ -147,13 +147,11 @@ module.exports.getlotserialcountdata = async function (req, res) {
     }
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
 
 module.exports.getWeekCodebyLot = async function (req, res) {
-  console.log("เข้า");
   var query = "";
   try {
     const connect = await ConnectOracleDB("FPC");
@@ -164,7 +162,6 @@ module.exports.getWeekCodebyLot = async function (req, res) {
     res.status(200).json(result.rows.flat());
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };

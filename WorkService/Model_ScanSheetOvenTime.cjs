@@ -81,7 +81,7 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
     //Procedure Section FPC
     try {
       const connect = await ConnectOracleDB("FPC");
-      queryFPC += `FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN('${strSheetNo}','${strUser}','${strStation}','${V_LOT_NO}','${V_PRODUCT}','${Fac}','');`;
+      queryFPC += `call FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN('${strSheetNo}','${strUser}','${strStation}','${V_LOT_NO}','${V_PRODUCT}','${Fac}','');`;
       const result = await connect.execute(queryFPC);
       if (result.rows == ''){
         res.status(200).json({ p_error: "" });
