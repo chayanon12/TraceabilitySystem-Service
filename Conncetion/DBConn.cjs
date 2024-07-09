@@ -45,6 +45,14 @@ const ConnectOracleDB = async (ConnType) => {
         console.log(process.env.SMT_USER,process.env.SMT_PASSWORD,process.env.SMT_CONNECTION_STRING)
         const connection = await oracledb.getConnection(SMT);
         return connection;
+    }else if (ConnType === 'PCTTTEST'){
+        const PCTTTEST = {
+            user: process.env.PCTTTEST_USER,
+            password: process.env.PCTTTEST_PASSWORD,
+            connectString : process.env.PCTTTEST_CONNECTION_STRING,
+        };
+        const connection = await oracledb.getConnection(PCTTTEST);
+        return connection;
     }
 };
 
