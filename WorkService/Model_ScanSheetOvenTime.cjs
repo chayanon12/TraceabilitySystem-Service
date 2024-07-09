@@ -11,7 +11,7 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
   let queryPG = "";
   let queryFPC = "";
   let Fac = process.env.FacA1;
-  let { strSheetNo, strUser, strStation } = req.body.strSheetNo;
+  let { strSheetNo, strUser, strStation } = req.body;
   let ART_LOT_NO;
   let MOT_PRODUCT_NAME;
   let V_LOT_NO;
