@@ -73,22 +73,27 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-module.exports.SetSerialLotShtELTTable = async function (req, res) {
+module.exports.SetRollSheetTrayTable = async function (req, res) {
   var query = "";
 
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
+    // console.log('Query',dataList)
     const json_convertdata = JSON.stringify(dataList);
-    query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','');`;
-    
+    query += `CALL "Traceability".trc_006_common_setrollsheettraytable('[${json_convertdata}]','');`;
     const result = await client.query(query);
-    console.log(result,'result')
-    if (result.rows !='') {
-      res.status(200).json(result.rows);
+    // console.log(result.rows[0]._strerror,'result')
+    if (result.rows[0]._strerror =='') {
+      res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
-    }
+     }
+     else{
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+     }
   } catch (error) {
+    
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
@@ -635,6 +640,58 @@ module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
     console.error(err.message);
     writeLogError(err.message, query); 
     res.status(500).json({ message: err.message }); 
+  }
+};
+
+module.exports.SetSerialLotShtELTTable = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','')`;
+    
+    const result = await client.query(query);
+    console.log(result,'result')
+    if (result.rows !='') {
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.SetSerialLotShtGradeTable = async function (req, res) {
+  var query = "";
+  var _strError=''
+  var SCAN_RESULT=''
+  var REMARK=''
+  const { dataList } = req.body;
+  try {
+    const json_convertdata = JSON.stringify(dataList);
+    console.log(json_convertdata)
+    const client = await ConnectPG_DB(); 
+    query = `CALL "Traceability".trc_000_common_setseriallotshtgradetable('${json_convertdata}','')`;
+    const result = await client.query(query); 
+    console.log(result.rows[0.]._strerror)
+    _strError=result.rows[0.]._strerror
+    // if (result.rows !== "") {
+    if(_strError!=''){
+      SCAN_RESULT='NG'
+      REMARK=_strError
+    }
+      res.status(200).json({strError:_strError,SCAN_RESULT:SCAN_RESULT,REMARK:REMARK});
+      await DisconnectPG_DB(client);
+    // }
+  } catch (err) {
+    _strError="Can not connect database!"
+    console.error(err.message);
+    writeLogError(err.message, query); 
+    res.status(500).json({ strError:_strError,SCAN_RESULT:'NG',REMARK:err.message }); 
   }
 };
 

@@ -24,6 +24,8 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/setseriallotshtelttable", Common.SetSerialLotShtELTTable);
  router.post("/getLotSerialRecordTimeData", Common.getLotSerialRecordTimeData);
  router.post("/setSerialRecordTimeTrayTable", Common.SetSerialRecordTimeTrayTable);
- router.post("/getSerialRecordTimeTrayTable", Common.getSerialRecordTimeTrayTable);
+ router.post("/SetRollSheetTrayTable", Common.SetRollSheetTrayTable);
+ router.post("/SetSerialLotShtGradeTable", Common.SetSerialLotShtGradeTable);
 
+ 
 module.exports = router;
