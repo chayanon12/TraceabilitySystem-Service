@@ -9,8 +9,6 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
 module.exports.getLotNo = async function (req, res) {
     try {
         const { txtlotno } = req.body;
-        console.log('txtlotno:', txtlotno);
-
         const connect = await ConnectOracleDB("FPC");
         let query = "";
         query += `SELECT NVL(L.LOT_PRD_NAME, ' ') AS PRD_NAME, `;
