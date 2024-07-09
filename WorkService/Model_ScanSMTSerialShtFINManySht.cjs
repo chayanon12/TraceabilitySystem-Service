@@ -10,7 +10,7 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
 //Function
 
 //FPC
-module.exports.GetSerialProductByProduct = async function (req, res) {
+module.exports.GetSerialProductByProduct = async function (req, res) { 
   let query = "";
   try {
     const Conn = await ConnectOracleDB("SMT");
@@ -208,6 +208,8 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
       });
       console.log(result.rows[0][0]);
       DisconnectOracleDB(Conn);
+    }else{
+      res.status(400).json({ message: "No data found" });
     }
   } catch (error) {}
 };
