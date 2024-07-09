@@ -47,5 +47,23 @@ const {
       res.status(500).json({ message: error.message });
     }
   };
-
+  module.exports.Submit_ELT = async function (req, res) {
+    var query = "";
+    try {
+      const client = await ConnectPG_DB();
+      let { dataList } = req.body;
+      const json_convertdata = JSON.stringify(dataList);
+      query = `CALL "Traceability".trc_010_elt_submitretrive('[${json_convertdata}]','');`;
+      const result = await client.query(query);
+      if (result.rows[0].p_error == "") {
+        dataList = null; 
+        res.status(200).json({ message: "Success" });
+      }else{
+        res.status(400).json({ message: result.rows[0].p_error });
+      }
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
  
