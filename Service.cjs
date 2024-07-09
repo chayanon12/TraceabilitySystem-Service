@@ -19,6 +19,7 @@ const ScanShtInspectXOut = require("./routes/ScanSheetInspectXOutRoutes.cjs");
 const ConfirmBarcodeGrade = require("./routes/ConfirmBarcodeGrade.cjs")
 const ScanSheetOvenTime = require("./routes/ScanSheetOvenTime.cjs");
 const Rejcet = require("./routes/Reject.cjs");
+const ELTmaster = require("./routes/ELTmaster.cjs");
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -46,6 +47,7 @@ app.use("/api", ScanShtInspectXOut);
 app.use("/api", ConfirmBarcodeGrade);
 app.use("/api", ScanSheetOvenTime);
 app.use("/api", Rejcet);
+app.use("/api",ELTmaster)
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
