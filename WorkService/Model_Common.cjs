@@ -677,7 +677,6 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
     const client = await ConnectPG_DB(); 
     query = `CALL "Traceability".trc_000_common_setseriallotshtgradetable('${json_convertdata}','')`;
     const result = await client.query(query); 
-    console.log(result.rows[0.]._strerror)
     _strError=result.rows[0.]._strerror
     // if (result.rows !== "") {
     if(_strError!=''){
@@ -695,3 +694,20 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
   }
 };
 
+module.exports.GetSerialProductByProduct = async function (req, res) {
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    console.log('เข้า',json_convertdata)
+    query += `SELECT "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]')`;
+    const result = await client.query(query);
+    console.log(result,'result')
+      res.status(200).json(result);
+      await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
