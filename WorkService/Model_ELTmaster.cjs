@@ -32,7 +32,7 @@ const {
         const {dataList} = req.body;
       const client = await ConnectPG_DB();
       const json_convertdata = JSON.stringify(dataList);
-      query += ` select * from "Traceability".trc_010_eltmaster_getseaech(
+      query += ` select * from "Traceability".trc_009_eltmaster_getseaech(
     '[${json_convertdata}]'
     ); `;
   
@@ -53,7 +53,7 @@ const {
       const client = await ConnectPG_DB();
       let { dataList } = req.body;
       const json_convertdata = JSON.stringify(dataList);
-      query = `CALL "Traceability".trc_010_elt_submitretrive('[${json_convertdata}]','');`;
+      query = `CALL "Traceability".trc_009_elt_submitretrive('[${json_convertdata}]','');`;
       const result = await client.query(query);
       if (result.rows[0].p_error == "") {
         dataList = null; 
