@@ -28,7 +28,7 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
   const { prdName } = req.body;
   const jsondata = {strProduct: prdName, strPlantCode: Fac};
   const json_convertdata = JSON.stringify(jsondata);
-  console.log(json_convertdata);
+  console.log(json_convertdata,'mayyy');
   try {
     const client = await ConnectPG_DB();
     query += `SELECT * from "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]');`;
@@ -209,7 +209,7 @@ module.exports.GetProductDataByLot = async function (req, res) {
     // // }
     // strLot.priority=process.env.priority
     
-     console.log(strLot)
+    console.log(strLot)
     query += `SELECT  FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETPRODUCTDATABYLOT('${strLot}','${process.env.priority}') AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -716,20 +716,20 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
   }
 };
 
-module.exports.GetSerialProductByProduct = async function (req, res) {
-  var query = "";
-  try {
-    const client = await ConnectPG_DB();
-    const { dataList } = req.body;
-    const json_convertdata = JSON.stringify(dataList);
-    console.log('เข้า',json_convertdata)
-    query += `SELECT "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]')`;
-    const result = await client.query(query);
-    console.log(result,'result')
-      res.status(200).json(result);
-      await DisconnectPG_DB(client);
-  } catch (error) {
-    writeLogError(error.message, query);
-    res.status(500).json({ message: error.message });
-  }
-};
+// module.exports.GetSerialProductByProduct = async function (req, res) {
+//   var query = "";
+//   try {
+//     const client = await ConnectPG_DB();
+//     const { dataList } = req.body;
+//     const json_convertdata = JSON.stringify(dataList);
+//     console.log('เข้า',json_convertdata)
+//     query += `SELECT "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]')`;
+//     const result = await client.query(query);
+//     console.log(result,'result')
+//       res.status(200).json(result);
+//       await DisconnectPG_DB(client);
+//   } catch (error) {
+//     writeLogError(error.message, query);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
