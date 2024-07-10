@@ -11,11 +11,12 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
   let queryPG = "";
   let queryFPC = "";
   let Fac = process.env.FacA1;
-  let { strSheetNo, strUser, strStation } = req.body.strSheetNo;
+  let { strSheetNo, strUser, strStation } = req.body;
   let ART_LOT_NO;
   let MOT_PRODUCT_NAME;
   let V_LOT_NO;
   let V_PRODUCT;
+
   try {
     // first check data in Postgres
     try {
@@ -80,15 +81,41 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
     queryFPC = "";
     //Procedure Section FPC
     try {
-      const connect = await ConnectOracleDB("FPC");
-      queryFPC += `call FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN('${strSheetNo}','${strUser}','${strStation}','${V_LOT_NO}','${V_PRODUCT}','${Fac}','');`;
+      const connect = await ConnectOracleDB("PCTTTEST");
+      // queryFPC += `call FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN('${strSheetNo}','${strUser}','${strStation}','${V_LOT_NO}','${V_PRODUCT}','${Fac}','');`;
+      const queryFPC = `DECLARE
+      P_SHEET_NO VARCHAR2(100) := '${strSheetNo}';
+      P_USER VARCHAR2(100) := '${strUser}';
+      P_STATION VARCHAR2(100) := '${strStation}';
+      V_LOT_NO VARCHAR2(100) := '${V_LOT_NO}';
+      V_PRODUCT VARCHAR2(100) := '${V_PRODUCT}';
+      V_PLANT_CODE VARCHAR2(100) := 'THA';
+      P_ERROR VARCHAR2(100);
+  BEGIN
+      FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN(
+          P_SHEET_NO,
+          P_USER,
+          P_STATION,
+          V_LOT_NO,
+          V_PRODUCT,
+          V_PLANT_CODE,
+          P_ERROR
+      );
+      DBMS_OUTPUT.PUT_LINE('P_ERROR: ' || P_ERROR);
+  END;`;
+      console.log(queryFPC);
       const result = await connect.execute(queryFPC);
-      if (result.rows == ''){
+      // console.log(result);
+      // res.status(200).json({ p_error: result });
+
+      if (result.rows == "") {
         res.status(200).json({ p_error: "" });
-      }else{
+      } else {
         res.status(409).json({ p_error: result.rows[0][0] });
       }
-    } catch (error) {}
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
     // writeLogError(error.message, query);
