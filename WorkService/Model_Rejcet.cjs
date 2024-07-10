@@ -80,11 +80,10 @@ module.exports.SetSubmitData = async function (req, res) {
     console.log(json_convertdata, "json_convertdata");
     query = `CALL "Traceability".trc_008_reject_setsubmitdata('[${json_convertdata}]','');`;
     const result = await client.query(query);
-    console.log(result.rows[0].p_error, "result");
     if (result.rows[0].p_error == "") {
-      dataList = null; 
+      dataList = null;
       res.status(200).json({ message: "Success" });
-    }else{
+    } else {
       res.status(400).json({ message: result.rows[0].p_error });
     }
   } catch (error) {
