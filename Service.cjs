@@ -23,6 +23,7 @@ const ELTmaster = require("./routes/ELTmaster.cjs");
 const SheetBinCheck  = require("./routes/SheetBinCheck.cjs");
 const Dispenser = require("./routes/ScanDispenser.js");
 const ScanSMTPlasma = require("./routes/ScanSMTPlasmaStopStartRoutes.cjs");
+const ScanSMTSerialControl = require("./routes/ScanSMTSerialControlTimeRoutes.cjs");
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -54,6 +55,7 @@ app.use("/api",ELTmaster)
 app.use("/api",SheetBinCheck)
 app.use("/api",Dispenser);
 app.use("/api", ScanSMTPlasma);
+app.use("/api", ScanSMTSerialControl);
 
 
 app.listen(port, () => {
