@@ -27,5 +27,6 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/SetRollSheetTrayTable", Common.SetRollSheetTrayTable);
  router.post("/SetSerialLotShtGradeTable", Common.SetSerialLotShtGradeTable);
  router.post("/GetSerialProductByProduct", Common.GetSerialProductByProduct);
+ router.post("/Get_Spi_aoi_result", Common.get_spi_aoi_result);
  
 module.exports = router;
