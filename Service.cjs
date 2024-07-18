@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 app.use("/api/Common", commonRoutes);
 app.use("/api", LoginService);
 app.use("/api", MenuService);
-app.use("/api", ScanSMTFIN);
+app.use("/api/ScanFin/", ScanSMTFIN);
 app.use("/api", ScanSMTRollSht);
 app.use("/api", ScanSheetMOTTime);
 app.use("/api", sheetmaster);
