@@ -14,6 +14,7 @@ router.post("/GetWeekCodebyLot", ScanSMTFIN.GetWeekCodebyLot); //ทำต่อ
 router.post("/GetSerialDuplicateConnectSht", ScanSMTFIN.GetSerialDuplicateConnectSht);
 router.post("/SetSerialRecordTimeTrayTable", ScanSMTFIN.SetSerialRecordTimeTrayTable);
 router.post("/SetSerialLotShtTable", ScanSMTFIN.SetSerialLotShtTable);
+router.post("/SetRollLeafTrayTable", ScanSMTFIN.SetRollLeafTrayTable);
 
 
 module.exports = router;

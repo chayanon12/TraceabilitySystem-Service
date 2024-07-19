@@ -448,7 +448,8 @@ module.exports.SetRollLeafTrayTable = async function (req, res) {
       strPlantCode: "5",
     };
     const json_convertdata = JSON.stringify(jsondata);
-    query += `CALL "Traceability".trc_000_common_SetRollLeafTrayTable('[${json_convertdata}]');`;
+    console.log(json_convertdata);
+    query += `CALL "Traceability".trc_000_common_setrollleaftraytable('[${json_convertdata}]','');`;
     const result = await client.query(query);
 
     if (result.rows.length > 0) {
@@ -502,13 +503,17 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const { strRollLeaf, _dtRollLeaf } = req.body;
     let data = {
       strRollLeaf: strRollLeaf,
-      strPlantCode: "5",
+      strPlantCode: "G",
     };
     const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
+    let datax =[];
+    datax = Object.entries(_dtRollLeaf)
+    console.log(datax.length );
+    
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
-    if (result.rows.length > 0 && _dtRollLeaf.length) {
+    if (result.rows.length > 0 && datax.length >0) {
       if (result.rows.length > 0 != _dtRollLeaf.length) {
         intCount = 1;
       } else {
@@ -519,7 +524,7 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
         }
       }
     }
-    res.status(200).json(intCount);
+    res.status(200).json({"intCount":intCount});
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
