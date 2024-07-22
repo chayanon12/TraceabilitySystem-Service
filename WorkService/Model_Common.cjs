@@ -726,8 +726,8 @@ module.exports.get_spi_aoi_result = async function (req, res) {
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
     const result = await client.query(query);
-    console.log(result.rows,'result')
-      res.status(200).json(result.rows);
+    console.log(result.rows[0]._strreturn,'result')
+      res.status(200).json(result.rows[0]._strreturn);
       await DisconnectPG_DB(client);
     } catch (error) {
       writeLogError(error.message, query);
