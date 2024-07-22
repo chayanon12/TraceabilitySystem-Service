@@ -9,7 +9,6 @@ const {
   module.exports.GetSheetBinInspectNo = async function (req, res) {
     var query = "";
     try {
-    
     const {dataList} = req.body;
       const client = await ConnectPG_DB();
       const json_convertdata = JSON.stringify(dataList);
