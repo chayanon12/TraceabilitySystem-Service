@@ -695,19 +695,22 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
   const { dataList } = req.body;
   try {
     const json_convertdata = JSON.stringify(dataList);
-    console.log(json_convertdata)
+   
     const client = await ConnectPG_DB(); 
-    query = `CALL "Traceability".trc_000_common_setseriallotshtgradetable('${json_convertdata}','')`;
+    query = `CALL "Traceability".trc_006_common_SetSerialLotShtGradeTable('${json_convertdata}','')`;
     const result = await client.query(query); 
     _strError=result.rows[0.]._strerror
-    // if (result.rows !== "") {
+   
+    if (_strError==null){
+      _strError=''
+    }
     if(_strError!=''){
       SCAN_RESULT='NG'
       REMARK=_strError
     }
+    console.log('SetSerialLotShtGradeTable',_strError)
       res.status(200).json({strError:_strError,SCAN_RESULT:SCAN_RESULT,REMARK:REMARK});
       await DisconnectPG_DB(client);
-    // }
   } catch (err) {
     _strError="Can not connect database!"
     console.error(err.message);
