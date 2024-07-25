@@ -56,6 +56,8 @@ app.use("/api",ELTmaster)
 app.use("/api",SheetBinCheck)
 app.use("/api",Dispenser);
 app.use("/api", ScanSMTPlasma);
+app.use("/api",ScanSMTSerialControl);
+app.use("/api", SpotHeat);
 
 
 app.listen(port, () => {

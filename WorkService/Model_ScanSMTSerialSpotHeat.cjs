@@ -13,6 +13,7 @@ const {
           let strResult = "NO"
           const client = await ConnectPG_DB();
           const json_convertdata = JSON.stringify(dataList);
+        
           query += ` SELECT * from "Traceability".trc_013_getserialspotheatresult('[${json_convertdata}]')`;
       
           const result = await client.query(query);
