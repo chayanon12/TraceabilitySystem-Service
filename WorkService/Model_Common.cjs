@@ -789,3 +789,40 @@ module.exports.get_spi_aoi_result = async function (req, res) {
       res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.getSerialPassByLot = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      console.log('data:', data);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylot('${data}'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+ 
+module.exports.SetSerialLotTrayTable = async function (req, res) {
+  var query = "";
+ 
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    const query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
+   
+    const result = await client.query(query, [json_convertdata]);
+    if (result.rows !='') {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
