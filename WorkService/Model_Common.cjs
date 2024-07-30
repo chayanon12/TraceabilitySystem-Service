@@ -616,6 +616,39 @@ module.exports.getLotSerialRecordTimeData = async function (req, res) {
   }
 };
 
+
+module.exports.getleafduplicateconnectroll = async function (req, res) {
+  var query = "";
+  intCount=0;
+  strLeafDup = ""
+
+  try {
+    const client = await ConnectPG_DB();
+    const {dataList} = req.body;
+    
+    json_convertdata = JSON.stringify(dataList); 
+    // console.log('json_convertdata',json_convertdata)
+    query = `select * from "Traceability".trc_000_common_getleafduplicateconnectroll('[${json_convertdata}]');`;
+    // SELECT "Traceability".trc_000_common_getleafduplicateconnectroll(:json_data);
+    const result = await client.query(query);
+    console.log(dataList,'---------------',dataList._strRollLeaf ,'---', result.rows[0].roll_leaf ,'---' ,dataList._strRollNo,'---' ,result.rows[0].roll_no ,'---', dataList._strLot ,'---', result.rows[0].lot_no   ,'---', dataList._intSeq ,'---', result.rows[0].sheet_seq )
+    if(result.rows.length>0){
+       if(dataList._strRollLeaf == result.rows[0].roll_leaf && dataList._strRollNo ==result.rows[0].roll_no  && dataList._strLot == result.rows[0].lot_no   && dataList._intSeq == result.rows[0].sheet_seq  ){
+        intCount=0
+       }
+       else{
+        intCount=1
+       }
+    }
+    _strLeafDup = ""
+      res.status(200).json(intCount);
+      await DisconnectPG_DB(client);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   var query = "";
   var json_convertdata = "";
@@ -716,6 +749,25 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
     console.error(err.message);
     writeLogError(err.message, query); 
     res.status(500).json({ strError:_strError,SCAN_RESULT:'NG',REMARK:err.message }); 
+  }
+};
+
+module.exports.get_spi_aoi_result = async function (req, res) {
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    console.log('เข้า',dataList)
+    const json_convertdata = JSON.stringify(dataList);
+
+    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
+    const result = await client.query(query);
+    console.log(result.rows[0]._strreturn,'result')
+      res.status(200).json(result.rows[0]._strreturn);
+      await DisconnectPG_DB(client);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
   }
 };
 
