@@ -1,10 +1,11 @@
 const {
-    ConnectPG_DB,
-    DisconnectPG_DB,
-    ConnectOracleDB,
-    DisconnectOracleDB,
-  } = require("../Conncetion/DBConn.cjs");
-  const oracledb = require('oracledb');
+  ConnectPG_DB,
+  DisconnectPG_DB,
+  ConnectOracleDB,
+  DisconnectOracleDB,
+} = require("../Conncetion/DBConn.cjs");
+const oracledb = require("oracledb");
+const { writeLogError } = require("../Common/LogFuction.cjs");
   
   module.exports.GetProductNameByLot = async function (req, res) {
     console.log('g-hkkkk')
@@ -29,8 +30,8 @@ const {
     
     try {
        const { txtLotNo,txtSheetNo,txtMCNo } = req.body;
-      const connect = await ConnectOracleDB("FPC");
-      let query = `CALL FPC.FPC_SMART_FACTORY_SMT.SET_SMT_PROC_FLOW_LEADTIME_SHT(:Lotno, :SheetNo, :MCNo, :hfZPRNProcID, :P_STATUS, :P_ERROR)`;
+      const connect = await ConnectOracleDB("PCTTTEST");
+      let query = `CALL FPC.FPC_SMART_FACTORY_SMT.SET_SMT_BAK_MOT_LEADTIME_CBSUS(:Lotno, :SheetNo, :MCNo, :hfZPRNProcID, :P_STATUS, :P_ERROR)`;
       console.log(query);
       
       const result = await connect.execute(
@@ -49,14 +50,12 @@ const {
         }
       );
       await DisconnectOracleDB(connect);
+      // for (let i=0)
       res.json({
         P_STATUS: result.outBinds.P_STATUS,
         P_ERROR: result.outBinds.P_ERROR
       });
-      console.log({
-        P_STATUS: result.outBinds.P_STATUS,
-        P_ERROR: result.outBinds.P_ERROR
-      })
+
     } catch (error) {
       console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
       res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
@@ -71,14 +70,18 @@ const {
       const { SheetNo } = req.body;
       let data={
         strSheetNo:SheetNo,
-        strProcId:'1640',
+        strProcId:'1840',
         strPlantCode:'5'
       }
       const json_convertdata = JSON.stringify(data);
       const client = await ConnectPG_DB();
       query += `SELECT * from "Traceability".trc_000_common_getmotrecordtimedata('[${json_convertdata}]')`;
-      const result = await connect.execute(query);
+      const result = await client.query(query);
+ 
+
+
       res.status(200).json(result.rows);
+      
       await DisconnectPG_DB(client);
       
     } catch (error) {

@@ -188,28 +188,16 @@ module.exports.GetRollLeafTotalByLot = async function (req, res) {
     const { LotNo } = req.body;
     let data = {
       strLotno: LotNo,
-      strPlantCode: "G",
+      strPlantCode: "5",
     };
-    
+    console.log(data,'data')
     const json_data = JSON.stringify(data);
     console.log("เข้า2",json_data);
     const client = await ConnectPG_DB();
     let query = `SELECT * from "Traceability".trc_000_common_getrollleaftotalbylot('[${json_data}]')`;
-   
     const result = await client.query(query);
-   
     await DisconnectPG_DB(client);
     res.json(result.rows.length);
-
-    // const columnNames = result.metaData.map(column => column.name);
-    // const rows = result.rows.map(row => {
-    //     let rowData = {};
-    //     columnNames.forEach((columnName, index) => {
-    //         rowData[columnName] = row[index];
-    //     });
-    //     return rowData;
-    // });
-    // res.json(rows);
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
