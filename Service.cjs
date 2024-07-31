@@ -26,6 +26,7 @@ const ScanSMTPlasma = require("./routes/ScanSMTPlasmaStopStartRoutes.cjs");
 const ScanSMTSerialControl = require("./routes/ScanSMTSerialControlTimeRoutes.cjs");
 const SpotHeat = require("./routes/ScanSMTSerialSpotHeat.cjs");
 const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtConfirmRoutes.cjs");
+const ELT_Type = require("./routes/ELTType.cjs");
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -60,6 +61,7 @@ app.use("/api", ScanSMTPlasma);
 app.use("/api",ScanSMTSerialControl);
 app.use("/api", SpotHeat);
 app.use("/api", ScanSMTSerialSht);
+app.use("/api",ELT_Type)
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

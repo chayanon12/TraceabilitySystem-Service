@@ -503,7 +503,7 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const { strRollLeaf, _dtRollLeaf } = req.body;
     let data = {
       strRollLeaf: strRollLeaf,
-      strPlantCode: "G",
+      strPlantCode: "5",
     };
     const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
