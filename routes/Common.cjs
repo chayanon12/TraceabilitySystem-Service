@@ -23,6 +23,7 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/setLotSheetInsXOut", Common.setLotSheetInsXOut);
  router.post("/setseriallotshtelttable", Common.SetSerialLotShtELTTable);
  router.post("/getLotSerialRecordTimeData", Common.getLotSerialRecordTimeData);
+ router.post("/getSerialRecordTimeTrayTable", Common.getSerialRecordTimeTrayTable);
  router.post("/setSerialRecordTimeTrayTable", Common.SetSerialRecordTimeTrayTable);
  router.post("/SetRollSheetTrayTable", Common.SetRollSheetTrayTable);
  router.post("/SetSerialLotShtGradeTable", Common.SetSerialLotShtGradeTable);
