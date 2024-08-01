@@ -498,12 +498,12 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
 //ok
 module.exports.GetRollLeafDuplicate = async function (req, res) {
   let query = "";
-  let intCount = "";
+  let intCount = 0;
   try {
     const { strRollLeaf, _dtRollLeaf } = req.body;
     let data = {
       strRollLeaf: strRollLeaf,
-      strPlantCode: "G",
+      strPlantCode: "5",
     };
     const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
