@@ -27,6 +27,7 @@ const ScanSMTSerialControl = require("./routes/ScanSMTSerialControlTimeRoutes.cj
 const SpotHeat = require("./routes/ScanSMTSerialSpotHeat.cjs");
 const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtConfirmRoutes.cjs");
 const ELT_Type = require("./routes/ELTType.cjs");
+const ScanSMTSerialBackend = require("./routes/ScanSMTSerialBackendConfirmRoutes.cjs");
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -49,19 +50,20 @@ app.use("/api", sheetmaster);
 app.use("/api", productmaster);
 app.use("/api", serialmaster);
 app.use("/api", ScanShtInspect);
-app.use('/api',ScanSheetBakeTime);
+app.use('/api', ScanSheetBakeTime);
 app.use("/api", ScanShtInspectXOut);
 app.use("/api", ConfirmBarcodeGrade);
 app.use("/api", ScanSheetOvenTime);
 app.use("/api", Rejcet);
-app.use("/api",ELTmaster)
-app.use("/api",SheetBinCheck)
-app.use("/api",Dispenser);
+app.use("/api", ELTmaster)
+app.use("/api", SheetBinCheck)
+app.use("/api", Dispenser);
 app.use("/api", ScanSMTPlasma);
-app.use("/api",ScanSMTSerialControl);
+app.use("/api", ScanSMTSerialControl);
 app.use("/api", SpotHeat);
 app.use("/api", ScanSMTSerialSht);
-app.use("/api",ELT_Type)
+app.use("/api", ELT_Type);
+app.use("/api", ScanSMTSerialBackend);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
