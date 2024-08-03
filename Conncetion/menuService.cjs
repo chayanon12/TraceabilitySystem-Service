@@ -126,17 +126,29 @@ module.exports.MenuHome = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const query = `
-    SELECT  PARENT_ID , MENU_NAME  
-    FROM NAP_MENU 
-    WHERE APP_ID = '16' 
+    SELECT
+	NM.PARENT_ID ,
+	NM.MENU_NAME ,
+	NM.URL,
+	COUNT(DECODE(NM.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work,
+	COUNT(DECODE(NM.PARENT_ID, '0929', 1, NULL)) OVER () AS count_maintain,
+	COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata
+  FROM
+    NAP_MENU NM
+  WHERE
+    APP_ID = '16'
     AND VISIBLE_FLAG = 'N'
-    AND PARENT_ID IS NOT null`;
+    AND PARENT_ID IS NOT NULL`;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
     // res.json(result.rows);
     const jsonResult = result.rows.map(row => ({
       menu_id: row[0],
       menu_name: row[1],
+      url: row[2],
+      count_work: row[3],
+      count_maintain: row[4],
+      count_viewdata: row[5]
     }));
     res.json(jsonResult)
   } catch (error) {
