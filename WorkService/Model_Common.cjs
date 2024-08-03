@@ -46,13 +46,19 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
 };
 module.exports.GetProductNameByLot = async function (req, res) {
   var query = "";
+  var _strPrdName=''
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const {strLot} = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strLot}') as PRD_NAME  FROM DUAL`;
     const result = await Conn.execute(query);
+   
+    if (result.rows[0][0]!=null) {
+      _strPrdName= result.rows[0]
+    }
+    // console.log('result.rows', _strPrdName)
     // if (result.rows.length > 0) {
-      res.status(200).json({prdName : result.rows[0]});
+      res.status(200).json({prdName : _strPrdName});
     // }
     DisconnectOracleDB(Conn);
   } catch (error) {
