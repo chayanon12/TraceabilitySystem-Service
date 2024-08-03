@@ -2,7 +2,8 @@ const { Client } = require('pg');
 const oracledb = require("oracledb");
 require("dotenv").config();
 oracledb.initOracleClient({
-    tnsAdmin: "D:\\app\\\Chayanon.I\\product\\11.2.0\\client_2\\network\\admin",
+    // tnsAdmin: "D:\\app\\\Chayanon.I\\product\\11.2.0\\client_2\\network\\admin",
+    tnsAdmin: process.env.TNS_ADMIN,
 });
 
 const ConnectPG_DB= async () => {

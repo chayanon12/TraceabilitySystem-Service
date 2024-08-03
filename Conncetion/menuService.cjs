@@ -84,7 +84,10 @@ module.exports.Menuname = async function (req, res) {
          NM.SEQ ,
          NM.ACTIVE_FLAG ,
          NM.VISIBLE_FLAG ,
-         NM.PARENT_ID
+         NM.PARENT_ID,
+         COUNT(DECODE(NM.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work,
+    	  COUNT(DECODE(NM.PARENT_ID, '0929', 1, NULL)) OVER () AS count_maintain,
+    	  COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata
       FROM
          NAP_MAP_ROLE_USER NMRU
       INNER JOIN NAP_MAP_ROLE_MENU NMRM ON
@@ -97,7 +100,22 @@ module.exports.Menuname = async function (req, res) {
       ORDER BY NM.SEQ `;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
-    res.json(result.rows);
+  //  res.json(result);
+  const jsonResult = result.rows.map(row => ({
+    menu_id: row[0],
+    menu_name: row[1],
+    url: row[2],
+    seq: row[3],
+    active_flag: row[4],
+    visible_flag: row[5],
+    parent_id: row[6],
+    count_work: row[7],
+    count_maintain: row[8],
+    count_viewdata: row[9]
+  }));
+   res.json(jsonResult);
+
+
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
   }
@@ -111,10 +129,16 @@ module.exports.MenuHome = async function (req, res) {
     SELECT  PARENT_ID , MENU_NAME  
     FROM NAP_MENU 
     WHERE APP_ID = '16' 
+    AND VISIBLE_FLAG = 'N'
     AND PARENT_ID IS NOT null`;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
-    res.json(result.rows);
+    // res.json(result.rows);
+    const jsonResult = result.rows.map(row => ({
+      menu_id: row[0],
+      menu_name: row[1],
+    }));
+    res.json(jsonResult)
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
   }
