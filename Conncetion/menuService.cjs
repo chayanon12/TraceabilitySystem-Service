@@ -97,6 +97,7 @@ module.exports.Menuname = async function (req, res) {
       WHERE
          NMRU.LOGIN_ID = '${login_id}'
         AND NM.APP_ID = '16'
+        AND NM.PARENT_ID IS NOT NULL
       ORDER BY NM.SEQ `;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
@@ -143,7 +144,7 @@ module.exports.MenuHome = async function (req, res) {
     DisconnectOracleDB(connect);
     // res.json(result.rows);
     const jsonResult = result.rows.map(row => ({
-      menu_id: row[0],
+      parent_id: row[0],
       menu_name: row[1],
       url: row[2],
       count_work: row[3],
