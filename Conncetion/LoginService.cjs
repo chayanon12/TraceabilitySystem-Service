@@ -12,32 +12,7 @@ const { now } = require("moment");
 const app = express();
 app.use(bodyParser.json());
 
-// module.exports.login = async (req, res) => {
-//   var query = "";
-//   try {
-//     const { User, Password } = req.body;
-//     const Conn = await ConnectOracleDB("FPC");
-//     query = `
-//         SELECT NUL.LOGIN_ID ,NUL.FACTORY_CODE ,NUL.ID_CODE ,INITCAP(NUL.USER_NAME) AS USER_NAME,INITCAP(NUL.USER_SURNAME) AS USER_SURNAME,NUL.EMAIL_ADD
-//         FROM NAP_USER_LOGIN NUL
-//         WHERE UPPER(NUL.USER_LOGIN) = UPPER('${User}')
-//             AND UPPER(NUL.USER_PASSWORD) = UPPER('${Password}')
-//             AND NUL.USER_STATUS = 'A' `;
-//     const result = await Conn.execute(query);
-//     if (result.rows.length > 0) {
-//       res.status(200).json(result.rows);
-//       DisconnectOracleDB(Conn);
-//     } else {
-//       res.status(401).json({ message: "Invalid User or Password" });
-//       DisconnectOracleDB(Conn);
-//     }
-//   } catch (err) {
-//     writeLogError(err.message,query);
-//     res.status(500).json({ message: err.message });
-//     console.log(err);
-//   }
-// };
-
+JWT_SECRET = process.env.JWT_TOKEN;
 module.exports.login = async (req, res) => {
   var query = "";
   try {
@@ -51,15 +26,26 @@ module.exports.login = async (req, res) => {
             AND NUL.USER_STATUS = 'A' `;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-      // res.status(200).json(result.rows);
-      const token = jwt.sign({ User, Password }, "yourSecretKey", {
-        expiresIn: "1m",
+      const token = jwt.sign({ id: User, username: Password }, JWT_SECRET, {
+        expiresIn: "10h",
       });
-      console.log(token,now())
-      res.status(200).json({ token: token,result:result.rows });
+      res.status(200).json({
+        status: "Success",
+        token: token,
+        Datainfo: {
+          user_login: result.rows[0][0],
+          factory_code: result.rows[0][1],
+          id_code: result.rows[0][2],
+          name: result.rows[0][3],
+          surname: result.rows[0][4],
+          email: result.rows[0][5],
+        },
+      });
       DisconnectOracleDB(Conn);
     } else {
-      res.status(401).json({ message: "Invalid User or Password" });
+      res
+        .status(401)
+        .json({ status: "Error", message: "Invalid User or Password" });
       DisconnectOracleDB(Conn);
     }
   } catch (err) {
@@ -68,22 +54,29 @@ module.exports.login = async (req, res) => {
     console.log(err);
   }
 };
-
-module.exports.verifyToken = (req, res, next) => {
-  let token ;
-  if (req.headers.authorization !== "") {
-    token = req.headers.authorization.split(" ")[1];
+module.exports.VerifyToken = (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res
+      .status(401)
+      .json({ status: "error", message: "No token provided" });
   }
-  if (!token) return res.status(401).json({ message: "Auth Error" });
-
-  jwt.verify(token, "yourSecretKey", (err, decoded) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: "Invalid token" });
+      return res
+        .status(401)
+        .json({ status: "error", message: "Invalid or expired token" });
     }
-    res.json({ success: true, decoded });
+    const expDate = new Date(decoded.exp * 1000).toISOString();
+    res.json({
+      status: "success",
+      message: "Access granted",
+      user: decoded,
+      timeout: expDate,
+    });
+    console.log(expDate)
   });
 };
-
 module.exports.getIPaddress = async (req, res) => {
   try {
     const clientIp = req.connection.remoteAddress;

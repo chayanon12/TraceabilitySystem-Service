@@ -4,8 +4,8 @@ const Login = require("../Conncetion/LoginService.cjs");
 
 
 router.post("/login", Login.login);
-router.get("/verifyToken", Login.verifyToken);
 router.get("/getIPaddress", Login.getIPaddress);
+router.post ("/VerifyToken", Login.VerifyToken);
 
 module.exports = router;
 
