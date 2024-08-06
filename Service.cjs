@@ -30,6 +30,7 @@ const ELT_Type = require("./routes/ELTType.cjs");
 const ScanSMTSerialBackend = require("./routes/ScanSMTSerialBackendConfirmRoutes.cjs");
 const AVIconfirm = require("./routes/AVIConfirm.cjs");
 const ScanAutoBendingTime = require("./routes/ScanAutoBendingTime.cjs");
+const ReJudgement = require("./routes/ReJudgement.cjs");
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -69,6 +70,8 @@ app.use("/api", ScanSMTSerialBackend);
 app.use("/api",ELT_Type)
 app.use("/api",AVIconfirm)
 app.use("/api", ScanAutoBendingTime);
+app.use("/api", ReJudgement);
+
 
 
 app.listen(port, () => {

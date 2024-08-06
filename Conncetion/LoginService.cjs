@@ -74,7 +74,6 @@ module.exports.VerifyToken = (req, res) => {
       user: decoded,
       timeout: expDate,
     });
-    console.log(expDate)
   });
 };
 module.exports.getIPaddress = async (req, res) => {
