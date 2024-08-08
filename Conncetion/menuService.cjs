@@ -85,9 +85,10 @@ module.exports.Menuname = async function (req, res) {
          NM.ACTIVE_FLAG ,
          NM.VISIBLE_FLAG ,
          NM.PARENT_ID,
-         COUNT(DECODE(NM.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work,
+        COUNT(DECODE(NM.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work,
     	  COUNT(DECODE(NM.PARENT_ID, '0929', 1, NULL)) OVER () AS count_maintain,
-    	  COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata
+    	  COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata,
+        NM.PAGE_TITLE
       FROM
          NAP_MAP_ROLE_USER NMRU
       INNER JOIN NAP_MAP_ROLE_MENU NMRM ON
@@ -112,11 +113,10 @@ module.exports.Menuname = async function (req, res) {
     parent_id: row[6],
     count_work: row[7],
     count_maintain: row[8],
-    count_viewdata: row[9]
+    count_viewdata: row[9],
+    page_title: row[10]
   }));
    res.json(jsonResult);
-
-
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
   }
@@ -133,7 +133,8 @@ module.exports.MenuHome = async function (req, res) {
 	NM.URL,
 	COUNT(DECODE(NM.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work,
 	COUNT(DECODE(NM.PARENT_ID, '0929', 1, NULL)) OVER () AS count_maintain,
-	COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata
+	COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata,
+  NM.PAGE_TITLE
   FROM
     NAP_MENU NM
   WHERE
@@ -149,7 +150,8 @@ module.exports.MenuHome = async function (req, res) {
       url: row[2],
       count_work: row[3],
       count_maintain: row[4],
-      count_viewdata: row[5]
+      count_viewdata: row[5],
+      page_title: row[6]
     }));
     res.json(jsonResult)
   } catch (error) {
