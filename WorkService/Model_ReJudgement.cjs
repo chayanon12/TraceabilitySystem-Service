@@ -14,12 +14,12 @@ module.exports.GetData = async function (req, res) {
     let { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     console.log(json_convertdata);
-    query += ` select * from "Traceability".trc_021_rejudgement_search_datat('[${json_convertdata}]') `;
+    query += ` select * from "Traceability".trc_021_rejudgement_search_data('[${json_convertdata}]') `;
 
     const result = await client.query(query);
 
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0]);
+      res.status(200).json(result.rows[0].dtdata);
       console.log(result.rows);
       await DisconnectPG_DB(client);
     } else {
