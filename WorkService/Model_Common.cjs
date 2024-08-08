@@ -825,20 +825,20 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
 
 //เปลี่ยนเป็น env
 module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
+  console.log("มาแล้ว")
   var query = "";
-  var _strResult='NG'
-  var FINAL_GATE_MASTER_FLG =0
-  var _strPlantCode='5'
-  var FINAL_GATE_MASTER_CODE='T999999999'
-  var WORKING_START_TIME='0800'
-  var _FINAL_GATE_MASTER_TIME ='0800:1959|0800,2000:0759|2000'
+  var _strResult='NG';
+  var FINAL_GATE_MASTER_FLG =process.env.VITE_FINAL_GATE_MASTER_FLG;
+  var _strPlantCode= process.env.FacA1;
+  var FINAL_GATE_MASTER_CODE=process.env.VITE_FINAL_GATE_MASTER_CODE;
+  var WORKING_START_TIME=process.env.VITE_WORKING_START_TIME;
+  var _FINAL_GATE_MASTER_TIME =process.env.VITE__FINAL_GATE_MASTER_TIME;
   try {
     const client = await ConnectPG_DB();
     const { strProduct } = req.body;
     console.log('strProduct :',strProduct)
     let datalist ={"_strProduct":strProduct,
                    "_strPlantCode":_strPlantCode,
-                   "FINAL_GATE_MASTER_CODE":_strPlantCode,
                    "FINAL_GATE_MASTER_CODE":FINAL_GATE_MASTER_CODE,
                    "WORKING_START_TIME":WORKING_START_TIME,
                    "_FINAL_GATE_MASTER_TIME":_FINAL_GATE_MASTER_TIME
