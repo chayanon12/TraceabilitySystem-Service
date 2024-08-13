@@ -427,18 +427,7 @@ module.exports.getserialforupdate = async function (req, res) {
   }
 };
 
-module.exports.getserialpassbylotpacking = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 
 module.exports.getserialtouchupdata = async function (req, res) {
   try {
@@ -830,5 +819,64 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+//เปลี่ยนเป็น env
+module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
+  console.log("มาแล้ว")
+  var query = "";
+  var _strResult='NG';
+  var FINAL_GATE_MASTER_FLG =process.env.VITE_FINAL_GATE_MASTER_FLG;
+  var _strPlantCode= process.env.FacA1;
+  var FINAL_GATE_MASTER_CODE=process.env.VITE_FINAL_GATE_MASTER_CODE;
+  var WORKING_START_TIME=process.env.VITE_WORKING_START_TIME;
+  var _FINAL_GATE_MASTER_TIME =process.env.VITE__FINAL_GATE_MASTER_TIME;
+  try {
+    const client = await ConnectPG_DB();
+    const { strProduct } = req.body;
+    console.log('strProduct :',strProduct)
+    let datalist ={"_strProduct":strProduct,
+                   "_strPlantCode":_strPlantCode,
+                   "FINAL_GATE_MASTER_CODE":FINAL_GATE_MASTER_CODE,
+                   "WORKING_START_TIME":WORKING_START_TIME,
+                   "_FINAL_GATE_MASTER_TIME":_FINAL_GATE_MASTER_TIME
+                  }
+    console.log(datalist)
+    const json_convertdata = JSON.stringify(datalist)
+    if (FINAL_GATE_MASTER_FLG==1){
+      const query = `SELECT * from  "Traceability".trc_020_finalgate_getfinalgatemastercheckresult('[${json_convertdata}]');`;
+      const result = await client.query(query);
+      if (result.rows !='') {
+        _strResult=result.rows[0].MASTER_RESULT
+      }
+    }
+    else{
+      _strResult='OK'
+    }
+      res.status(200).json(_strResult);
+      await DisconnectPG_DB(client);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.GetSerialPassByLotPacking = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      console.log('data:', data);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
   }
 };

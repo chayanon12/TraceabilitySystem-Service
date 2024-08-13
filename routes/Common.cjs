@@ -32,5 +32,7 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/getleafduplicateconnectroll", Common.getleafduplicateconnectroll);
  router.post("/getSerialPassByLot", Common.getSerialPassByLot);
  router.post("/setseriallottraytable", Common.SetSerialLotTrayTable);
+ router.post("/GetFinalGateMasterCheckResult", Common.GetFinalGateMasterCheckResult);
+ router.post("/GetSerialPassByLotPacking", Common.GetSerialPassByLotPacking);
  
 module.exports = router;
