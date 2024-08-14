@@ -90,7 +90,7 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
     console.log(query)
-    const result = await client.query(query);
+    const result = await client.query(query);"Schemas"
 
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
@@ -867,6 +867,67 @@ module.exports.GetSerialPassByLotPacking = async function (req, res) {
       const result = await client.query(query);
       await DisconnectPG_DB(client);
       res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+
+module.exports.GetSerialFinInspectResult = async function (req, res) {
+  var query = "";
+  var _strReturn="SKIP FQC"
+  try {
+    // {
+    //   "dataList": 
+    //     {"_strSerialNo": "TestSerialNo", 
+    //      "_strProc": "ZFIN",
+    //      "_strPlantCode": "5" }
+    // }
+      const { dataList } = req.body;
+      console.log('GetCheckChipDuplicate :',dataList)
+      const json_convertdata = JSON.stringify(dataList);
+      query += `select * from "Traceability".trc_000_common_getserialfininspectresult('[${json_convertdata}]');`;
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      if(result.rows.length>0){
+        if(result.rows[0].row_count>0){
+          _strReturn = "OK"
+        }
+      }
+      res.status(200).json(_strReturn);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+
+module.exports.GetCheckChipDuplicate = async function (req, res) {
+  var query = "";
+  var _intSuccess=0
+  try {
+    // {
+    //   "dataList": 
+    //     {"_strPrdName": "RGOZ-412MW-0A",//1
+    //         "_strSerial": "TestSerial",//2
+    //         "_strPlantCode": "5"//3
+    //     }
+    // }
+      const { dataList } = req.body;
+      console.log('GetCheckChipDuplicate :',dataList)
+      const json_convertdata = JSON.stringify(dataList);
+      query += `select * from "Traceability".trc_000_common_getcheckchipduplicate('[${json_convertdata}]');`;
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      if(result.rows.length>0){
+        if(result.rows[0].test_result=='OK'){
+          _intSuccess = 1
+        }
+      }
+      res.status(200).json(_intSuccess);
   } catch (err) {
       writeLogError(err.message, query);
       res.status(500).json({ message: err.message });
