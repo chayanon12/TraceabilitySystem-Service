@@ -53,3 +53,22 @@ module.exports.UpdateData = async function (req, res) {
     }
   };
 
+  module.exports.GetSerialBoxProductByProduct = async function (req, res) {
+    let query = "";
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSBoxPByP('RGO-387W-0A') AS x  FROM DUAL`;
+      const result = await Conn.execute(query);
+      if (result.rows.length > 0) {
+       
+        let data =[ {
+          'prdname':result.rows[0][0][0][0]
+        }]
+        res.status(200).json(data);
+        console.log(result.rows,"data");
+        DisconnectOracleDB(Conn);
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };

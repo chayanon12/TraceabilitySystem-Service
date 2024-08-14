@@ -880,3 +880,77 @@ module.exports.GetSerialPassByLotPacking = async function (req, res) {
       res.status(500).json({ message: err.message });
   }
 };
+
+module.exports.GetSerialPassByLotPacking = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      console.log('data:', data);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+module.exports.GetBoxCount = async function (req, res) {
+  var query = "";
+  var intCount = 0
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const {prdName ,boxNo  } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetBoxCount( '${prdName}', '${boxNo}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {
+       
+      let data =[ {
+        'BOX_COUNT':result.rows[0][0][0][0],
+        'BOX_QTY':result.rows[0][0][0][1]
+      }]    
+      
+     if(data.length > 0){
+      intCount = data[0].BOX_COUNT
+     }
+      res.status(200).json(intCount);
+      DisconnectOracleDB(Conn);
+    }
+   
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+}
+module.exports.GetCountTrayByBoxPacking = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const {prdName ,boxNo , srtPack } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetCTrayBBoxPack( '${prdName}', '${boxNo}','${srtPack}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {
+       
+      let data =[ {
+        'BOX_COUNT':result.rows[0][0][0][0],
+        'PACKING_COUNT':result.rows[0][0][0][1]
+      }]    
+      
+    //  if(data.length > 0){
+    //   intCount = data[0].BOX_COUNT
+    //  } 
+    
+      res.status(200).json(data);
+     console.log(result.rows,"result",data)
+      DisconnectOracleDB(Conn);
+
+    }
+   
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+}
+
