@@ -208,14 +208,6 @@ module.exports.GetProductDataByLot = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const { strLot} = req.body;
-    // console.log(strLot.strLot)
-    // // let data={
-    // //   strLot:strLot
-
-    // // }
-    // strLot.priority=process.env.priority
-    
-    console.log(strLot)
     query += `SELECT  FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETPRODUCTDATABYLOT('${strLot}','${process.env.priority}') AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
