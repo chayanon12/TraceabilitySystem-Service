@@ -26,9 +26,9 @@ module.exports.login = async (req, res) => {
             AND NUL.USER_STATUS = 'A' `;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-      const token = jwt.sign({ id: User, username: Password }, JWT_SECRET, {
-        expiresIn: "10h",
-      });
+      const token = jwt.sign({ id: User, username: Password }, JWT_SECRET
+        // , {expiresIn: "10h",}
+      );
       res.status(200).json({
         status: "Success",
         token: token,
@@ -67,12 +67,12 @@ module.exports.VerifyToken = (req, res) => {
         .status(401)
         .json({ status: "error", message: "Invalid or expired token" });
     }
-    const expDate = new Date(decoded.exp * 1000).toISOString();
+    // const expDate = new Date(decoded.exp * 1000).toISOString();
     res.json({
       status: "success",
       message: "Access granted",
-      user: decoded,
-      timeout: expDate,
+      user: decoded
+      // timeout: expDate,
     });
   });
 };
