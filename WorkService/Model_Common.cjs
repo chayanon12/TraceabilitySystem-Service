@@ -28,7 +28,6 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
   const { prdName } = req.body;
   const jsondata = {strProduct: prdName, strPlantCode: Fac};
   const json_convertdata = JSON.stringify(jsondata);
-  console.log(json_convertdata,'mayyy');
   try {
     const client = await ConnectPG_DB();
     query += `SELECT * from "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]');`;
@@ -56,7 +55,6 @@ module.exports.GetProductNameByLot = async function (req, res) {
     if (result.rows[0][0]!=null) {
       _strPrdName= result.rows[0]
     }
-    // console.log('result.rows', _strPrdName)
     // if (result.rows.length > 0) {
       res.status(200).json({prdName : _strPrdName});
     // }
@@ -89,7 +87,6 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
-    console.log(query)
     const result = await client.query(query);"Schemas"
 
     if (result.rows.length > 0) {
@@ -107,11 +104,9 @@ module.exports.SetRollSheetTrayTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-    // console.log('Query',dataList)
     const json_convertdata = JSON.stringify(dataList);
     query += `CALL "Traceability".trc_006_common_setrollsheettraytable('[${json_convertdata}]','');`;
     const result = await client.query(query);
-    // console.log(result.rows[0]._strerror,'result')
     if (result.rows[0]._strerror =='') {
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
@@ -173,9 +168,7 @@ module.exports.getlotserialcountdata = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    console.log(json_convertdata)
     query += ` SELECT * from "Traceability".trc_000_common_getlotserialcountdata('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
@@ -203,7 +196,6 @@ module.exports.getWeekCodebyLot = async function (req, res) {
 };
 
 module.exports.GetProductDataByLot = async function (req, res) {
-  console.log('เข้า')
   var query = "";
   try {
     const connect = await ConnectOracleDB("FPC");
@@ -214,7 +206,6 @@ module.exports.GetProductDataByLot = async function (req, res) {
     res.status(200).json(result.rows);
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -262,7 +253,6 @@ module.exports.getProductShtGroup = async function (req, res) {
   var query = "";
   try {
       const _data = JSON.stringify(req.body);
-      console.log('prdName:', _data);
       query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtgroup('${_data}'); `;
 
       const client = await ConnectPG_DB();
@@ -279,7 +269,6 @@ module.exports.getProductShtBIN = async function (req, res) {
   var query = "";
   try {
       const bingroup = JSON.stringify(req.body);
-      console.log('bingroup:', bingroup);
       query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtbin('${bingroup}'); `;
 
       const client = await ConnectPG_DB();
@@ -397,7 +386,6 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     const data = JSON.parse(dataJsonString);
-    console.log(data);
     res.status(200).json(result.rows.flat());
   } catch (error) {
     writeLogError(error.message, query);
@@ -506,7 +494,6 @@ module.exports.getworkingdate = async function (req, res) {
     query = ` SELECT * FROM "Traceability".trc_000_common_getworkingdate(); `;
     const result = await client.query(query);
 
-    console.log(result.rows);
     await DisconnectPG_DB(client);
     res.status(200).json({ Result: result });
   } catch (error) {
@@ -539,9 +526,7 @@ module.exports.CallSMTReflowRecordTimeResult = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const {dataList} = req.body;
-    console.log(dataList)
     json_convertdata = JSON.stringify(dataList);
-    console.log(json_convertdata);
     query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult($1::jsonb,'');`;
     // query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult('[${json_convertdata}]','');`;
 
@@ -614,11 +599,8 @@ module.exports.getleafduplicateconnectroll = async function (req, res) {
     const {dataList} = req.body;
     
     json_convertdata = JSON.stringify(dataList); 
-    // console.log('json_convertdata',json_convertdata)
     query = `select * from "Traceability".trc_000_common_getleafduplicateconnectroll('[${json_convertdata}]');`;
-    // SELECT "Traceability".trc_000_common_getleafduplicateconnectroll(:json_data);
     const result = await client.query(query);
-    console.log(dataList,'---------------',dataList._strRollLeaf ,'---', result.rows[0].roll_leaf ,'---' ,dataList._strRollNo,'---' ,result.rows[0].roll_no ,'---', dataList._strLot ,'---', result.rows[0].lot_no   ,'---', dataList._intSeq ,'---', result.rows[0].sheet_seq )
     if(result.rows.length>0){
        if(dataList._strRollLeaf == result.rows[0].roll_leaf && dataList._strRollNo ==result.rows[0].roll_no  && dataList._strLot == result.rows[0].lot_no   && dataList._intSeq == result.rows[0].sheet_seq  ){
         intCount=0
@@ -642,9 +624,7 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const {dataList} = req.body;
-    console.log(dataList)
     json_convertdata = JSON.stringify(dataList);
-    console.log(json_convertdata);
     query = `call "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'');`;
 
     const result = await client.query(query, [json_convertdata]);
@@ -667,7 +647,6 @@ module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
   var query = "";
   try {
     const data = JSON.stringify(req.body); 
-    console.log('Data:', data);
 
     query = `SELECT * FROM "Traceability".trc_000_common_getserialrecordtimetraytable('[${data}]');`;
 
@@ -695,7 +674,6 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
     query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','')`;
     
     const result = await client.query(query);
-    console.log(result,'result')
     if (result.rows !='') {
       res.status(200).json(result.rows);
       await DisconnectPG_DB(client);
@@ -728,7 +706,6 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
       SCAN_RESULT='NG'
       REMARK=_strError
     }
-    console.log('SetSerialLotShtGradeTable',_strError)
       res.status(200).json({strError:_strError,SCAN_RESULT:SCAN_RESULT,REMARK:REMARK});
       await DisconnectPG_DB(client);
   } catch (err) {
@@ -744,12 +721,10 @@ module.exports.get_spi_aoi_result = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-    console.log('เข้า',dataList)
     const json_convertdata = JSON.stringify(dataList);
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
     const result = await client.query(query);
-    console.log(result.rows[0]._strreturn,'result')
       res.status(200).json(result.rows[0]._strreturn);
       await DisconnectPG_DB(client);
     } catch (error) {
@@ -763,12 +738,10 @@ module.exports.get_spi_aoi_result = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-    console.log('เข้า',dataList)
     const json_convertdata = JSON.stringify(dataList);
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
     const result = await client.query(query);
-    console.log(result.rows[0]._strreturn,'result')
       res.status(200).json(result.rows[0]._strreturn);
       await DisconnectPG_DB(client);
     } catch (error) {
@@ -781,7 +754,6 @@ module.exports.getSerialPassByLot = async function (req, res) {
   var query = "";
   try {
       const data = JSON.stringify(req.body);
-      console.log('data:', data);
       query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylot('${data}'); `;
  
       const client = await ConnectPG_DB();
@@ -817,7 +789,6 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
 
 //เปลี่ยนเป็น env
 module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
-  console.log("มาแล้ว")
   var query = "";
   var _strResult='NG';
   var FINAL_GATE_MASTER_FLG =process.env.VITE_FINAL_GATE_MASTER_FLG;
@@ -828,14 +799,12 @@ module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { strProduct } = req.body;
-    console.log('strProduct :',strProduct)
     let datalist ={"_strProduct":strProduct,
                    "_strPlantCode":_strPlantCode,
                    "FINAL_GATE_MASTER_CODE":FINAL_GATE_MASTER_CODE,
                    "WORKING_START_TIME":WORKING_START_TIME,
                    "_FINAL_GATE_MASTER_TIME":_FINAL_GATE_MASTER_TIME
                   }
-    console.log(datalist)
     const json_convertdata = JSON.stringify(datalist)
     if (FINAL_GATE_MASTER_FLG==1){
       const query = `SELECT * from  "Traceability".trc_020_finalgate_getfinalgatemastercheckresult('[${json_convertdata}]');`;
@@ -860,7 +829,6 @@ module.exports.GetSerialPassByLotPacking = async function (req, res) {
   var query = "";
   try {
       const data = JSON.stringify(req.body);
-      console.log('data:', data);
       query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
  
       const client = await ConnectPG_DB();
@@ -885,7 +853,6 @@ module.exports.GetSerialFinInspectResult = async function (req, res) {
     //      "_strPlantCode": "5" }
     // }
       const { dataList } = req.body;
-      console.log('GetCheckChipDuplicate :',dataList)
       const json_convertdata = JSON.stringify(dataList);
       query += `select * from "Traceability".trc_000_common_getserialfininspectresult('[${json_convertdata}]');`;
       const client = await ConnectPG_DB();
@@ -916,7 +883,6 @@ module.exports.GetCheckChipDuplicate = async function (req, res) {
     //     }
     // }
       const { dataList } = req.body;
-      console.log('GetCheckChipDuplicate :',dataList)
       const json_convertdata = JSON.stringify(dataList);
       query += `select * from "Traceability".trc_000_common_getcheckchipduplicate('[${json_convertdata}]');`;
       const client = await ConnectPG_DB();
@@ -981,7 +947,6 @@ module.exports.GetCountTrayByBoxPacking = async function (req, res) {
     //  } 
     
       res.status(200).json(data);
-     console.log(result.rows,"result",data)
       DisconnectOracleDB(Conn);
 
     }
