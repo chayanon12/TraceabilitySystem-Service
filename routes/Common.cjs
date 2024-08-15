@@ -36,9 +36,12 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/GetSerialPassByLotPacking", Common.GetSerialPassByLotPacking);
  router.post("/GetBoxCount", Common.GetBoxCount);
  router.post("/GetCountTrayByBoxPacking", Common.GetCountTrayByBoxPacking);
-
+//  router.post("/GetSerialOSTResult", Common.GetSerialOSTResult);
  router.post("/GetCheckChipDuplicate", Common.GetCheckChipDuplicate);
  router.post("/GetSerialFinInspectResult", Common.GetSerialFinInspectResult);
+ router.post("/GetEFPCSheetInspectionResult", Common.GetEFPCSheetInspectionResult);
+ 
+ 
  
  
 module.exports = router;

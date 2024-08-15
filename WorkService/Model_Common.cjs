@@ -26,7 +26,7 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
   var query = "";
   var Fac = process.env.FacA1;
   const { prdName } = req.body;
-  const jsondata = {strProduct: prdName, strPlantCode: Fac};
+  const jsondata = { strProduct: prdName, strPlantCode: Fac };
   const json_convertdata = JSON.stringify(jsondata);
   try {
     const client = await ConnectPG_DB();
@@ -34,10 +34,8 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
 
     const result = await client.query(query);
 
-    
-      res.status(200).json(result.rows);
-      await DisconnectPG_DB(client);
-
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
@@ -45,25 +43,25 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
 };
 module.exports.GetProductNameByLot = async function (req, res) {
   var query = "";
-  var _strPrdName=''
+  var _strPrdName = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    const {strLot} = req.body;
+    const { strLot } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strLot}') as PRD_NAME  FROM DUAL`;
     const result = await Conn.execute(query);
-   
-    if (result.rows[0][0]!=null) {
-      _strPrdName= result.rows[0]
+
+    if (result.rows[0][0] != null) {
+      _strPrdName = result.rows[0];
     }
     // if (result.rows.length > 0) {
-      res.status(200).json({prdName : _strPrdName});
+    res.status(200).json({ prdName: _strPrdName });
     // }
     DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
-}
+};
 ///------Example
 
 module.exports.GetProductData = async function (req, res) {
@@ -87,7 +85,8 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
-    const result = await client.query(query);"Schemas"
+    const result = await client.query(query);
+    ("Schemas");
 
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
@@ -107,21 +106,18 @@ module.exports.SetRollSheetTrayTable = async function (req, res) {
     const json_convertdata = JSON.stringify(dataList);
     query += `CALL "Traceability".trc_006_common_setrollsheettraytable('[${json_convertdata}]','');`;
     const result = await client.query(query);
-    if (result.rows[0]._strerror =='') {
+    if (result.rows[0]._strerror == "") {
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
-     }
-     else{
+    } else {
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
-     }
+    }
   } catch (error) {
-    
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
-
 
 module.exports.getconnectshtmastercheckresult = async function (req, res) {
   try {
@@ -199,7 +195,7 @@ module.exports.GetProductDataByLot = async function (req, res) {
   var query = "";
   try {
     const connect = await ConnectOracleDB("FPC");
-    const { strLot} = req.body;
+    const { strLot } = req.body;
     query += `SELECT  FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETPRODUCTDATABYLOT('${strLot}','${process.env.priority}') AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -252,32 +248,32 @@ module.exports.getproductdata = async function (req, res) {
 module.exports.getProductShtGroup = async function (req, res) {
   var query = "";
   try {
-      const _data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtgroup('${_data}'); `;
+    const _data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtgroup('${_data}'); `;
 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows);
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
 module.exports.getProductShtBIN = async function (req, res) {
   var query = "";
   try {
-      const bingroup = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtbin('${bingroup}'); `;
+    const bingroup = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getproductshtbin('${bingroup}'); `;
 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows);
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -382,7 +378,7 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { Serial } = req.body;
-    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`;  //--THA92770P53J17J5B
+    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`; //--THA92770P53J17J5B
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     const data = JSON.parse(dataJsonString);
@@ -406,8 +402,6 @@ module.exports.getserialforupdate = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 module.exports.getserialtouchupdata = async function (req, res) {
   try {
@@ -506,7 +500,7 @@ module.exports.GetReflowRecordTimeData = async function (req, res) {
 
   try {
     const client = await ConnectPG_DB();
-    const {dataList} = req.body;
+    const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
 
     query = `select * from "Traceability".trc_000_common_GetReflowRecordTimeData('[${json_convertdata}]');`;
@@ -525,7 +519,7 @@ module.exports.CallSMTReflowRecordTimeResult = async function (req, res) {
   var json_convertdata = "";
   try {
     const client = await ConnectPG_DB();
-    const {dataList} = req.body;
+    const { dataList } = req.body;
     json_convertdata = JSON.stringify(dataList);
     query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult($1::jsonb,'');`;
     // query = `call "Traceability".trc_000_common_CallSMTReflowRecordTimeResult('[${json_convertdata}]','');`;
@@ -547,13 +541,12 @@ module.exports.CallSMTReflowRecordTimeResult = async function (req, res) {
   }
 };
 
-
 module.exports.DeleteReflowRecordTimeData = async function (req, res) {
   var query = "";
   try {
     const client = await ConnectPG_DB();
-    const {strSheetNo,strPlantCode} = req.body;
-    const dataList = {strSheetNo:strSheetNo,strPlantCode:strPlantCode}
+    const { strSheetNo, strPlantCode } = req.body;
+    const dataList = { strSheetNo: strSheetNo, strPlantCode: strPlantCode };
     json_convertdata = JSON.stringify(dataList);
     query = `call "Traceability".trc_000_common_DeleteReflowRecordTimeData('[${json_convertdata}]','');`;
     const result = await client.query(query);
@@ -588,31 +581,33 @@ module.exports.getLotSerialRecordTimeData = async function (req, res) {
   }
 };
 
-
 module.exports.getleafduplicateconnectroll = async function (req, res) {
   var query = "";
-  intCount=0;
-  strLeafDup = ""
+  intCount = 0;
+  strLeafDup = "";
 
   try {
     const client = await ConnectPG_DB();
-    const {dataList} = req.body;
-    
-    json_convertdata = JSON.stringify(dataList); 
+    const { dataList } = req.body;
+
+    json_convertdata = JSON.stringify(dataList);
     query = `select * from "Traceability".trc_000_common_getleafduplicateconnectroll('[${json_convertdata}]');`;
     const result = await client.query(query);
-    if(result.rows.length>0){
-       if(dataList._strRollLeaf == result.rows[0].roll_leaf && dataList._strRollNo ==result.rows[0].roll_no  && dataList._strLot == result.rows[0].lot_no   && dataList._intSeq == result.rows[0].sheet_seq  ){
-        intCount=0
-       }
-       else{
-        intCount=1
-       }
+    if (result.rows.length > 0) {
+      if (
+        dataList._strRollLeaf == result.rows[0].roll_leaf &&
+        dataList._strRollNo == result.rows[0].roll_no &&
+        dataList._strLot == result.rows[0].lot_no &&
+        dataList._intSeq == result.rows[0].sheet_seq
+      ) {
+        intCount = 0;
+      } else {
+        intCount = 1;
+      }
     }
-    _strLeafDup = ""
-      res.status(200).json(intCount);
-      await DisconnectPG_DB(client);
-
+    _strLeafDup = "";
+    res.status(200).json(intCount);
+    await DisconnectPG_DB(client);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -623,7 +618,7 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   var json_convertdata = "";
   try {
     const client = await ConnectPG_DB();
-    const {dataList} = req.body;
+    const { dataList } = req.body;
     json_convertdata = JSON.stringify(dataList);
     query = `call "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'');`;
 
@@ -646,12 +641,12 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
 module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
   var query = "";
   try {
-    const data = JSON.stringify(req.body); 
+    const data = JSON.stringify(req.body);
 
     query = `SELECT * FROM "Traceability".trc_000_common_getserialrecordtimetraytable('[${data}]');`;
 
-    const client = await ConnectPG_DB(); 
-    const result = await client.query(query); 
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
 
     if (result.rows !== "") {
       res.status(200).json(result.rows[0]);
@@ -659,8 +654,8 @@ module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
     }
   } catch (err) {
     console.error(err.message);
-    writeLogError(err.message, query); 
-    res.status(500).json({ message: err.message }); 
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -672,9 +667,9 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','')`;
-    
+
     const result = await client.query(query);
-    if (result.rows !='') {
+    if (result.rows != "") {
       res.status(200).json(result.rows);
       await DisconnectPG_DB(client);
     }
@@ -684,35 +679,38 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
   }
 };
 
-
 module.exports.SetSerialLotShtGradeTable = async function (req, res) {
   var query = "";
-  var _strError=''
-  var SCAN_RESULT=''
-  var REMARK=''
+  var _strError = "";
+  var SCAN_RESULT = "";
+  var REMARK = "";
   const { dataList } = req.body;
   try {
     const json_convertdata = JSON.stringify(dataList);
-   
-    const client = await ConnectPG_DB(); 
+
+    const client = await ConnectPG_DB();
     query = `CALL "Traceability".trc_006_common_SetSerialLotShtGradeTable('${json_convertdata}','')`;
-    const result = await client.query(query); 
-    _strError=result.rows[0.]._strerror
-   
-    if (_strError==null){
-      _strError=''
+    const result = await client.query(query);
+    _strError = result.rows[0]._strerror;
+
+    if (_strError == null) {
+      _strError = "";
     }
-    if(_strError!=''){
-      SCAN_RESULT='NG'
-      REMARK=_strError
+    if (_strError != "") {
+      SCAN_RESULT = "NG";
+      REMARK = _strError;
     }
-      res.status(200).json({strError:_strError,SCAN_RESULT:SCAN_RESULT,REMARK:REMARK});
-      await DisconnectPG_DB(client);
+    res
+      .status(200)
+      .json({ strError: _strError, SCAN_RESULT: SCAN_RESULT, REMARK: REMARK });
+    await DisconnectPG_DB(client);
   } catch (err) {
-    _strError="Can not connect database!"
+    _strError = "Can not connect database!";
     console.error(err.message);
-    writeLogError(err.message, query); 
-    res.status(500).json({ strError:_strError,SCAN_RESULT:'NG',REMARK:err.message }); 
+    writeLogError(err.message, query);
+    res
+      .status(500)
+      .json({ strError: _strError, SCAN_RESULT: "NG", REMARK: err.message });
   }
 };
 
@@ -725,11 +723,11 @@ module.exports.get_spi_aoi_result = async function (req, res) {
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
     const result = await client.query(query);
-      res.status(200).json(result.rows[0]._strreturn);
-      await DisconnectPG_DB(client);
-    } catch (error) {
-      writeLogError(error.message, query);
-      res.status(500).json({ message: error.message });
+    res.status(200).json(result.rows[0]._strreturn);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -742,41 +740,41 @@ module.exports.get_spi_aoi_result = async function (req, res) {
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
     const result = await client.query(query);
-      res.status(200).json(result.rows[0]._strreturn);
-      await DisconnectPG_DB(client);
-    } catch (error) {
-      writeLogError(error.message, query);
-      res.status(500).json({ message: error.message });
+    res.status(200).json(result.rows[0]._strreturn);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
   }
 };
 
 module.exports.getSerialPassByLot = async function (req, res) {
   var query = "";
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylot('${data}'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows[0]);
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylot('${data}'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
- 
+
 module.exports.SetSerialLotTrayTable = async function (req, res) {
   var query = "";
- 
+
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     const query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
-   
+
     const result = await client.query(query, [json_convertdata]);
-    if (result.rows !='') {
+    if (result.rows != "") {
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
     }
@@ -786,174 +784,397 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
   }
 };
 
-
 //เปลี่ยนเป็น env
 module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
   var query = "";
-  var _strResult='NG';
-  var FINAL_GATE_MASTER_FLG =process.env.VITE_FINAL_GATE_MASTER_FLG;
-  var _strPlantCode= process.env.FacA1;
-  var FINAL_GATE_MASTER_CODE=process.env.VITE_FINAL_GATE_MASTER_CODE;
-  var WORKING_START_TIME=process.env.VITE_WORKING_START_TIME;
-  var _FINAL_GATE_MASTER_TIME =process.env.VITE__FINAL_GATE_MASTER_TIME;
+  var _strResult = "NG";
+  var FINAL_GATE_MASTER_FLG = process.env.VITE_FINAL_GATE_MASTER_FLG;
+  var _strPlantCode = process.env.FacA1;
+  var FINAL_GATE_MASTER_CODE = process.env.VITE_FINAL_GATE_MASTER_CODE;
+  var WORKING_START_TIME = process.env.VITE_WORKING_START_TIME;
+  var _FINAL_GATE_MASTER_TIME = process.env.VITE__FINAL_GATE_MASTER_TIME;
   try {
     const client = await ConnectPG_DB();
     const { strProduct } = req.body;
-    let datalist ={"_strProduct":strProduct,
-                   "_strPlantCode":_strPlantCode,
-                   "FINAL_GATE_MASTER_CODE":FINAL_GATE_MASTER_CODE,
-                   "WORKING_START_TIME":WORKING_START_TIME,
-                   "_FINAL_GATE_MASTER_TIME":_FINAL_GATE_MASTER_TIME
-                  }
-    const json_convertdata = JSON.stringify(datalist)
-    if (FINAL_GATE_MASTER_FLG==1){
+    let datalist = {
+      _strProduct: strProduct,
+      _strPlantCode: _strPlantCode,
+      FINAL_GATE_MASTER_CODE: FINAL_GATE_MASTER_CODE,
+      WORKING_START_TIME: WORKING_START_TIME,
+      _FINAL_GATE_MASTER_TIME: _FINAL_GATE_MASTER_TIME,
+    };
+    const json_convertdata = JSON.stringify(datalist);
+    if (FINAL_GATE_MASTER_FLG == 1) {
       const query = `SELECT * from  "Traceability".trc_020_finalgate_getfinalgatemastercheckresult('[${json_convertdata}]');`;
       const result = await client.query(query);
-      if (result.rows !='') {
-        _strResult=result.rows[0].MASTER_RESULT
+      if (result.rows != "") {
+        _strResult = result.rows[0].MASTER_RESULT;
       }
+    } else {
+      _strResult = "OK";
     }
-    else{
-      _strResult='OK'
-    }
-      res.status(200).json(_strResult);
-      await DisconnectPG_DB(client);
-
+    res.status(200).json(_strResult);
+    await DisconnectPG_DB(client);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
 module.exports.GetSerialPassByLotPacking = async function (req, res) {
   var query = "";
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows[0]);
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
-
 
 module.exports.GetSerialFinInspectResult = async function (req, res) {
   var query = "";
-  var _strReturn="SKIP FQC"
+  var _strReturn = "SKIP FQC";
   try {
     // {
-    //   "dataList": 
-    //     {"_strSerialNo": "TestSerialNo", 
+    //   "dataList":
+    //     {"_strSerialNo": "TestSerialNo",
     //      "_strProc": "ZFIN",
     //      "_strPlantCode": "5" }
     // }
-      const { dataList } = req.body;
-      const json_convertdata = JSON.stringify(dataList);
-      query += `select * from "Traceability".trc_000_common_getserialfininspectresult('[${json_convertdata}]');`;
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      if(result.rows.length>0){
-        if(result.rows[0].row_count>0){
-          _strReturn = "OK"
-        }
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_000_common_getserialfininspectresult('[${json_convertdata}]');`;
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    if (result.rows.length > 0) {
+      if (result.rows[0].row_count > 0) {
+        _strReturn = "OK";
       }
-      res.status(200).json(_strReturn);
+    }
+    res.status(200).json(_strReturn);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
-
 module.exports.GetCheckChipDuplicate = async function (req, res) {
   var query = "";
-  var _intSuccess=0
+  var _intSuccess = 0;
   try {
     // {
-    //   "dataList": 
+    //   "dataList":
     //     {"_strPrdName": "RGOZ-412MW-0A",//1
     //         "_strSerial": "TestSerial",//2
     //         "_strPlantCode": "5"//3
     //     }
     // }
-      const { dataList } = req.body;
-      const json_convertdata = JSON.stringify(dataList);
-      query += `select * from "Traceability".trc_000_common_getcheckchipduplicate('[${json_convertdata}]');`;
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      if(result.rows.length>0){
-        if(result.rows[0].test_result=='OK'){
-          _intSuccess = 1
-        }
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_000_common_getcheckchipduplicate('[${json_convertdata}]');`;
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    if (result.rows.length > 0) {
+      if (result.rows[0].test_result == "OK") {
+        _intSuccess = 1;
       }
-      res.status(200).json(_intSuccess);
+    }
+    res.status(200).json(_intSuccess);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
-
 module.exports.GetBoxCount = async function (req, res) {
   var query = "";
-  var intCount = 0
+  var intCount = 0;
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    const {prdName ,boxNo  } = req.body;
+    const { prdName, boxNo } = req.body;
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetBoxCount( '${prdName}', '${boxNo}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-       
-      let data =[ {
-        'BOX_COUNT':result.rows[0][0][0][0],
-        'BOX_QTY':result.rows[0][0][0][1]
-      }]    
-      
-     if(data.length > 0){
-      intCount = data[0].BOX_COUNT
-     }
+      let data = [
+        {
+          BOX_COUNT: result.rows[0][0][0][0],
+          BOX_QTY: result.rows[0][0][0][1],
+        },
+      ];
+
+      if (data.length > 0) {
+        intCount = data[0].BOX_COUNT;
+      }
       res.status(200).json(intCount);
       DisconnectOracleDB(Conn);
     }
-   
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
-}
+};
 module.exports.GetCountTrayByBoxPacking = async function (req, res) {
   var query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    const {prdName ,boxNo , srtPack } = req.body;
+    const { prdName, boxNo, srtPack } = req.body;
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetCTrayBBoxPack( '${prdName}', '${boxNo}','${srtPack}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-       
-      let data =[ {
-        'BOX_COUNT':result.rows[0][0][0][0],
-        'PACKING_COUNT':result.rows[0][0][0][1]
-      }]    
-      
-    //  if(data.length > 0){
-    //   intCount = data[0].BOX_COUNT
-    //  } 
-    
+      let data = [
+        {
+          BOX_COUNT: result.rows[0][0][0][0],
+          PACKING_COUNT: result.rows[0][0][0][1],
+        },
+      ];
+
+      //  if(data.length > 0){
+      //   intCount = data[0].BOX_COUNT
+      //  }
+
       res.status(200).json(data);
       DisconnectOracleDB(Conn);
-
     }
-   
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
+};
+
+
+
+module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
+  const {
+    _strPlantCode,
+    _strProduct,
+    _strFrontSheetNo,
+    _strBackSheetNo,
+    _intPcsNo,
+    _strAOMFlg,
+    _strAOIFlg,
+    _strOSTFlg,
+    _strAVIFlg,
+    _strResult,
+  } = req.body;
+  var _strRemark = "";
+  _strResult = "OK";
+
+  if (_strAOMFlg == "Y") {
+  }
+  if (_strAOIFlg == "Y") {
+    var dtDataAOI;
+    var strAOIResult = "";
+     dtDataAOI = await GetSerialAOIEFPCResult(
+      _strPlantCode,
+      _strFrontSheetNo,
+      _intPcsNo,
+      _strProduct,
+      "N"
+    );
+    if (dtDataAOI.length > 0) {
+      strAOIResult = dtDataAOI[0]["AOI_RESULT"]; //ยังไม่ถูก
+      if (
+        strAOIResult != "" &&
+        strAOIResult != "OK" &&
+        strAOIResult != "PASS" &&
+        strAOIResult != "GOOD"
+      ) {
+        _strResult = "NG";
+        _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
+      }
+    } else {
+      dtDataAOI = await GetSerialAOIEFPCResult(
+        _strPlantCode,
+        _strBackSheetNo,
+        _intPcsNo,
+        _strProduct,
+        "N"
+      );
+      if (dtDataAOI.length > 0) {
+        strAOIResult = dtDataAOI[0]["AOI_RESULT"]; //ยังไม่ถูก
+        if (
+          strAOIResult != "" &&
+          strAOIResult != "OK" &&
+          strAOIResult != "PASS" &&
+          strAOIResult != "GOOD"
+        ) {
+          _strResult = "NG";
+          _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
+        }
+      }
+    }
+  }
+  if (_strOSTFlg == "Y") {
+    var dtOSTData;
+    var strOSTResult = "";
+    dtOSTData = await GetSerialOSTResult(
+      _strPlantCode,
+      _strFrontSheetNo,
+      _intPcsNo,
+      "N"
+    );
+    if (dtOSTData.length > 0) {
+      strOSTResult = dtOSTData[0]["OST_RESULT"];
+      if (
+        strOSTResult != "" &&
+        strOSTResult != "OK" &&
+        strOSTResult != "PASS" &&
+        strOSTResult != "GOOD"
+      ) {
+        _strResult = "NG";
+        _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
+      }
+    } else {
+      dtOSTData = await GetSerialOSTResult(
+        _strPlantCode,
+        _strBackSheetNo,
+        _intPcsNo,
+        "N"
+      );
+      if (dtOSTData.length > 0) {
+        strOSTResult = dtOSTData[0]["OST_RESULT"];
+        if (
+          strOSTResult != "" &&
+          strOSTResult != "OK" &&
+          strOSTResult != "PASS" &&
+          strOSTResult != "GOOD"
+        ) {
+          _strResult = "NG";
+          _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
+        }
+      }
+    }
+  }
+  if (_strAVIFlg == "Y") {
+    var dtAVIData;
+    var strAVIResult = "";
+    dtAVIData = await GetSerialAVIResult(
+      _strPlantCode,
+      _strFrontSheetNo,
+      _intPcsNo,
+      "N"
+    );
+    if (dtAVIData.length > 0) {
+      strAVIResult = dtAVIData[0]["AVI_RESULT"];
+      if (
+        strAVIResult != "" &&
+        strAVIResult != "OK" &&
+        strAVIResult != "PASS" &&
+        strAVIResult != "GOOD"
+      ) {
+        _strResult = "NG";
+        _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
+      }
+    } else {
+      dtAVIData = await GetSerialAVIResult(
+        _strPlantCode,
+        _strBackSheetNo,
+        _intPcsNo,
+        "N"
+      );
+      if (dtAVIData.length > 0) {
+        strAVIResult = dtAVIData[0]["AVI_RESULT"];
+        if (
+          strAVIResult != "" &&
+          strAVIResult != "OK" &&
+          strAVIResult != "PASS" &&
+          strAVIResult != "GOOD"
+        ) {
+          _strResult = "NG";
+          _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
+        }
+      }
+    }
+  }
+  res.status(200).json(_strRemark);
+};
+
+async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
+  let query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    console.log("data:", SerialNo, intPCSNo, strSMPJCavityFlg, "เข้า");
+    query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    await DisconnectOracleDB(Conn);
+    return result.rows[0][0];
+  } catch (error) {
+    writeLogError(error.message, query);
+    return error.message;
+  }
 }
 
+async function GetSerialAOIEFPCResult(
+  _strPlantCode,
+  _strFrontSheetNo,
+  _intPcsNo,
+  _strProduct,
+  _strSMPJCavityFlg
+) {
+  let query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    // query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    await DisconnectOracleDB(Conn);
+    return result.rows[0][0];
+  } catch (error) {
+    writeLogError(error.message, query);
+    return error.message;
+  }
+}
+
+async function GetSerialAVIResult(
+  _strPlantCode,
+  _strFrontSheetNo,
+  _intPcsNo,
+  _strSMPJCavityFlg
+) {
+  let query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    // query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    await DisconnectOracleDB(Conn);
+    return result.rows[0][0];
+  } catch (error) {
+    writeLogError(error.message, query);
+    return error.message;
+  }
+}
+// module.exports.GetSerialOSTResult = async function (req, res) {
+//   var query = "";
+//   try {
+//     const Conn = await ConnectOracleDB("PCTTTEST");
+//     const {SerialNo ,intPCSNo,strSMPJCavityFlg} = req.body;
+//     console.log('data ',SerialNo ,intPCSNo,strSMPJCavityFlg,'เข้า')
+//     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult( '${SerialNo}','${intPCSNo}','${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+//     const result = await Conn.execute(query);
+//     // if (result.rows.length > 0) {
+
+//     //   let data =[ {
+//     //     'BOX_COUNT':result.rows[0][0][0][0],
+//     //     'PACKING_COUNT':result.rows[0][0][0][1]
+//     //   }]
+
+//     //  if(data.length > 0){
+//     //   intCount = data[0].BOX_COUNT
+//     //  }
+
+//       res.status(200).json(result.rows);
+//       DisconnectOracleDB(Conn);
+
+//     // }
+
+//   } catch (error) {
+//     writeLogError(error.message, query);
+//     res.status(500).json({ message: error.message });
+//   }
+// }
