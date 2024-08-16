@@ -6,6 +6,7 @@ const {
 } = require("../Conncetion/DBConn.cjs");
 const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
+const dateFns = require('date-fns');
 
 ///------Example
 module.exports.xxxxxx = async function (req, res) {
@@ -45,7 +46,7 @@ module.exports.GetProductNameByLot = async function (req, res) {
   var query = "";
   var _strPrdName = "";
   try {
-    const Conn = await ConnectOracleDB("PCTTTEST");
+    const Conn = await ConnectOracleDB("FPC");
     const { strLot } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strLot}') as PRD_NAME  FROM DUAL`;
     const result = await Conn.execute(query);
@@ -178,13 +179,123 @@ module.exports.getlotserialcountdata = async function (req, res) {
 
 module.exports.getWeekCodebyLot = async function (req, res) {
   var query = "";
+  var SERIAL_DATE_START_WEEK_CODE= '01/01/1970' //ENV
+  var _strReturn=''
+  var _strDate=''
   try {
     const connect = await ConnectOracleDB("FPC");
-    const { STRLOT, STRPROC } = req.body;
-    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${STRLOT}', '${STRPROC}')AS data1 FROM dual`;
+    const { _strLot, _strProc,_strWeekType ,_strSerialInfo} = req.body;
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
-    res.status(200).json(result.rows.flat());
+    if(result.rows[0][0]!=null){
+      _strDate=result.rows[0][0]
+      const [day, month, year] = _strDate.split('/');
+      const dtToday = new Date(Date.UTC(year, month - 1, day));
+      const [startDay, startMonth, startYear] = SERIAL_DATE_START_WEEK_CODE.split('/');
+      const dtStartDate = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+      const dtNextSaturday = new Date(dtToday);
+      dtNextSaturday.setUTCDate(dtToday.getUTCDate() + (6 - dtToday.getUTCDay()));
+      const weekNumber = (date) => {
+          const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+          const dayOfYear = ((date - start) / 86400000) + 1;
+          return Math.ceil(dayOfYear / 7);
+      };
+      let WeekCnt = weekNumber(dtNextSaturday).toString().padStart(2, '0');
+      
+      const dtNow = dtToday;
+      const strMonth = (dtNow.getUTCMonth() + 1).toString().padStart(2, '0');
+      let strYear;
+      if (strMonth === '12' && WeekCnt === '01') {
+          strYear = (dtNow.getUTCFullYear() + 1).toString().trim();
+      } else {
+          strYear = dtNow.getUTCFullYear().toString().trim();
+      }
+      const LOT_NO = _strLot;
+      let txtLot = '';
+      let txtLot2 = '';
+      let txtWeek = '';
+      let txtYear = '';
+      let txtMonth = '';
+      let txtDay = '';
+
+      switch (_strWeekType) {
+        case "Y":
+        case "R":
+        case "I":
+        case "M":
+        case "C":
+            if (LOT_NO !== "") {
+                txtLot = LOT_NO;
+            }
+            txtWeek = WeekCnt;
+            if (_strWeekType === "Y") {
+                const strFirst = strYear[0];
+                const TempStr = ConvertBase34(year - parseInt(strFirst + "000"));
+                txtYear = TempStr[TempStr.length - 1];
+            } else {
+                txtYear = strYear[3];
+            }
+            txtDay = dtToday.getUTCDay(); // JavaScript getDay() returns 0 for Sunday, 1 for Monday, etc.
+            _strReturn = `${txtYear}${txtWeek}${txtDay}`;
+            break;
+
+        case "W":
+            txtYear = '';
+            txtDay = '';
+            if (LOT_NO !== "") {
+                txtLot = LOT_NO;
+                txtLot2 = LOT_NO.slice(-2);
+            }
+            txtWeek = ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
+            txtWeek = txtWeek.padStart(2, '0');
+            _strReturn = `${txtWeek}${txtLot2}`;
+            break;
+
+        case "J":
+            txtDay = ChangeBase34(dtToday.getUTCDate());
+            txtMonth = ChangeBase34(dtToday.getUTCMonth() + 1);
+            txtWeek = ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
+            txtYear = strYear;
+            _strReturn = `${txtMonth}${txtDay}`;
+            break;
+
+        case "N":
+            const intDayDiff = Math.floor((dtToday - dtStartDate) / (1000 * 60 * 60 * 24));
+            const strDayCode = Convert000(ConvertBase34(intDayDiff));
+            txtMonth = strDayCode;
+            txtWeek = strDayCode[1];
+            txtYear = strDayCode[0];
+            txtDay = strDayCode[2];
+            _strReturn = strDayCode;
+            break;
+
+        case "U":
+            txtDay = ChangeBase34(dtToday.getUTCDate());
+            txtMonth = ChangeBase34(dtToday.getUTCMonth() + 1);
+            _strReturn = `${txtMonth}${txtDay}`;
+            break;
+
+        case "S":
+            const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ''); // yyMMdd
+            _strReturn = Convert0000(ConvertBase34(parseInt(formattedDate)));
+            break;
+
+        case "D":
+            const serialDate = new Date(_strSerialInfo.split('/').reverse().join('-') + "T00:00:00");
+            const dateDiff = Math.floor((dtToday - serialDate) / (1000 * 60 * 60 * 24));
+            _strReturn = Convert0000(dateDiff);
+            break;
+
+        default:
+            txtLot2 = LOT_NO.slice(-2);
+            _strReturn = `${txtWeek}${txtLot2}`;
+            break;
+    }
+     
+    }
+    console.log(_strDate ,' ',dtToday,' ',dtStartDate,' ',dtNextSaturday,' ',WeekCnt,' ',dtNow,' ',strMonth,' ',strYear,' ',_strReturn)
+    res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
@@ -1178,3 +1289,37 @@ async function GetSerialAVIResult(
 //     res.status(500).json({ message: error.message });
 //   }
 // }
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+
+module.exports.Getsheetnobyserialno = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${data}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+module.exports.Getsheetdatabyserialno = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetdatabyserialno('[${data}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};

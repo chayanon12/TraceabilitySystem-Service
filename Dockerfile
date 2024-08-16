@@ -2,7 +2,7 @@ FROM node:20
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y --no-install-recommends alien postgresql-client postgresql nano vim libaio1 wget && \
+RUN apt-get update && apt-get install -y --no-install-recommends alien postgresql-client postgresql nano vim git libaio1 wget && \
     wget https://download.oracle.com/otn_software/linux/instantclient/185000/oracle-instantclient18.5-basiclite-18.5.0.0.0-3.x86_64.rpm && \
     wget https://download.oracle.com/otn_software/linux/instantclient/185000/oracle-instantclient18.5-devel-18.5.0.0.0-3.x86_64.rpm && \
     alien -i oracle-instantclient18.5-basiclite-18.5.0.0.0-3.x86_64.rpm && \
