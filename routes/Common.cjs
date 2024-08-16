@@ -42,6 +42,8 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/GetEFPCSheetInspectionResult", Common.GetEFPCSheetInspectionResult);
  
  
+ router.post("/GetSheetNoBySerialNo", Common.Getsheetnobyserialno);
+ router.post("/GetSheetDataBySerialNo", Common.Getsheetdatabyserialno);
  
  
 module.exports = router;

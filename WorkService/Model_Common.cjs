@@ -46,7 +46,7 @@ module.exports.GetProductNameByLot = async function (req, res) {
   var query = "";
   var _strPrdName = "";
   try {
-    const Conn = await ConnectOracleDB("PCTTTEST");
+    const Conn = await ConnectOracleDB("FPC");
     const { strLot } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strLot}') as PRD_NAME  FROM DUAL`;
     const result = await Conn.execute(query);
@@ -1289,3 +1289,37 @@ async function GetSerialAVIResult(
 //     res.status(500).json({ message: error.message });
 //   }
 // }
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+
+module.exports.Getsheetnobyserialno = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${data}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+module.exports.Getsheetdatabyserialno = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetdatabyserialno('[${data}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
