@@ -242,6 +242,7 @@ module.exports.updateProduct_Master = async function (req, res) {
 };
 
 module.exports.deleteProduct_Master = async function (req, res) {
+ 
   try {
     const p_datadel = JSON.stringify(req.body);
     query = `
