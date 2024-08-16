@@ -45,7 +45,7 @@ module.exports.GetProductNameByLot = async function (req, res) {
   var query = "";
   var _strPrdName = "";
   try {
-    const Conn = await ConnectOracleDB("PCTTTEST");
+    const Conn = await ConnectOracleDB("FPC");
     const { strLot } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductNameByLot('${strLot}') as PRD_NAME  FROM DUAL`;
     const result = await Conn.execute(query);
