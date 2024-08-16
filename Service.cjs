@@ -31,6 +31,12 @@ const ScanSMTSerialBackend = require("./routes/ScanSMTSerialBackendConfirmRoutes
 const AVIconfirm = require("./routes/AVIConfirm.cjs");
 const ScanAutoBendingTime = require("./routes/ScanAutoBendingTime.cjs");
 const ReJudgement = require("./routes/ReJudgement.cjs");
+const cors = require('cors');
+app.use(cors({
+  origin: '*', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // เพิ่ม headers ที่จำเป็น
+}));
 app.use(express.json());
 
 app.use((req, res, next) => {
