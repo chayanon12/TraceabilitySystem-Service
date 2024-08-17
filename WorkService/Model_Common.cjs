@@ -230,39 +230,45 @@ module.exports.getWeekCodebyLot = async function (req, res) {
             }
             txtWeek = WeekCnt;
             if (_strWeekType === "Y") {
+              
                 const strFirst = strYear[0];
-                const TempStr = ConvertBase34(year - parseInt(strFirst + "000"));
+                
+                const TempStr = await ConvertBase34(year - parseInt(strFirst + "000"));
+                console.log(strYear,'---',strYear[0],strFirst + "000",TempStr)
                 txtYear = TempStr[TempStr.length - 1];
+              
             } else {
                 txtYear = strYear[3];
             }
-            txtDay = dtToday.getUTCDay(); // JavaScript getDay() returns 0 for Sunday, 1 for Monday, etc.
+            txtDay = dtToday.getUTCDay(); 
+           
             _strReturn = `${txtYear}${txtWeek}${txtDay}`;
             break;
 
         case "W":
             txtYear = '';
             txtDay = '';
+            
             if (LOT_NO !== "") {
                 txtLot = LOT_NO;
                 txtLot2 = LOT_NO.slice(-2);
             }
-            txtWeek = ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
+            txtWeek =await ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
             txtWeek = txtWeek.padStart(2, '0');
             _strReturn = `${txtWeek}${txtLot2}`;
             break;
 
         case "J":
-            txtDay = ChangeBase34(dtToday.getUTCDate());
-            txtMonth = ChangeBase34(dtToday.getUTCMonth() + 1);
-            txtWeek = ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
+            txtDay =await ChangeBase34(dtToday.getUTCDate());
+            txtMonth =await ChangeBase34(dtToday.getUTCMonth() + 1);
+            txtWeek =await ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
             txtYear = strYear;
             _strReturn = `${txtMonth}${txtDay}`;
             break;
 
         case "N":
             const intDayDiff = Math.floor((dtToday - dtStartDate) / (1000 * 60 * 60 * 24));
-            const strDayCode = Convert000(ConvertBase34(intDayDiff));
+            const strDayCode =await Convert000(ConvertBase34(intDayDiff));
             txtMonth = strDayCode;
             txtWeek = strDayCode[1];
             txtYear = strDayCode[0];
@@ -271,20 +277,20 @@ module.exports.getWeekCodebyLot = async function (req, res) {
             break;
 
         case "U":
-            txtDay = ChangeBase34(dtToday.getUTCDate());
-            txtMonth = ChangeBase34(dtToday.getUTCMonth() + 1);
+            txtDay =await ChangeBase34(dtToday.getUTCDate());
+            txtMonth =await ChangeBase34(dtToday.getUTCMonth() + 1);
             _strReturn = `${txtMonth}${txtDay}`;
             break;
 
         case "S":
             const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ''); // yyMMdd
-            _strReturn = Convert0000(ConvertBase34(parseInt(formattedDate)));
+            _strReturn =await Convert0000(ConvertBase34(parseInt(formattedDate)));
             break;
 
         case "D":
             const serialDate = new Date(_strSerialInfo.split('/').reverse().join('-') + "T00:00:00");
             const dateDiff = Math.floor((dtToday - serialDate) / (1000 * 60 * 60 * 24));
-            _strReturn = Convert0000(dateDiff);
+            _strReturn =await Convert0000(dateDiff);
             break;
 
         default:
@@ -294,13 +300,57 @@ module.exports.getWeekCodebyLot = async function (req, res) {
     }
      
     }
-    console.log(_strDate ,' ',dtToday,' ',dtStartDate,' ',dtNextSaturday,' ',WeekCnt,' ',dtNow,' ',strMonth,' ',strYear,' ',_strReturn)
+    console.log('----',_strReturn)
+    // console.log(_strDate ,'1 ',dtToday,' ',dtStartDate,' ',dtNextSaturday,' ',WeekCnt,' ',dtNow,' ',strMonth,' ',strYear,' ',_strReturn)
     res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
+
+const Convert0000 = async (strText) => {
+  return ("0000" + strText).slice(-4);
+};
+
+const Convert000= async (strText) =>{
+  let result = "000" + strText;
+  return result.slice(-3);
+}
+
+const ConvertBase34 = async (lngNumber2) => {
+  let shou;
+  let Amari = [];
+  let i = 0;
+  let StrTemp = "";
+  let LngNumber = lngNumber2;
+  // console.log(lngNumber2);
+  do {
+    Amari[i] = LngNumber % 34;
+    shou = Math.floor(LngNumber / 34);
+    if (shou === 0) {
+      break;
+    }
+    i++;
+    if (shou < 34) {
+      Amari[i] = shou;
+      break;
+    }
+    LngNumber = shou;
+  } while (true);
+
+  for (let j = i; j >= 0; j--) {
+    StrTemp += await ChangeBase34(Amari[j]);
+  }
+  return StrTemp;
+};
+
+
+const ChangeBase34 = async (lngNumber2) =>  {
+  const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  return strChange[lngNumber2];
+}
+
 
 module.exports.GetProductDataByLot = async function (req, res) {
   var query = "";
