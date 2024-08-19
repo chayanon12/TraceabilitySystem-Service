@@ -284,6 +284,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
 
         case "S":
             const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ''); // yyMMdd
+            console.log('formattedDate :',formattedDate,parseInt(formattedDate),await ConvertBase34(parseInt(formattedDate)),await Convert0000(ConvertBase34(parseInt(formattedDate))))
             _strReturn =await Convert0000(ConvertBase34(parseInt(formattedDate)));
             break;
 
