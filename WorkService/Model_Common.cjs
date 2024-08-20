@@ -7,6 +7,7 @@ const {
 const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 const dateFns = require('date-fns');
+const { Query } = require("pg");
 
 ///------Example
 module.exports.xxxxxx = async function (req, res) {
@@ -1060,8 +1061,10 @@ module.exports.GetBoxCount = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { prdName, boxNo } = req.body;
+    console.log(prdName, boxNo ,"get Box count")
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetBoxCount( '${prdName}', '${boxNo}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
+    console.log(query,"query")
     if (result.rows.length > 0) {
       let data = [
         {
@@ -1371,5 +1374,67 @@ module.exports.Getsheetdatabyserialno = async function (req, res) {
   } catch (err) {
       writeLogError(err.message, query);
       res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.GetSerialBoxProductByProduct = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const {prdName} = req.body;
+     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSBProductByPd('${prdName}')  FROM DUAL `;
+    const result = await Conn.execute(query);
+    console.log(query,"query")
+    if (result.rows.length > 0) {
+      let data = [
+        {
+          SLM_PRD_NAME: result.rows[0][0][0][0],
+          SLM_CUST_PART_NAME: result.rows[0][0][0][1],
+          SLM_SERIAL_LENGTH: result.rows[0][0][0][2],
+          SLM_FIX_FLAG: result.rows[0][0][0][3],
+          SLM_FIX_DIGIT: result.rows[0][0][0][4],
+          SLM_FIX_START_DIGIT: result.rows[0][0][0][5],
+          SLM_FIX_END_DIGIT: result.rows[0][0][0][6],
+          SLM_TRAY_FLAG: result.rows[0][0][0][7],
+          SLM_TRAY_LENGTH: result.rows[0][0][0][8],
+          SLM_TEST_RESULT_FLAG: result.rows[0][0][0][9],
+          SLM_SERIAL_COUNT: result.rows[0][0][0][10],
+          SLM_AUTO_SCAN: result.rows[0][0][0][11],
+          SLM_BARCODE_REQ_CONFIG: result.rows[0][0][0][12],
+          SLM_CONFIG_CODE: result.rows[0][0][0][13],
+          SLM_START_CONFIG: result.rows[0][0][0][14],
+          SLM_END_CONFIG: result.rows[0][0][0][15],
+          SLM_TRAY_SERIAL_COUNT: result.rows[0][0][0][16],
+          SLM_LOT_FLAG: result.rows[0][0][0][17],
+          SLM_LOT_SERIAL_START: result.rows[0][0][0][18],
+          SLM_LOT_SERIAL_END: result.rows[0][0][0][19],
+          SLM_LOT_START: result.rows[0][0][0][20],
+          SLM_LOT_END: result.rows[0][0][0][21],
+          SLM_FINAL_GATE_FLG: result.rows[0][0][0][22],
+          SLM_FACTORY_NAME: result.rows[0][0][0][23],
+          SLM_PLASMA_TIME_FLG: result.rows[0][0][0][24],
+          SLM_PLASMA_TIME: result.rows[0][0][0][25],
+          SLM_START_SEQ_FLG: result.rows[0][0][0][26],
+          SLM_START_SEQ_CODE: result.rows[0][0][0][27],
+          SLM_START_SEQ_START: result.rows[0][0][0][28],
+          SLM_START_SEQ_END: result.rows[0][0][0][29],
+          SLM_DATE_INPROC_FLG: result.rows[0][0][0][30],
+          SLM_DATE_INPROC: result.rows[0][0][0][31],
+          SLM_DATE_TYPE: result.rows[0][0][0][32],
+          SLM_CHECK_WEEKCODE_FLG: result.rows[0][0][0][33],
+          SLM_CHECK_WEEKCODE_START: result.rows[0][0][0][34],
+          SLM_CHECK_WEEKCODE_END: result.rows[0][0][0][35],
+          SLM_SERIAL_START_CODE: result.rows[0][0][0][36],
+
+        },
+      ];
+
+     
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
   }
 };
