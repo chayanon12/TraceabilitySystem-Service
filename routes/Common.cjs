@@ -44,6 +44,7 @@ const Common = require("../WorkService/Model_Common.cjs");
  
  router.post("/GetSheetNoBySerialNo", Common.Getsheetnobyserialno);
  router.post("/GetSheetDataBySerialNo", Common.Getsheetdatabyserialno);
+ router.post("/GetSerialTestResultManyTable", Common.GetSerialTestResultManyTable);
  
  
 module.exports = router;

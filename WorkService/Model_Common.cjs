@@ -185,6 +185,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const { _strLot, _strProc,_strWeekType ,_strSerialInfo} = req.body;
+    console.log('getWeekCodebyLot ','----',_strLot,'----',_strProc,'----',_strWeekType ,'----',_strSerialInfo)
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -522,18 +523,7 @@ module.exports.getrollleafduplicate = async function (req, res) {
   }
 };
 
-module.exports.getserialduplicate = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 
 module.exports.getserialduplicateconnectsht = async function (req, res) {
   var query = "";
@@ -984,10 +974,11 @@ module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
 
 module.exports.GetSerialPassByLotPacking = async function (req, res) {
   var query = "";
+  
   try {
     const data = JSON.stringify(req.body);
     query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
-
+    console.log('query:',query)
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
@@ -1082,6 +1073,7 @@ module.exports.GetBoxCount = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
 module.exports.GetCountTrayByBoxPacking = async function (req, res) {
   var query = "";
   try {
@@ -1311,38 +1303,7 @@ async function GetSerialAVIResult(
     return error.message;
   }
 }
-// module.exports.GetSerialOSTResult = async function (req, res) {
-//   var query = "";
-//   try {
-//     const Conn = await ConnectOracleDB("PCTTTEST");
-//     const {SerialNo ,intPCSNo,strSMPJCavityFlg} = req.body;
-//     console.log('data ',SerialNo ,intPCSNo,strSMPJCavityFlg,'เข้า')
-//     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult( '${SerialNo}','${intPCSNo}','${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
-//     const result = await Conn.execute(query);
-//     // if (result.rows.length > 0) {
 
-//     //   let data =[ {
-//     //     'BOX_COUNT':result.rows[0][0][0][0],
-//     //     'PACKING_COUNT':result.rows[0][0][0][1]
-//     //   }]
-
-//     //  if(data.length > 0){
-//     //   intCount = data[0].BOX_COUNT
-//     //  }
-
-//       res.status(200).json(result.rows);
-//       DisconnectOracleDB(Conn);
-
-//     // }
-
-//   } catch (error) {
-//     writeLogError(error.message, query);
-//     res.status(500).json({ message: error.message });
-//   }
-// }
-//     res.status(500).json({ message: error.message });
-//   }
-// }
 
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
@@ -1369,6 +1330,81 @@ module.exports.Getsheetdatabyserialno = async function (req, res) {
       const result = await client.query(query);
       await DisconnectPG_DB(client);
       res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+
+module.exports.GetSerialTestResultManyTable = async function (req, res) {
+  var query = "";
+  let data=[{}]
+  try {
+      //query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable( '{"strPlantCode":"5","strPrdname":"RGOZ-960ML-2D","strWeekCodeType":"U","strSerial":"THA9276167M21387Y"}', '{}');
+      const { dataList,dtSerial } = req.body;
+      const json_convertdata = JSON.stringify(dataList);
+      query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable('${json_convertdata}','','{}')`;
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      console.log('dtserial0',result.rows[0])
+      await DisconnectPG_DB(client);
+      let response=result.rows[0].response
+      if(response!=null){
+        console.log(response.SERIAL,dtSerial.SERIAL)
+        if(response.SERIAL!=null ||response.SERIAL!=''){
+          dtSerial.SERIAL=response.SERIAL
+        }
+        if(response.TEST_RESULT!=null ||response.TEST_RESULT!=''){
+          dtSerial.TEST_RESULT=response.TEST_RESULT
+        }
+
+        if(response.TYPE_TEST_RESULT!=null ||response.TYPE_TEST_RESULT!=''){
+          dtSerial.TYPE_TEST_RESULT=response.TYPE_TEST_RESULT
+        }
+
+        if(response.REJECT!=null ||response.REJECT!=''){
+          dtSerial.REJECT=response.REJECT
+        }
+
+        if(response.TOUCH_UP!=null ||response.TOUCH_UP!=''){
+          dtSerial.TOUCH_UP=response.TOUCH_UP
+        }
+
+        if(response.REJECT2!=null ||response.REJECT2!=''){
+          dtSerial.REJECT2=response.REJECT2
+        }
+
+        if(response.REJECT_CODE!=null ||response.REJECT_CODE!=''){
+          dtSerial.REJECT_CODE=response.REJECT_CODE
+        }
+
+        if(response.REMARK!=null ||response.REMARK!=''){
+          dtSerial.REMARK=response.REMARK
+        }
+
+        if(response.UPDATE_FLG!=null ||response.UPDATE_FLG!=''){
+          dtSerial.UPDATE_FLG=response.UPDATE_FLG
+        }
+
+        if(response.FRONT_SHEET_NO!=null ||response.FRONT_SHEET_NO!=''){
+          dtSerial.FRONT_SHEET_NO=response.FRONT_SHEET_NO
+        }
+
+        if(response.BACK_SHEET_NO!=null ||response.BACK_SHEET_NO!=''){
+          dtSerial.BACK_SHEET_NO=response.BACK_SHEET_NO
+        }
+
+        if(response.SHEET_PCS_NO!=null ||response.SHEET_PCS_NO!=''){
+          dtSerial.SHEET_PCS_NO=response.SHEET_PCS_NO
+        }
+
+        if(response.ROLL_LEAF_NO!=null ||response.ROLL_LEAF_NO!=''){
+          dtSerial.ROLL_LEAF_NO=response.ROLL_LEAF_NO
+        }
+      }
+      console.log('dtserial1',dtSerial)
+      res.status(200).json(dtSerial);
   } catch (err) {
       writeLogError(err.message, query);
       res.status(500).json({ message: err.message });
