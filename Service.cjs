@@ -31,6 +31,7 @@ const ScanSMTSerialBackend = require("./routes/ScanSMTSerialBackendConfirmRoutes
 const AVIconfirm = require("./routes/AVIConfirm.cjs");
 const ScanAutoBendingTime = require("./routes/ScanAutoBendingTime.cjs");
 const ReJudgement = require("./routes/ReJudgement.cjs");
+const PackingOnlyGood  = require("./routes/ScanSMTSerialPcsBoxOnlyGood.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -77,6 +78,7 @@ app.use("/api",ELT_Type)
 app.use("/api",AVIconfirm)
 app.use("/api", ScanAutoBendingTime);
 app.use("/api", ReJudgement);
+app.use("/api", PackingOnlyGood);
 
 
 

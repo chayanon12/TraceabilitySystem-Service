@@ -1310,9 +1310,11 @@ async function GetSerialAVIResult(
 
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
+  console.log("MAL")
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${data}]'); `;
+      const {data}= req.body
+      const datalist = JSON.stringify(data);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${datalist}]'); `;
  
       const client = await ConnectPG_DB();
       const result = await client.query(query);
@@ -1391,7 +1393,6 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
         },
       ];
 
-     
       res.status(200).json(data);
       DisconnectOracleDB(Conn);
     }
@@ -1474,3 +1475,24 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
       res.status(500).json({ message: err.message });
   }
 };
+module.exports.SetSerialLotTrayTableGood = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    const query = `CALL "Traceability".trc_022_common_setseriallottraytablegood($1, '')`;
+
+    const result = await client.query(query, [json_convertdata]);
+    if (result.rows != "") {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
