@@ -1303,12 +1303,12 @@ async function GetSerialAVIResult(
 
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
+  console.log("/////////////////////////////////////////////")
   try {
-    console.log("OK มา")
-
       const {data}= req.body
-      console.log("OK data",data)
+      console.log("OK data------------------------------",data)
       const datalist = JSON.stringify(data);
+      console.log(datalist,"datalist")
       query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno($1); `;
  
       const client = await ConnectPG_DB();
