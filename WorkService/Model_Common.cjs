@@ -1532,11 +1532,11 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
   }
 };
 
-module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
+module.exports.GetSerialDuplicate = async function (req, res) {
   var query = "";
   try {
-      const p_data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getfinalgatemastercheckresult('${p_data}'); `;
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getserialduplicate('[${data}]'); `;
  
       const client = await ConnectPG_DB();
       const result = await client.query(query);
