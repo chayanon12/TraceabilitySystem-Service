@@ -345,6 +345,7 @@ const ConvertBase34 = async (lngNumber2) => {
   for (let j = i; j >= 0; j--) {
     StrTemp += await ChangeBase34(Amari[j]);
   }
+  console.log('StrTemp',StrTemp)
   return StrTemp;
 };
 
@@ -543,6 +544,27 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
   }
 };
 
+module.exports.GetSerialDuplicate = async function (req, res) {
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    console.log(dataList," DATA LIST DUPLICATE :",json_convertdata )
+    query += `select * from "Traceability".trc_000_common_getserialduplicate('[${json_convertdata}]')`; 
+    const result = await client.query(query);
+    if (result.rows !== "") {
+      res.status(200).json(result.rows[0]);
+      
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports.getserialforupdate = async function (req, res) {
   try {
     var query = "";
@@ -608,18 +630,6 @@ module.exports.getsheetduplicateconnectshttypenone = async function (req, res) {
   }
 };
 
-module.exports.getsheetnobyserialno = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 module.exports.getsystemdate = async function (req, res) {
   try {
@@ -1310,13 +1320,16 @@ async function GetSerialAVIResult(
 
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
-  console.log("MAL")
   try {
+    console.log("OK มา")
+
       const {data}= req.body
+      console.log("OK data",data)
       const datalist = JSON.stringify(data);
       query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${datalist}]'); `;
  
       const client = await ConnectPG_DB();
+      console.log(query)
       const result = await client.query(query);
       await DisconnectPG_DB(client);
       res.status(200).json(result.rows[0]);
@@ -1528,18 +1541,67 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
   }
 };
 
-module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
-  var query = "";
+
+module.exports.GetCheckSumSerial = async function (req, res) {
+  let boolResult = true;
   try {
-      const p_data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getfinalgatemastercheckresult('${p_data}'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows[0]);
-  } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    const { _str_Serial, _str_DateType,_intEngRevEndDigit} = req.body;  
+    const MaxEvenNumber = (Math.trunc(_intEngRevEndDigit / 2) * 2) + (((_intEngRevEndDigit % 2) * 2) - 1);
+    const MaxOddNumber = Math.trunc(_intEngRevEndDigit / 2) * 2;
+    let EvenNumber = 0;
+    let OddNumber = 0;
+    let TriNumber = 0;
+    let FouNumber = 0;
+    let FivNumber = 0;
+    let SixNumber = 0;
+    let SevNumber = 0;
+    if (["Y", "W", "R", "B", "I", "M"].includes(_str_DateType)) {
+      if (_str_Serial.length >= _intEngRevEndDigit) {
+        
+          const SerialNumber = _str_Serial.substring(0, _intEngRevEndDigit);
+          const strSerialCheckSum = _str_Serial.charAt(_intEngRevEndDigit);
+         
+          EvenNumber = 0;
+          for (let j = 1; j <= MaxEvenNumber; j += 2) {
+              EvenNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
+          }
+          OddNumber = 0;
+          for (let j = 2; j <= MaxOddNumber; j += 2) {
+              OddNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
+          } 
+          TriNumber = OddNumber * 3;
+          FouNumber = EvenNumber + TriNumber;
+          FivNumber = Math.ceil(FouNumber / 34);
+          SixNumber = FivNumber * 34;
+          SevNumber = SixNumber - FouNumber;
+
+          if (ConvertBase34(SevNumber) !== strSerialCheckSum) {
+              boolResult = false;
+          }
+      } else {
+          boolResult = false;
+      }
+  }
+    res.status(200).json(boolResult);
+  } catch (error) {
+    writeLogError(error.message);
+    res.status(500).json({ message: error.message });
   }
 };
+const ConvertBase34to10 =  (strText) => {
+  const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+    let result = 0;
+    let j = 0;
+    if (strText === "") return result;
+    for (let i = strText.length - 1; i >= 0; i--) {
+        const char = strText.charAt(i);
+        const index = strChange.indexOf(char);
+        if (index === -1) {
+            throw new Error(`Character ${char} is not valid in base 34`);
+        }
+        result += index * Math.pow(34, j);
+        j++;
+    }
+    return parseInt(result);
+
+}
