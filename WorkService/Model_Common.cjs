@@ -1593,6 +1593,32 @@ module.exports.GetCheckSumSerial = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+module.exports.getcheckspecialbyserial = async function (req, res) {
+  var query = "";
+  let response = 0;
+  try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    console.log (json_convertdata);
+      // select * from "Traceability".trc_000_common_getcheckspecialbyserial('[{"strSerialno":"THA92770P53J17J5B","strPlantCode":"5"}]')
+      query = ` select * from "Traceability".trc_000_common_getcheckspecialbyserial('[${json_convertdata}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      let response = 0;
+     if (result.rows[0] != ''){
+      response = result.rows[0].return_result;
+     }else{
+      response = 0;
+     }
+      res.status(200).json({result:response});
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
 
 const ConvertBase34to10 =  (strText) => {
   const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
