@@ -1310,9 +1310,11 @@ async function GetSerialAVIResult(
 
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
+  console.log("MAL")
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${data}]'); `;
+      const {data}= req.body
+      const datalist = JSON.stringify(data);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${datalist}]'); `;
  
       const client = await ConnectPG_DB();
       const result = await client.query(query);
@@ -1391,7 +1393,6 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
         },
       ];
 
-     
       res.status(200).json(data);
       DisconnectOracleDB(Conn);
     }
@@ -1411,7 +1412,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
       query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable('${json_convertdata}','','{}')`;
       const client = await ConnectPG_DB();
       const result = await client.query(query);
-      console.log('dtserial0',result.rows[0])
+      // console.log('dtserial0',result.rows[0])
       await DisconnectPG_DB(client);
       let response=result.rows[0].response
       if(response!=null){
@@ -1467,8 +1468,76 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
           dtSerial.ROLL_LEAF_NO=response.ROLL_LEAF_NO
         }
       }
-      console.log('dtserial1',dtSerial)
+      // console.log('dtserial1',dtSerial)
       res.status(200).json(dtSerial);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+module.exports.SetSerialLotTrayTableGood = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    const query = `CALL "Traceability".trc_022_packing_gate_onlygood_setseriallottraytablegood($1, '')`;
+
+    const result = await client.query(query, [json_convertdata]);
+    if (result.rows != "") {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.getProductDataFix = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getproductdatafix('${data}'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+      // select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[{"strSerial":"THA9276167M21387Y","strPlantCode":"5","strPacking":"","strMasterCode":"T999999999","strPrdname":"RGOZ-960ML-2D"}]')
+      query = ` select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[${json_convertdata}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
+  var query = "";
+  try {
+      const p_data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getfinalgatemastercheckresult('${p_data}'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      res.status(200).json(result.rows[0]);
   } catch (err) {
       writeLogError(err.message, query);
       res.status(500).json({ message: err.message });
