@@ -894,23 +894,6 @@ module.exports.get_spi_aoi_result = async function (req, res) {
   }
 };
 
-module.exports.get_spi_aoi_result = async function (req, res) {
-  var query = "";
-  try {
-    const client = await ConnectPG_DB();
-    const { dataList } = req.body;
-    const json_convertdata = JSON.stringify(dataList);
-
-    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
-    const result = await client.query(query);
-    res.status(200).json(result.rows[0]._strreturn);
-    await DisconnectPG_DB(client);
-  } catch (error) {
-    writeLogError(error.message, query);
-    res.status(500).json({ message: error.message });
-  }
-};
-
 module.exports.getSerialPassByLot = async function (req, res) {
   var query = "";
   try {
@@ -1525,11 +1508,35 @@ module.exports.getProductDataFix = async function (req, res) {
 
 module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
   var query = "";
+  let response = 0;
   try {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
+    console.log (json_convertdata);
       // select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[{"strSerial":"THA9276167M21387Y","strPlantCode":"5","strPacking":"","strMasterCode":"T999999999","strPrdname":"RGOZ-960ML-2D"}]')
       query = ` select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[${json_convertdata}]'); `;
+ 
+      const client = await ConnectPG_DB();
+      const result = await client.query(query);
+      await DisconnectPG_DB(client);
+      if (result.rows[0].plasma_time > 0){
+        response = result.rows[0].plasma_time;
+        if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0){
+          response = 0;
+        }
+      }
+      res.status(200).json({plasma_time:response});
+  } catch (err) {
+      writeLogError(err.message, query);
+      res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.GetSerialDuplicate = async function (req, res) {
+  var query = "";
+  try {
+      const data = JSON.stringify(req.body);
+      query = ` SELECT * FROM "Traceability".trc_000_common_getserialduplicate('[${data}]'); `;
  
       const client = await ConnectPG_DB();
       const result = await client.query(query);
@@ -1540,8 +1547,6 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
       res.status(500).json({ message: err.message });
   }
 };
-
-
 module.exports.GetCheckSumSerial = async function (req, res) {
   let boolResult = true;
   try {
@@ -1588,6 +1593,7 @@ module.exports.GetCheckSumSerial = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
 const ConvertBase34to10 =  (strText) => {
   const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
     let result = 0;
