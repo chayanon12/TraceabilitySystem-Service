@@ -1309,11 +1309,11 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
       const {data}= req.body
       console.log("OK data",data)
       const datalist = JSON.stringify(data);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno('[${datalist}]'); `;
+      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno($1); `;
  
       const client = await ConnectPG_DB();
       console.log(query)
-      const result = await client.query(query);
+      const result = await client.query(query, [datalist]);
       await DisconnectPG_DB(client);
       res.status(200).json(result.rows[0]);
   } catch (err) {
