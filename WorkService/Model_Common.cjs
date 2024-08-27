@@ -6,7 +6,7 @@ const {
 } = require("../Conncetion/DBConn.cjs");
 const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
-const dateFns = require('date-fns');
+const dateFns = require("date-fns");
 const { Query } = require("pg");
 
 ///------Example
@@ -180,46 +180,61 @@ module.exports.getlotserialcountdata = async function (req, res) {
 
 module.exports.getWeekCodebyLot = async function (req, res) {
   var query = "";
-  var SERIAL_DATE_START_WEEK_CODE= '01/01/1970' //ENV
-  var _strReturn=''
-  var _strDate=''
+  var SERIAL_DATE_START_WEEK_CODE = "01/01/1970"; //ENV
+  var _strReturn = "";
+  var _strDate = "";
   try {
     const connect = await ConnectOracleDB("FPC");
-    const { _strLot, _strProc,_strWeekType ,_strSerialInfo} = req.body;
-    console.log('getWeekCodebyLot ','----',_strLot,'----',_strProc,'----',_strWeekType ,'----',_strSerialInfo)
+    const { _strLot, _strProc, _strWeekType, _strSerialInfo } = req.body;
+    console.log(
+      "getWeekCodebyLot ",
+      "----",
+      _strLot,
+      "----",
+      _strProc,
+      "----",
+      _strWeekType,
+      "----",
+      _strSerialInfo
+    );
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
-    if(result.rows[0][0]!=null){
-      _strDate=result.rows[0][0]
-      const [day, month, year] = _strDate.split('/');
+    if (result.rows[0][0] != null) {
+      _strDate = result.rows[0][0];
+      const [day, month, year] = _strDate.split("/");
       const dtToday = new Date(Date.UTC(year, month - 1, day));
-      const [startDay, startMonth, startYear] = SERIAL_DATE_START_WEEK_CODE.split('/');
-      const dtStartDate = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+      const [startDay, startMonth, startYear] =
+        SERIAL_DATE_START_WEEK_CODE.split("/");
+      const dtStartDate = new Date(
+        Date.UTC(startYear, startMonth - 1, startDay)
+      );
       const dtNextSaturday = new Date(dtToday);
-      dtNextSaturday.setUTCDate(dtToday.getUTCDate() + (6 - dtToday.getUTCDay()));
+      dtNextSaturday.setUTCDate(
+        dtToday.getUTCDate() + (6 - dtToday.getUTCDay())
+      );
       const weekNumber = (date) => {
-          const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-          const dayOfYear = ((date - start) / 86400000) + 1;
-          return Math.ceil(dayOfYear / 7);
+        const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+        const dayOfYear = (date - start) / 86400000 + 1;
+        return Math.ceil(dayOfYear / 7);
       };
-      let WeekCnt = weekNumber(dtNextSaturday).toString().padStart(2, '0');
-      
+      let WeekCnt = weekNumber(dtNextSaturday).toString().padStart(2, "0");
+
       const dtNow = dtToday;
-      const strMonth = (dtNow.getUTCMonth() + 1).toString().padStart(2, '0');
+      const strMonth = (dtNow.getUTCMonth() + 1).toString().padStart(2, "0");
       let strYear;
-      if (strMonth === '12' && WeekCnt === '01') {
-          strYear = (dtNow.getUTCFullYear() + 1).toString().trim();
+      if (strMonth === "12" && WeekCnt === "01") {
+        strYear = (dtNow.getUTCFullYear() + 1).toString().trim();
       } else {
-          strYear = dtNow.getUTCFullYear().toString().trim();
+        strYear = dtNow.getUTCFullYear().toString().trim();
       }
       const LOT_NO = _strLot;
-      let txtLot = '';
-      let txtLot2 = '';
-      let txtWeek = '';
-      let txtYear = '';
-      let txtMonth = '';
-      let txtDay = '';
+      let txtLot = "";
+      let txtLot2 = "";
+      let txtWeek = "";
+      let txtYear = "";
+      let txtMonth = "";
+      let txtDay = "";
 
       switch (_strWeekType) {
         case "Y":
@@ -227,83 +242,103 @@ module.exports.getWeekCodebyLot = async function (req, res) {
         case "I":
         case "M":
         case "C":
-            if (LOT_NO !== "") {
-                txtLot = LOT_NO;
-            }
-            txtWeek = WeekCnt;
-            if (_strWeekType === "Y") {
-              
-                const strFirst = strYear[0];
-                
-                const TempStr = await ConvertBase34(year - parseInt(strFirst + "000"));
-                console.log(strYear,'---',strYear[0],strFirst + "000",TempStr)
-                txtYear = TempStr[TempStr.length - 1];
-              
-            } else {
-                txtYear = strYear[3];
-            }
-            txtDay = dtToday.getUTCDay(); 
-           
-            _strReturn = `${txtYear}${txtWeek}${txtDay}`;
-            break;
+          if (LOT_NO !== "") {
+            txtLot = LOT_NO;
+          }
+          txtWeek = WeekCnt;
+          if (_strWeekType === "Y") {
+            const strFirst = strYear[0];
+
+            const TempStr = await ConvertBase34(
+              year - parseInt(strFirst + "000")
+            );
+            console.log(strYear, "---", strYear[0], strFirst + "000", TempStr);
+            txtYear = TempStr[TempStr.length - 1];
+          } else {
+            txtYear = strYear[3];
+          }
+          txtDay = dtToday.getUTCDay();
+
+          _strReturn = `${txtYear}${txtWeek}${txtDay}`;
+          break;
 
         case "W":
-            txtYear = '';
-            txtDay = '';
-            
-            if (LOT_NO !== "") {
-                txtLot = LOT_NO;
-                txtLot2 = LOT_NO.slice(-2);
-            }
-            txtWeek =await ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
-            txtWeek = txtWeek.padStart(2, '0');
-            _strReturn = `${txtWeek}${txtLot2}`;
-            break;
+          txtYear = "";
+          txtDay = "";
+
+          if (LOT_NO !== "") {
+            txtLot = LOT_NO;
+            txtLot2 = LOT_NO.slice(-2);
+          }
+          txtWeek = await ConvertBase34(
+            parseInt(strYear[strYear.length - 1] + WeekCnt)
+          );
+          txtWeek = txtWeek.padStart(2, "0");
+          _strReturn = `${txtWeek}${txtLot2}`;
+          break;
 
         case "J":
-            txtDay =await ChangeBase34(dtToday.getUTCDate());
-            txtMonth =await ChangeBase34(dtToday.getUTCMonth() + 1);
-            txtWeek =await ConvertBase34(parseInt(strYear[strYear.length - 1] + WeekCnt));
-            txtYear = strYear;
-            _strReturn = `${txtMonth}${txtDay}`;
-            break;
+          txtDay = await ChangeBase34(dtToday.getUTCDate());
+          txtMonth = await ChangeBase34(dtToday.getUTCMonth() + 1);
+          txtWeek = await ConvertBase34(
+            parseInt(strYear[strYear.length - 1] + WeekCnt)
+          );
+          txtYear = strYear;
+          _strReturn = `${txtMonth}${txtDay}`;
+          break;
 
         case "N":
-            const intDayDiff = Math.floor((dtToday - dtStartDate) / (1000 * 60 * 60 * 24));
-            const strDayCode =await Convert000(ConvertBase34(intDayDiff));
-            txtMonth = strDayCode;
-            txtWeek = strDayCode[1];
-            txtYear = strDayCode[0];
-            txtDay = strDayCode[2];
-            _strReturn = strDayCode;
-            break;
+          const intDayDiff = Math.floor(
+            (dtToday - dtStartDate) / (1000 * 60 * 60 * 24)
+          );
+          const strDayCode = await Convert000(ConvertBase34(intDayDiff));
+          txtMonth = strDayCode;
+          txtWeek = strDayCode[1];
+          txtYear = strDayCode[0];
+          txtDay = strDayCode[2];
+          _strReturn = strDayCode;
+          break;
 
         case "U":
-            txtDay =await ChangeBase34(dtToday.getUTCDate());
-            txtMonth =await ChangeBase34(dtToday.getUTCMonth() + 1);
-            _strReturn = `${txtMonth}${txtDay}`;
-            break;
+          txtDay = await ChangeBase34(dtToday.getUTCDate());
+          txtMonth = await ChangeBase34(dtToday.getUTCMonth() + 1);
+          _strReturn = `${txtMonth}${txtDay}`;
+          break;
 
         case "S":
-            const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ''); // yyMMdd
-            console.log('formattedDate :',formattedDate,parseInt(formattedDate),await ConvertBase34(parseInt(formattedDate)),await Convert0000(ConvertBase34(parseInt(formattedDate))))
-            _strReturn =await Convert0000(ConvertBase34(parseInt(formattedDate)));
-            break;
+          const formattedDate = dtToday
+            .toISOString()
+            .slice(2, 10)
+            .replace(/-/g, ""); // yyMMdd
+          console.log(
+            "formattedDate :",
+            formattedDate,
+            parseInt(formattedDate),
+            await ConvertBase34(parseInt(formattedDate)),
+            await Convert0000(ConvertBase34(parseInt(formattedDate)))
+          );
+          _strReturn = await Convert0000(
+            ConvertBase34(parseInt(formattedDate))
+          );
+          break;
 
         case "D":
-            const serialDate = new Date(_strSerialInfo.split('/').reverse().join('-') + "T00:00:00");
-            const dateDiff = Math.floor((dtToday - serialDate) / (1000 * 60 * 60 * 24));
-            _strReturn =await Convert0000(dateDiff);
-            break;
+          const serialDate = new Date(
+            _strSerialInfo.split("/").reverse().join("-") + "T00:00:00"
+          );
+          const dateDiff = Math.floor(
+            (dtToday - serialDate) / (1000 * 60 * 60 * 24)
+          );
+          _strReturn = await Convert0000(dateDiff);
+          break;
 
         default:
-            txtLot2 = LOT_NO.slice(-2);
-            _strReturn = `${txtWeek}${txtLot2}`;
-            break;
+          txtLot2 = LOT_NO.slice(-2);
+          _strReturn = `${txtWeek}${txtLot2}`;
+          break;
+      }
     }
-     
-    }
-    console.log('----',_strReturn)
+    console.log("----", _strReturn);
     // console.log(_strDate ,'1 ',dtToday,' ',dtStartDate,' ',dtNextSaturday,' ',WeekCnt,' ',dtNow,' ',strMonth,' ',strYear,' ',_strReturn)
     res.status(200).json(_strReturn);
   } catch (error) {
@@ -316,10 +351,10 @@ const Convert0000 = async (strText) => {
   return ("0000" + strText).slice(-4);
 };
 
-const Convert000= async (strText) =>{
+const Convert000 = async (strText) => {
   let result = "000" + strText;
   return result.slice(-3);
-}
+};
 
 const ConvertBase34 = async (lngNumber2) => {
   let shou;
@@ -345,16 +380,14 @@ const ConvertBase34 = async (lngNumber2) => {
   for (let j = i; j >= 0; j--) {
     StrTemp += await ChangeBase34(Amari[j]);
   }
-  console.log('StrTemp',StrTemp)
+  console.log("StrTemp", StrTemp);
   return StrTemp;
 };
 
-
-const ChangeBase34 = async (lngNumber2) =>  {
+const ChangeBase34 = async (lngNumber2) => {
   const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
   return strChange[lngNumber2];
-}
-
+};
 
 module.exports.GetProductDataByLot = async function (req, res) {
   var query = "";
@@ -525,8 +558,6 @@ module.exports.getrollleafduplicate = async function (req, res) {
   }
 };
 
-
-
 module.exports.getserialduplicateconnectsht = async function (req, res) {
   var query = "";
   try {
@@ -550,12 +581,12 @@ module.exports.GetSerialDuplicate = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    console.log(dataList," DATA LIST DUPLICATE :",json_convertdata )
-    query += `select * from "Traceability".trc_000_common_getserialduplicate('[${json_convertdata}]')`; 
+    console.log(dataList, " DATA LIST DUPLICATE :", json_convertdata);
+    query += `select * from "Traceability".trc_000_common_getserialduplicate('[${json_convertdata}]')`;
     const result = await client.query(query);
     if (result.rows !== "") {
       res.status(200).json(result.rows[0]);
-      
+
       await DisconnectPG_DB(client);
     }
   } catch (error) {
@@ -629,7 +660,6 @@ module.exports.getsheetduplicateconnectshttypenone = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 module.exports.getsystemdate = async function (req, res) {
   try {
@@ -968,11 +998,11 @@ module.exports.GetFinalGateMasterCheckResult = async function (req, res) {
 
 module.exports.GetSerialPassByLotPacking = async function (req, res) {
   var query = "";
-  
+
   try {
     const data = JSON.stringify(req.body);
     query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylotpacking('[${data}]'); `;
-    console.log('query:',query)
+    console.log("query:", query);
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
@@ -1046,10 +1076,10 @@ module.exports.GetBoxCount = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { prdName, boxNo } = req.body;
-    console.log(prdName, boxNo ,"get Box count")
+    console.log(prdName, boxNo, "get Box count");
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetBoxCount( '${prdName}', '${boxNo}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
-    console.log(query,"query")
+    console.log(query, "query");
     if (result.rows.length > 0) {
       let data = [
         {
@@ -1098,8 +1128,6 @@ module.exports.GetCountTrayByBoxPacking = async function (req, res) {
   }
 };
 
-
-
 module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
   const {
     _strPlantCode,
@@ -1121,7 +1149,7 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
   if (_strAOIFlg == "Y") {
     var dtDataAOI;
     var strAOIResult = "";
-     dtDataAOI = await GetSerialAOIEFPCResult(
+    dtDataAOI = await GetSerialAOIEFPCResult(
       _strPlantCode,
       _strFrontSheetNo,
       _intPcsNo,
@@ -1300,7 +1328,6 @@ async function GetSerialAVIResult(
   }
 }
 
-
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
   console.log("/////////////////////////////////////////////")
@@ -1317,23 +1344,23 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
       await DisconnectPG_DB(client);
       res.status(200).json(result.rows[0]);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 module.exports.Getsheetdatabyserialno = async function (req, res) {
   var query = "";
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getsheetdatabyserialno('[${data}]'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows[0]);
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getsheetdatabyserialno('[${data}]'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -1341,10 +1368,10 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
   var query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    const {prdName} = req.body;
-     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSBProductByPd('${prdName}')  FROM DUAL `;
+    const { prdName } = req.body;
+    query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSBProductByPd('${prdName}')  FROM DUAL `;
     const result = await Conn.execute(query);
-    console.log(query,"query")
+    console.log(query, "query");
     if (result.rows.length > 0) {
       let data = [
         {
@@ -1385,7 +1412,6 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
           SLM_CHECK_WEEKCODE_START: result.rows[0][0][0][34],
           SLM_CHECK_WEEKCODE_END: result.rows[0][0][0][35],
           SLM_SERIAL_START_CODE: result.rows[0][0][0][36],
-
         },
       ];
 
@@ -1400,75 +1426,78 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
 
 module.exports.GetSerialTestResultManyTable = async function (req, res) {
   var query = "";
-  let data=[{}]
+  let data = [{}];
   try {
-      //query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable( '{"strPlantCode":"5","strPrdname":"RGOZ-960ML-2D","strWeekCodeType":"U","strSerial":"THA9276167M21387Y"}', '{}');
-      const { dataList,dtSerial } = req.body;
-      const json_convertdata = JSON.stringify(dataList);
-      query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable('${json_convertdata}','','{}')`;
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      // console.log('dtserial0',result.rows[0])
-      await DisconnectPG_DB(client);
-      let response=result.rows[0].response
-      if(response!=null){
-        console.log(response.SERIAL,dtSerial.SERIAL)
-        if(response.SERIAL!=null ||response.SERIAL!=''){
-          dtSerial.SERIAL=response.SERIAL
-        }
-        if(response.TEST_RESULT!=null ||response.TEST_RESULT!=''){
-          dtSerial.TEST_RESULT=response.TEST_RESULT
-        }
-
-        if(response.TYPE_TEST_RESULT!=null ||response.TYPE_TEST_RESULT!=''){
-          dtSerial.TYPE_TEST_RESULT=response.TYPE_TEST_RESULT
-        }
-
-        if(response.REJECT!=null ||response.REJECT!=''){
-          dtSerial.REJECT=response.REJECT
-        }
-
-        if(response.TOUCH_UP!=null ||response.TOUCH_UP!=''){
-          dtSerial.TOUCH_UP=response.TOUCH_UP
-        }
-
-        if(response.REJECT2!=null ||response.REJECT2!=''){
-          dtSerial.REJECT2=response.REJECT2
-        }
-
-        if(response.REJECT_CODE!=null ||response.REJECT_CODE!=''){
-          dtSerial.REJECT_CODE=response.REJECT_CODE
-        }
-
-        if(response.REMARK!=null ||response.REMARK!=''){
-          dtSerial.REMARK=response.REMARK
-        }
-
-        if(response.UPDATE_FLG!=null ||response.UPDATE_FLG!=''){
-          dtSerial.UPDATE_FLG=response.UPDATE_FLG
-        }
-
-        if(response.FRONT_SHEET_NO!=null ||response.FRONT_SHEET_NO!=''){
-          dtSerial.FRONT_SHEET_NO=response.FRONT_SHEET_NO
-        }
-
-        if(response.BACK_SHEET_NO!=null ||response.BACK_SHEET_NO!=''){
-          dtSerial.BACK_SHEET_NO=response.BACK_SHEET_NO
-        }
-
-        if(response.SHEET_PCS_NO!=null ||response.SHEET_PCS_NO!=''){
-          dtSerial.SHEET_PCS_NO=response.SHEET_PCS_NO
-        }
-
-        if(response.ROLL_LEAF_NO!=null ||response.ROLL_LEAF_NO!=''){
-          dtSerial.ROLL_LEAF_NO=response.ROLL_LEAF_NO
-        }
+    //query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable( '{"strPlantCode":"5","strPrdname":"RGOZ-960ML-2D","strWeekCodeType":"U","strSerial":"THA9276167M21387Y"}', '{}');
+    const { dataList, dtSerial } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable('${json_convertdata}','','{}')`;
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    // console.log('dtserial0',result.rows[0])
+    await DisconnectPG_DB(client);
+    let response = result.rows[0].response;
+    if (response != null) {
+      console.log(response.SERIAL, dtSerial.SERIAL);
+      if (response.SERIAL != null || response.SERIAL != "") {
+        dtSerial.SERIAL = response.SERIAL;
       }
-      // console.log('dtserial1',dtSerial)
-      res.status(200).json(dtSerial);
+      if (response.TEST_RESULT != null || response.TEST_RESULT != "") {
+        dtSerial.TEST_RESULT = response.TEST_RESULT;
+      }
+
+      if (
+        response.TYPE_TEST_RESULT != null ||
+        response.TYPE_TEST_RESULT != ""
+      ) {
+        dtSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+      }
+
+      if (response.REJECT != null || response.REJECT != "") {
+        dtSerial.REJECT = response.REJECT;
+      }
+
+      if (response.TOUCH_UP != null || response.TOUCH_UP != "") {
+        dtSerial.TOUCH_UP = response.TOUCH_UP;
+      }
+
+      if (response.REJECT2 != null || response.REJECT2 != "") {
+        dtSerial.REJECT2 = response.REJECT2;
+      }
+
+      if (response.REJECT_CODE != null || response.REJECT_CODE != "") {
+        dtSerial.REJECT_CODE = response.REJECT_CODE;
+      }
+
+      if (response.REMARK != null || response.REMARK != "") {
+        dtSerial.REMARK = response.REMARK;
+      }
+
+      if (response.UPDATE_FLG != null || response.UPDATE_FLG != "") {
+        dtSerial.UPDATE_FLG = response.UPDATE_FLG;
+      }
+
+      if (response.FRONT_SHEET_NO != null || response.FRONT_SHEET_NO != "") {
+        dtSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+      }
+
+      if (response.BACK_SHEET_NO != null || response.BACK_SHEET_NO != "") {
+        dtSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+      }
+
+      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+      }
+
+      if (response.ROLL_LEAF_NO != null || response.ROLL_LEAF_NO != "") {
+        dtSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
+      }
+    }
+    // console.log('dtserial1',dtSerial)
+    res.status(200).json(dtSerial);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 module.exports.SetSerialLotTrayTableGood = async function (req, res) {
@@ -1493,16 +1522,16 @@ module.exports.SetSerialLotTrayTableGood = async function (req, res) {
 module.exports.getProductDataFix = async function (req, res) {
   var query = "";
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getproductdatafix('${data}'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows[0]);
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getproductdatafix('${data}'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -1512,46 +1541,48 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
   try {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    console.log (json_convertdata);
-      // select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[{"strSerial":"THA9276167M21387Y","strPlantCode":"5","strPacking":"","strMasterCode":"T999999999","strPrdname":"RGOZ-960ML-2D"}]')
-      query = ` select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[${json_convertdata}]'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      if (result.rows[0].plasma_time > 0){
-        response = result.rows[0].plasma_time;
-        if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0){
-          response = 0;
-        }
+    console.log(json_convertdata);
+    // select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[{"strSerial":"THA9276167M21387Y","strPlantCode":"5","strPacking":"","strMasterCode":"T999999999","strPrdname":"RGOZ-960ML-2D"}]')
+    query = ` select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[${json_convertdata}]'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    if (result.rows[0].plasma_time > 0) {
+      response = result.rows[0].plasma_time;
+      if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
+        response = 0;
       }
-      res.status(200).json({plasma_time:response});
+    }
+    res.status(200).json({ plasma_time: response });
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 
 module.exports.GetSerialDuplicate = async function (req, res) {
   var query = "";
   try {
-      const data = JSON.stringify(req.body);
-      query = ` SELECT * FROM "Traceability".trc_000_common_getserialduplicate('[${data}]'); `;
- 
-      const client = await ConnectPG_DB();
-      const result = await client.query(query);
-      await DisconnectPG_DB(client);
-      res.status(200).json(result.rows[0]);
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getserialduplicate('[${data}]'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
-      writeLogError(err.message, query);
-      res.status(500).json({ message: err.message });
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };
 module.exports.GetCheckSumSerial = async function (req, res) {
   let boolResult = true;
   try {
-    const { _str_Serial, _str_DateType,_intEngRevEndDigit} = req.body;  
-    const MaxEvenNumber = (Math.trunc(_intEngRevEndDigit / 2) * 2) + (((_intEngRevEndDigit % 2) * 2) - 1);
+    const { _str_Serial, _str_DateType, _intEngRevEndDigit } = req.body;
+    const MaxEvenNumber =
+      Math.trunc(_intEngRevEndDigit / 2) * 2 +
+      ((_intEngRevEndDigit % 2) * 2 - 1);
     const MaxOddNumber = Math.trunc(_intEngRevEndDigit / 2) * 2;
     let EvenNumber = 0;
     let OddNumber = 0;
@@ -1562,52 +1593,74 @@ module.exports.GetCheckSumSerial = async function (req, res) {
     let SevNumber = 0;
     if (["Y", "W", "R", "B", "I", "M"].includes(_str_DateType)) {
       if (_str_Serial.length >= _intEngRevEndDigit) {
-        
-          const SerialNumber = _str_Serial.substring(0, _intEngRevEndDigit);
-          const strSerialCheckSum = _str_Serial.charAt(_intEngRevEndDigit);
-         
-          EvenNumber = 0;
-          for (let j = 1; j <= MaxEvenNumber; j += 2) {
-              EvenNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
-          }
-          OddNumber = 0;
-          for (let j = 2; j <= MaxOddNumber; j += 2) {
-              OddNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
-          } 
-          TriNumber = OddNumber * 3;
-          FouNumber = EvenNumber + TriNumber;
-          FivNumber = Math.ceil(FouNumber / 34);
-          SixNumber = FivNumber * 34;
-          SevNumber = SixNumber - FouNumber;
+        const SerialNumber = _str_Serial.substring(0, _intEngRevEndDigit);
+        const strSerialCheckSum = _str_Serial.charAt(_intEngRevEndDigit);
 
-          if (ConvertBase34(SevNumber) !== strSerialCheckSum) {
-              boolResult = false;
-          }
-      } else {
+        EvenNumber = 0;
+        for (let j = 1; j <= MaxEvenNumber; j += 2) {
+          EvenNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
+        }
+        OddNumber = 0;
+        for (let j = 2; j <= MaxOddNumber; j += 2) {
+          OddNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
+        }
+        TriNumber = OddNumber * 3;
+        FouNumber = EvenNumber + TriNumber;
+        FivNumber = Math.ceil(FouNumber / 34);
+        SixNumber = FivNumber * 34;
+        SevNumber = SixNumber - FouNumber;
+
+        if (ConvertBase34(SevNumber) !== strSerialCheckSum) {
           boolResult = false;
+        }
+      } else {
+        boolResult = false;
       }
-  }
+    }
     res.status(200).json(boolResult);
   } catch (error) {
     writeLogError(error.message);
     res.status(500).json({ message: error.message });
   }
 };
+module.exports.getcheckspecialbyserial = async function (req, res) {
+  var query = "";
+  let response = 0;
+  try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    // select * from "Traceability".trc_000_common_getcheckspecialbyserial('[{"strSerialno":"THA92770P53J17J5B","strPlantCode":"5"}]')
+    query = ` select * from "Traceability".trc_000_common_getcheckspecialbyserial('[${json_convertdata}]'); `;
 
-const ConvertBase34to10 =  (strText) => {
-  const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-    let result = 0;
-    let j = 0;
-    if (strText === "") return result;
-    for (let i = strText.length - 1; i >= 0; i--) {
-        const char = strText.charAt(i);
-        const index = strChange.indexOf(char);
-        if (index === -1) {
-            throw new Error(`Character ${char} is not valid in base 34`);
-        }
-        result += index * Math.pow(34, j);
-        j++;
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    let response = 0;
+    if (result.rows[0] != "") {
+      response = result.rows[0].return_result;
+    } else {
+      response = 0;
     }
-    return parseInt(result);
+    res.status(200).json({ result: response });
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
+  }
+};
 
-}
+const ConvertBase34to10 = (strText) => {
+  const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let result = 0;
+  let j = 0;
+  if (strText === "") return result;
+  for (let i = strText.length - 1; i >= 0; i--) {
+    const char = strText.charAt(i);
+    const index = strChange.indexOf(char);
+    if (index === -1) {
+      throw new Error(`Character ${char} is not valid in base 34`);
+    }
+    result += index * Math.pow(34, j);
+    j++;
+  }
+  return parseInt(result);
+};
