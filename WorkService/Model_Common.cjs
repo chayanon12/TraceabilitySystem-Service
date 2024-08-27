@@ -1482,7 +1482,7 @@ module.exports.SetSerialLotTrayTableGood = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    const query = `CALL "Traceability".trc_022_common_setseriallottraytablegood($1, '')`;
+    const query = `CALL "Traceability".trc_022_packing_gate_onlygood_setseriallottraytablegood($1, '')`;
 
     const result = await client.query(query, [json_convertdata]);
     if (result.rows != "") {
@@ -1494,10 +1494,6 @@ module.exports.SetSerialLotTrayTableGood = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-
-
 module.exports.getProductDataFix = async function (req, res) {
   var query = "";
   try {

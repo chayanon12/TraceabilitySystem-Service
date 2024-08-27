@@ -11,7 +11,6 @@ const {
     var query = "";
     try {
       const Conn = await ConnectOracleDB("PCTTTEST");
-      cos
       const {Serial_No} = req.body;
        query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetExistsBoxSerial('${Serial_No}')  FROM DUAL `;
       const result = await Conn.execute(query);
@@ -26,6 +25,7 @@ const {
         ];
   
         res.status(200).json(data);
+        console.log("data",data)
         DisconnectOracleDB(Conn);
       }
     } catch (error) {
