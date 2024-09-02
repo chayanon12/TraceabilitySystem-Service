@@ -51,6 +51,7 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/GetPlasmaTimeBySerialNo", Common.GetPlasmaTimeBySerialNo);
  router.post("/getcheckspecialbyserial", Common.getcheckspecialbyserial);
  router.post("/GetSerialBoxTestResultManyTableOnlyGood", Common.GetSerialBoxTestResultManyTableOnlyGood);
+ router.post("/SetBoxPackingSerialTray", Common.SetBoxPackingSerialTray);
 //  router.post("/getfinalgatemastercheckresult", Common.GetFinalGateMasterCheckResult);
  
 module.exports = router;

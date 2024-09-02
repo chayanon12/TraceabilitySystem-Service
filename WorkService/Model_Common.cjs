@@ -1307,25 +1307,15 @@ async function GetSerialAOIEFPCResult(
     let roll_leaf =  await GetRollLeafBySheetNo(_strPlantCode,_strFrontSheetNo)
     console.log('roll_leaf',roll_leaf)
     const Conn = await ConnectOracleDB("PCTTTEST");
-    console.log("เข้ามาแล้วววววววววว")
     if(roll_leaf !== ""){
-      console.log("malaewwwww")
-     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult(    
-     '${_strPlantCode}',
-    '${_strFrontSheetNo}',
-    '${_intPcsNo}',
-    '${_strProduct}',
-    '${_strSMPJCavityFlg}',
-    '${roll_leaf}') AS  FROM DUAL`;
-    }else{
-      query = ''
+     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSeAOIEFPCResult('${_strPlantCode}', '${_strFrontSheetNo}', ${_intPcsNo},'${_strProduct}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
     }
     const result = await Conn.execute(query);
-    console.log(result.rows,"OK---------------------------")
     await DisconnectOracleDB(Conn);
     return result.rows[0][0];
   } catch (error) {
     writeLogError(error.message, query);
+    console.log(error.message)
     return error.message;
   }
 }
@@ -1717,5 +1707,58 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req, re
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SetBoxPackingSerialTray = async function (req, res) {
+  let Conn;
+  let _strErrorAll =""
+  try {
+    Conn = await ConnectOracleDB("PCTTTEST");
+    const { strPrdName, strBox, strPack, strSerial, strUserID, strStation , _strResult} = req.body;
+    const result = await Conn.execute(
+      `BEGIN
+          FPC.TRC_COMMON_TRACEABILITY.SetBoxPackingSerialTray(
+           :strPrdName,
+           :strBox,
+           :strPack,
+           :strSerial,
+           :strUserID,
+           :strStation,
+           :P_ERROR
+         );
+       END;`,
+      {
+        strPrdName: { val: strPrdName, type: oracledb.STRING },
+        strBox: { val: strBox, type: oracledb.STRING },
+        strPack: { val: strPack, type: oracledb.STRING },
+        strSerial: { val: strSerial, type: oracledb.STRING },
+        strUserID: { val: strUserID, type: oracledb.STRING },
+        strStation: { val: strStation, type: oracledb.STRING },
+        P_ERROR: { type: oracledb.STRING, dir: oracledb.BIND_OUT }
+      }
+    );
+    if (result.outBinds.P_ERROR.trim() !== 'OK') {
+      _strErrorAll = {
+        SCAN_RESULT : 'NG',
+        REMARK :  result.outBinds.P_ERROR,
+        _strResult :'NG'
+
+      }
+     
+    }
+    res.status(200).json(_strErrorAll);
+  } catch (error) {
+    console.error('Error:', error.message);
+    writeLogError(error.message, '');
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  } finally {
+    if (Conn) {
+      try {
+        await DisconnectOracleDB(Conn);
+      } catch (closeError) {
+        console.error('Failed to close the database connection:', closeError.message);
+      }
+    }
   }
 };
