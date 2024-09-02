@@ -1034,6 +1034,7 @@ module.exports.GetSerialFinInspectResult = async function (req, res) {
         _strReturn = "OK";
       }
     }
+    cons
     res.status(200).json(_strReturn);
   } catch (err) {
     writeLogError(err.message, query);
@@ -1141,12 +1142,17 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
     _strAVIFlg,
     _strResult,
   } = req.body;
+  console.log("MALA--------------------------------------")
   var _strRemark = "";
-  _strResult = "OK";
+  let result_ = _strResult;
+  result_ = "OK";
 
+console.log(_strAOIFlg,"_strAOIFlg")
   if (_strAOMFlg == "Y") {
+    
   }
   if (_strAOIFlg == "Y") {
+    console.log(_strAOIFlg,"_strAOIFlg////////////////")
     var dtDataAOI;
     var strAOIResult = "";
     dtDataAOI = await GetSerialAOIEFPCResult(
@@ -1164,10 +1170,12 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
         strAOIResult != "PASS" &&
         strAOIResult != "GOOD"
       ) {
-        _strResult = "NG";
+        result_ = "NG";
         _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
       }
     } else {
+    
+
       dtDataAOI = await GetSerialAOIEFPCResult(
         _strPlantCode,
         _strBackSheetNo,
@@ -1183,7 +1191,7 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
           strAOIResult != "PASS" &&
           strAOIResult != "GOOD"
         ) {
-          _strResult = "NG";
+          result_ = "NG";
           _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
         }
       }
@@ -1206,7 +1214,7 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
         strOSTResult != "PASS" &&
         strOSTResult != "GOOD"
       ) {
-        _strResult = "NG";
+        result_ = "NG";
         _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
       }
     } else {
@@ -1224,7 +1232,7 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
           strOSTResult != "PASS" &&
           strOSTResult != "GOOD"
         ) {
-          _strResult = "NG";
+          result_ = "NG";
           _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
         }
       }
@@ -1234,7 +1242,6 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
     var dtAVIData;
     var strAVIResult = "";
     dtAVIData = await GetSerialAVIResult(
-      _strPlantCode,
       _strFrontSheetNo,
       _intPcsNo,
       "N"
@@ -1247,12 +1254,11 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
         strAVIResult != "PASS" &&
         strAVIResult != "GOOD"
       ) {
-        _strResult = "NG";
+        result_ = "NG";
         _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
       }
     } else {
       dtAVIData = await GetSerialAVIResult(
-        _strPlantCode,
         _strBackSheetNo,
         _intPcsNo,
         "N"
@@ -1265,7 +1271,7 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
           strAVIResult != "PASS" &&
           strAVIResult != "GOOD"
         ) {
-          _strResult = "NG";
+          result_ = "NG";
           _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
         }
       }
@@ -1298,9 +1304,24 @@ async function GetSerialAOIEFPCResult(
 ) {
   let query = "";
   try {
+    let roll_leaf =  await GetRollLeafBySheetNo(_strPlantCode,_strFrontSheetNo)
+    console.log('roll_leaf',roll_leaf)
     const Conn = await ConnectOracleDB("PCTTTEST");
-    // query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    console.log("เข้ามาแล้วววววววววว")
+    if(roll_leaf !== ""){
+      console.log("malaewwwww")
+     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult(    
+     '${_strPlantCode}',
+    '${_strFrontSheetNo}',
+    '${_intPcsNo}',
+    '${_strProduct}',
+    '${_strSMPJCavityFlg}',
+    '${roll_leaf}') AS  FROM DUAL`;
+    }else{
+      query = ''
+    }
     const result = await Conn.execute(query);
+    console.log(result.rows,"OK---------------------------")
     await DisconnectOracleDB(Conn);
     return result.rows[0][0];
   } catch (error) {
@@ -1310,7 +1331,6 @@ async function GetSerialAOIEFPCResult(
 }
 
 async function GetSerialAVIResult(
-  _strPlantCode,
   _strFrontSheetNo,
   _intPcsNo,
   _strSMPJCavityFlg
@@ -1318,7 +1338,7 @@ async function GetSerialAVIResult(
   let query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    // query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIResult('${_strFrontSheetNo}', '${_intPcsNo}', '${_strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
     await DisconnectOracleDB(Conn);
     return result.rows[0][0];
@@ -1328,18 +1348,34 @@ async function GetSerialAVIResult(
   }
 }
 
+async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
+  let query = "";
+  try {
+    console.log("strPlantCode, strSheetNo", strPlantCode, strSheetNo);
+    const client = await ConnectPG_DB();
+    query = `SELECT * FROM "Traceability".GetRollLeafBySheetNo('[{"strPlantCode": "${strPlantCode}", "strSheetNo": "${strSheetNo}"}]')`;
+    
+    // Execute the query
+    const result = await client.query(query);
+    console.log(result.rows, "-----------------------//////////////////");
+    await DisconnectPG_DB(client);
+
+    return result.rows[0].roll_leaf; 
+  } catch (error) {
+    writeLogError(error.message, query);
+    return error.message;
+  }
+}
+
+
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
-  console.log("/////////////////////////////////////////////")
   try {
       const {data}= req.body
-      console.log("OK data------------------------------",data)
       const datalist = JSON.stringify(data);
-      console.log(datalist,"datalist")
       query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno($1); `;
  
       const client = await ConnectPG_DB();
-      console.log(query)
       const result = await client.query(query, [datalist]);
       await DisconnectPG_DB(client);
       res.status(200).json(result.rows[0]);
@@ -1371,7 +1407,6 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
     const { prdName } = req.body;
     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSBProductByPd('${prdName}')  FROM DUAL `;
     const result = await Conn.execute(query);
-    console.log(query, "query");
     if (result.rows.length > 0) {
       let data = [
         {
@@ -1663,4 +1698,23 @@ const ConvertBase34to10 = (strText) => {
     j++;
   }
   return parseInt(result);
+};
+
+module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req, res) {
+  
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList, dtSerial } = req.body;
+    console.log(dtSerial,"dtSerial")
+    const json_convertdata = JSON.stringify(dataList);
+
+    query += `CALL "Traceability".trc_000_common_getserialboxtestresultmanytableonlygood('[${json_convertdata}]','','{}')`;
+    const result = await client.query(query);
+    res.status(200).json(result.rows[0]);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
 };
