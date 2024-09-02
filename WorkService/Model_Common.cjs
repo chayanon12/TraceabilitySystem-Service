@@ -1465,6 +1465,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
   try {
     //query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable( '{"strPlantCode":"5","strPrdname":"RGOZ-960ML-2D","strWeekCodeType":"U","strSerial":"THA9276167M21387Y"}', '{}');
     const { dataList, dtSerial } = req.body;
+    console.log(dtSerial, "dtSerial");
     const json_convertdata = JSON.stringify(dataList);
     query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable('${json_convertdata}','','{}')`;
     const client = await ConnectPG_DB();
