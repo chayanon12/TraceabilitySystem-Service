@@ -8,6 +8,7 @@ const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 const dateFns = require("date-fns");
 const { Query } = require("pg");
+const { el } = require("date-fns/locale");
 
 ///------Example
 module.exports.xxxxxx = async function (req, res) {
@@ -135,14 +136,29 @@ module.exports.getconnectshtmastercheckresult = async function (req, res) {
 };
 
 module.exports.getconnectshtplasmatime = async function (req, res) {
+  var query = "";
+  let _strError = "";
   try {
-    var query = "";
     const client = await ConnectPG_DB();
-    const json_convertdata = JSON.stringify(req.body);
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
     query = `SELECT * FROM "Traceability".trc_000_common_getconnectshtplasmatime('[${json_convertdata}]')`;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows[0]);
+    if (result.rows.length > 0) {
+      if (result.rows[0].lot_no !== "") {
+        if (dataList._strLotNo !== result.rows[0].lot_no) {
+          _strError = "Sheet mix lot";
+        } else if (result.rows[0].plasma_time > dataList.dblPlasmaTime) {
+          _strError = `Sheet over control plasma time ${dataList.dblPlasmaTime} hrs.`;
+        }
+      } else {
+        _strError = "Sheet no record plasma time";
+      }
+    } else {
+      _strError = "Sheet no record plasma time";
+    }
+    res.status(200).json(_strError);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -561,14 +577,18 @@ module.exports.getrollleafduplicate = async function (req, res) {
 
 module.exports.getserialduplicateconnectsht = async function (req, res) {
   var query = "";
+  let intCount = 0;
   try {
     const client = await ConnectPG_DB();
-    const { Serial } = req.body;
+    const { dataList } = req.body;
     query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`; //--THA92770P53J17J5B
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    const data = JSON.parse(dataJsonString);
-    res.status(200).json(result.rows.flat());
+    if (result.rows.length > 0) {
+      intCount = 1;
+      dataList._strSerialNoDup === result.rows[0].serial_no;
+    }
+    res.status(200).json(intCount);
   } catch (error) {
     writeLogError(error.message, query);
     console.log(error);
