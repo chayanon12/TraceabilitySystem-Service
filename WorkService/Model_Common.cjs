@@ -1820,3 +1820,106 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
     }
   }
 };
+module.exports.SetSerialLotShtTable = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(req.body);
+    query += `call "Traceability".trc_000_common_setrollleaftraytable('[${json_convertdata}]','')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows[0]);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SetRollLeafTrayTable = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(req.body);
+    query += `call "Traceability".trc_000_common_setrollleaftraytable('[${json_convertdata}]','')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows[0]);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.GetSheetDuplicateConnectSht = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(req.body);
+    query += `SELECT * FROM "Traceability".trc_000_common_getsheetduplicateconnectsht('[${json_convertdata}]')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows[0]);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.GetShippingSerialNo = async function (req, res) {
+  try {
+    const { strLotNo, dtSerial, strWeekType } = req.body;
+    let _strReturn = "";
+    let _intSeq = 1;
+    let _strShetSeq = "";
+
+    const _strLotBase34_1 = ConvertBase34(
+      parseInt(strLotNo.substring(0, 1)) +
+      parseInt(strLotNo.substring(1, 2)) +
+      parseInt(strLotNo.substring(2, 3))
+    );
+    const _strLotBase34_4 = Convert0000(
+      ConvertBase34(parseInt(strLotNo.substring(3, 9)))
+    );
+
+    dtSerial.forEach(drRow => {
+      let _strResult = "OK";
+      let _strRemark = "";
+
+      if (strWeekType === "S") {
+
+        if (_strLotBase34_1 !== drRow.SERIAL.substring(10, 11) ||
+          _strLotBase34_4 !== drRow.SERIAL.substring(19, 23)) {
+          _strReturn = "NG";
+          _strResult = "NG";
+          _strRemark = "Serial mix lot";
+        } else if (drRow.SEQ.toString() !== drRow.SERIAL.substring(11, 12)) {
+          _strReturn = "NG";
+          _strResult = "NG";
+          _strRemark = "Serial mix strip";
+        } else {
+          if (_intSeq === 1) {
+            _strShetSeq = drRow.SERIAL.substring(7, 10);
+          } else if (drRow.SERIAL.substring(7, 10) !== _strShetSeq) {
+            _strReturn = "NG";
+            _strResult = "NG";
+            _strRemark = "Serial mix sheet";
+          }
+        }
+      }
+
+      drRow.SCAN_RESULT = _strResult;
+      drRow.REMARK = _strRemark;
+
+      _intSeq += 1;
+    });
+
+    res.status(200).json(_strReturn);
+  } catch (error) {
+    writeLogError(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
