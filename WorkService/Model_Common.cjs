@@ -447,18 +447,7 @@ module.exports.getlotsheetdataallbylot = async function (req, res) {
   }
 };
 
-module.exports.getproductdata = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 
 module.exports.getProductShtGroup = async function (req, res) {
   var query = "";
@@ -1570,12 +1559,13 @@ module.exports.getProductDataFix = async function (req, res) {
   var query = "";
   try {
     const data = JSON.stringify(req.body);
-    query = ` SELECT * FROM "Traceability".trc_000_common_getproductdatafix('${data}'); `;
-
+    query = ` SELECT * FROM "Traceability".trc_000_common_getproductdatafix('[${data}]'); `;
+console.log(query)
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result.rows);
+    console.log(result.rows,'result.rows[0]')
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
