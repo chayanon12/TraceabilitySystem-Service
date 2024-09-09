@@ -1084,15 +1084,13 @@ module.exports.GetBoxCount = async function (req, res) {
     if (result.rows.length > 0) {
       let data = [
         {
-          BOX_COUNT: result.rows[0][0][0][0],
+          BOX_COUNT: result.rows[0][0][0][0]||0,
           BOX_QTY: result.rows[0][0][0][1],
         },
       ];
 
-      if (data.length > 0) {
-        intCount = data[0].BOX_COUNT;
-      }
-      res.status(200).json(intCount);
+    
+      res.status(200).json(data);
       DisconnectOracleDB(Conn);
     }
   } catch (error) {
@@ -1280,6 +1278,10 @@ console.log(_strAOIFlg,"_strAOIFlg")
   res.status(200).json(_strRemark);
 };
 
+
+
+
+
 async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
   let query = "";
   try {
@@ -1323,7 +1325,7 @@ async function GetSerialAOIEFPCResult(
 async function GetSerialAVIResult(
   _strFrontSheetNo,
   _intPcsNo,
-  _strSMPJCavityFlg
+  _strSMPJCavityFlgfv
 ) {
   let query = "";
   try {
@@ -1340,6 +1342,7 @@ async function GetSerialAVIResult(
 
 async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
   let query = "";
+  let roll_leaf =""
   try {
     console.log("strPlantCode, strSheetNo", strPlantCode, strSheetNo);
     const client = await ConnectPG_DB();
@@ -1349,8 +1352,10 @@ async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
     const result = await client.query(query);
     console.log(result.rows, "-----------------------//////////////////");
     await DisconnectPG_DB(client);
-
-    return result.rows[0].roll_leaf; 
+if(result.rows[0].roll_leaf != "" || result.rows[0].roll_leaf != undefined || result.rows[0].roll_leaf == null ){
+  roll_leaf = result.rows[0].roll_leaf 
+}
+    return roll_leaf; 
   } catch (error) {
     writeLogError(error.message, query);
     return error.message;
@@ -1702,7 +1707,57 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req, re
 
     query += `CALL "Traceability".trc_000_common_getserialboxtestresultmanytableonlygood('[${json_convertdata}]','','{}')`;
     const result = await client.query(query);
-    res.status(200).json(result.rows[0]);
+
+
+    console.log(result.rows[0],"result.rows[0]")
+    let response = result.rows[0].response;
+    if (response != null) {
+     
+      if (response.TEST_RESULT != null || response.TEST_RESULT != "") {
+        dtSerial.TEST_RESULT = response.TEST_RESULT;
+      }
+      if (response.TYPE_TEST_RESULT != null || response.TYPE_TEST_RESULT != "") {
+        dtSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+      }
+      if (response.PLASMA_TIME != null || response.PLASMA_TIME != "") {
+        dtSerial.PLASMA_TIME = response.PLASMA_TIME;
+      }
+      if (response.REJECT != null || response.REJECT != "") {
+        dtSerial.REJECT = response.REJECT;
+      }
+      if (response.TOUCH_UP != null || response.TOUCH_UP != "") {
+        dtSerial.TOUCH_UP = response.TOUCH_UP;
+      }
+      if (response.REJECT2 != null || response.REJECT2 != "") {
+        dtSerial.REJECT2 = response.REJECT2;
+      }
+      if (response.REJECT_CODE != null || response.REJECT_CODE != "") {
+        dtSerial.REJECT_CODE = response.REJECT_CODE;
+      }
+      if (response.REMARK != null || response.REMARK != "") {
+        dtSerial.REMARK = response.REMARK;
+      }
+      if (response.UPDATE_FLG != null || response.UPDATE_FLG != "") {
+        dtSerial.UPDATE_FLG = response.UPDATE_FLG;
+      }
+      if (response.ROW_COUNT != null || response.ROW_COUNT != "") {
+        dtSerial.ROW_COUNT = response.ROW_COUNT;
+      }
+      if (response.FRONT_SHEET_NO != null || response.FRONT_SHEET_NO != "") {
+        dtSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+      }
+      if (response.BACK_SHEET_NO != null || response.BACK_SHEET_NO != "") {
+        dtSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+      }
+      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+      }
+      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+      }
+    }     
+    res.status(200).json(dtSerial);
+   
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
@@ -1715,7 +1770,10 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
   let _strErrorAll =""
   try {
     Conn = await ConnectOracleDB("PCTTTEST");
+    
     const { strPrdName, strBox, strPack, strSerial, strUserID, strStation , _strResult} = req.body;
+    console.log(strPrdName, strBox, strPack, strSerial, strUserID, strStation , _strResult,'------------')
+    if(strSerial !== ""){
     const result = await Conn.execute(
       `BEGIN
           FPC.TRC_COMMON_TRACEABILITY.SetBoxPackingSerialTray(
@@ -1738,15 +1796,15 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
         P_ERROR: { type: oracledb.STRING, dir: oracledb.BIND_OUT }
       }
     );
-    if (result.outBinds.P_ERROR.trim() !== 'OK') {
-      _strErrorAll = {
-        SCAN_RESULT : 'NG',
-        REMARK :  result.outBinds.P_ERROR,
-        _strResult :'NG'
+    
+      _strErrorAll =  result.outBinds.P_ERROR
+      
 
-      }
+      
      
-    }
+    
+  }
+   console.log(_strErrorAll,'_strErrorAll')
     res.status(200).json(_strErrorAll);
   } catch (error) {
     console.error('Error:', error.message);
