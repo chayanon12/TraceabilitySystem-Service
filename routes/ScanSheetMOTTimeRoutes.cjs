@@ -5,5 +5,6 @@ const ScanSheetMOTTime = require("../WorkService/Model_ScanSheetMOTTime.cjs");
 router.post("/GetProductNameByLot", ScanSheetMOTTime.GetProductNameByLot);
 router.post("/GetMOTRecordTimeData", ScanSheetMOTTime.GetMOTRecordTimeData);
 router.post("/CallFPCSheetLeadTimeResult", ScanSheetMOTTime.CallFPCSheetLeadTimeResult);
+router.post("/DeleteMOTRecordTimeData", ScanSheetMOTTime.DeleteMOTRecordTimeData);
 
 module.exports = router;
