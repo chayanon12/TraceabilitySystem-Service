@@ -1923,3 +1923,21 @@ module.exports.GetShippingSerialNo = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.GetLotRollLeafDataAllByLot = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_000_common_getlotsheetdataallbylot('[${json_convertdata}]')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
