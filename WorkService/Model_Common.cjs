@@ -1941,3 +1941,23 @@ module.exports.GetLotRollLeafDataAllByLot = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+module.exports.SetConfirmConnectShtPcs = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    query += `call "Traceability".trc_026_confrimShtPcs_SetConfirmConnectShtPcs('[${json_convertdata}]','')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows[0]);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
