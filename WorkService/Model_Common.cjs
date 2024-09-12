@@ -600,7 +600,8 @@ module.exports.getserialduplicateconnectsht = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('${Serial}')`; //--THA92770P53J17J5B
+    const json_convertdata = JSON.stringify(dataList);
+    query += `SELECT  * FROM "Traceability".trc_000_common_getserialduplicateconnectsht('[${json_convertdata}]')`; //--THA92770P53J17J5B
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     if (result.rows.length > 0) {
