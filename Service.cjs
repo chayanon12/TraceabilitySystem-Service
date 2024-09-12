@@ -33,6 +33,7 @@ const ScanAutoBendingTime = require("./routes/ScanAutoBendingTime.cjs");
 const ReJudgement = require("./routes/ReJudgement.cjs");
 const PackingOnlyGood  = require("./routes/ScanSMTSerialPcsBoxOnlyGood.cjs");
 const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtRoutes.cjs");
+const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -81,6 +82,7 @@ app.use("/api", ScanAutoBendingTime);
 app.use("/api", ReJudgement);
 app.use("/api", PackingOnlyGood);
 app.use("/api", ScanSMTSerialSht);
+app.use("/api", PackingConfirmSheet);
 
 
 app.listen(port, () => {
