@@ -1867,10 +1867,12 @@ module.exports.SetSerialLotShtTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(req.body);
-    query += `call "Traceability".trc_000_common_setrollleaftraytable('[${json_convertdata}]','')`;
+    console.log(json_convertdata, "json_convertdata")
+    query += `call "Traceability".trc_000_common_setseriallotshttable('[${json_convertdata}]','')`;
 
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
+    console.log(result.rows[0])
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
