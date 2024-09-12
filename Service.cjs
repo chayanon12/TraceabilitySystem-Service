@@ -34,7 +34,7 @@ const ReJudgement = require("./routes/ReJudgement.cjs");
 const PackingOnlyGood  = require("./routes/ScanSMTSerialPcsBoxOnlyGood.cjs");
 const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtRoutes.cjs");
 const AOIConfirmResult = require("./routes/AOIConfirmResultRoutes.cjs");
-const ChangPatial = require("./routes/Model_ChangPatialRoutes.cjs");
+const ChangPatial = require("./routes/ChangPatialRoutes.cjs");
 const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
 const cors = require('cors');
 app.use(cors({
