@@ -33,7 +33,9 @@ const ScanAutoBendingTime = require("./routes/ScanAutoBendingTime.cjs");
 const ReJudgement = require("./routes/ReJudgement.cjs");
 const PackingOnlyGood  = require("./routes/ScanSMTSerialPcsBoxOnlyGood.cjs");
 const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtRoutes.cjs");
-const ChangPatial = require("./routes/Model_ChangPatialRoutes.cjs");
+const AOIConfirmResult = require("./routes/AOIConfirmResultRoutes.cjs");
+const ChangPatial = require("./routes/ChangPatialRoutes.cjs");
+const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -82,7 +84,9 @@ app.use("/api", ScanAutoBendingTime);
 app.use("/api", ReJudgement);
 app.use("/api", PackingOnlyGood);
 app.use("/api", ScanSMTSerialSht);
+app.use("/api", PackingConfirmSheet);
 app.use("/api/ChangPatial", ChangPatial);
+app.use("/api/AOIConfirmResult", AOIConfirmResult);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
