@@ -35,7 +35,7 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
     query += `SELECT * from "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]');`;
 
     const result = await client.query(query);
-
+console.log(result,"GetSerialProductByProduct")
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
   } catch (error) {
@@ -2005,6 +2005,32 @@ module.exports.SetConfirmConnectShtPcs = async function (req, res) {
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.GetLotRollLeafDataAllByLot = async function (req, res) {
+ 
+  var query = "";
+  try {
+  
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    console.log("มานะ1",dataList)
+    const json_convertdata = JSON.stringify(dataList);
+    console.log("มานะ2",json_convertdata)
+    query += ` SELECT * from "Traceability".trc_000_common_GetLotRollLeafDataAllByLot('[${json_convertdata}]')`;
+    const result = await client.query(query);
+    console.log(result.rows[0],result.rows.length,"///")
+
+    // if (result.rows.length > 0) {
+   
+    // }  
+     res.status(200).json(result.rows);
+      DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
