@@ -192,7 +192,6 @@ module.exports.GetRollLeafTotalByLot = async function (req, res) {
     };
     console.log(data,'data')
     const json_data = JSON.stringify(data);
-    console.log("เข้า2",json_data);
     const client = await ConnectPG_DB();
     let query = `SELECT * from "Traceability".trc_000_common_getrollleaftotalbylot('[${json_data}]')`;
     const result = await client.query(query);

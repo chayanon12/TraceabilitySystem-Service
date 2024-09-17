@@ -50,6 +50,16 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/getProductDataFix", Common.getProductDataFix);
  router.post("/GetPlasmaTimeBySerialNo", Common.GetPlasmaTimeBySerialNo);
  router.post("/getcheckspecialbyserial", Common.getcheckspecialbyserial);
+ router.post("/GetSerialBoxTestResultManyTableOnlyGood", Common.GetSerialBoxTestResultManyTableOnlyGood);
+ router.post("/SetBoxPackingSerialTray", Common.SetBoxPackingSerialTray);
+ router.post("/getconnectshtplasmatime", Common.getconnectshtplasmatime);
+ router.post("/SetRollLeafTrayTable", Common.SetRollLeafTrayTable);
+ router.post("/SetSerialLotShtTable", Common.SetSerialLotShtTable);
+ router.post("/getconnectshtmastercheckresult", Common.getconnectshtmastercheckresult);
+ router.post("/getSheetDuplicateConnectSht", Common.GetSheetDuplicateConnectSht);
+ router.post("/GetShippingSerialNo", Common.GetShippingSerialNo);
+ router.post("/GetLotRollLeafDataAllByLot", Common.GetLotRollLeafDataAllByLot);
+ router.post("/SetConfirmConnectShtPcs", Common.SetConfirmConnectShtPcs);
  router.post("/GetLotRollLeafDataAllByLot", Common.GetLotRollLeafDataAllByLot);
  
 //  router.post("/getfinalgatemastercheckresult", Common.GetFinalGateMasterCheckResult);

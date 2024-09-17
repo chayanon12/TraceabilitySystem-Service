@@ -25,13 +25,19 @@ const Dispenser = require("./routes/ScanDispenser.js");
 const ScanSMTPlasma = require("./routes/ScanSMTPlasmaStopStartRoutes.cjs");
 const ScanSMTSerialControl = require("./routes/ScanSMTSerialControlTimeRoutes.cjs");
 const SpotHeat = require("./routes/ScanSMTSerialSpotHeat.cjs");
-const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtConfirmRoutes.cjs");
+const ScanSMTSerialShtConfirm = require("./routes/ScanSMTSerialShtConfirmRoutes.cjs");
 const ELT_Type = require("./routes/ELTType.cjs");
 const ScanSMTSerialBackend = require("./routes/ScanSMTSerialBackendConfirmRoutes.cjs");
 const AVIconfirm = require("./routes/AVIConfirm.cjs");
 const ScanAutoBendingTime = require("./routes/ScanAutoBendingTime.cjs");
 const ReJudgement = require("./routes/ReJudgement.cjs");
 const PackingOnlyGood  = require("./routes/ScanSMTSerialPcsBoxOnlyGood.cjs");
+const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtRoutes.cjs");
+const AOIConfirmResult = require("./routes/AOIConfirmResultRoutes.cjs");
+const ChangPatial = require("./routes/ChangPatialRoutes.cjs");
+const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
+const FinalGate = require("./routes/FinalGateRoutes.cjs");
+const SerialReplaceRecord = require("./routes/SerialReplaceRecordTime.cjs")
 const ConfirmRollLeaf = require("./routes/ScanSMTConnectRollConfirm.cjs");
 const ChangeSerial = require("./routes/ChangeSerial.cjs");
 const cors = require('cors');
@@ -73,7 +79,7 @@ app.use("/api", Dispenser);
 app.use("/api", ScanSMTPlasma);
 app.use("/api", ScanSMTSerialControl);
 app.use("/api", SpotHeat);
-app.use("/api", ScanSMTSerialSht);
+app.use("/api", ScanSMTSerialShtConfirm);
 app.use("/api", ELT_Type);
 app.use("/api", ScanSMTSerialBackend);
 app.use("/api",ELT_Type)
@@ -81,6 +87,12 @@ app.use("/api",AVIconfirm)
 app.use("/api", ScanAutoBendingTime);
 app.use("/api", ReJudgement);
 app.use("/api", PackingOnlyGood);
+app.use("/api", ScanSMTSerialSht);
+app.use("/api", PackingConfirmSheet);
+app.use("/api/ChangPatial", ChangPatial);
+app.use("/api/AOIConfirmResult", AOIConfirmResult);
+app.use("/api/FinalGate", FinalGate);
+app.use("/api", SerialReplaceRecord);
 app.use("/api", ConfirmRollLeaf);
 app.use("/api", ChangeSerial);
 
