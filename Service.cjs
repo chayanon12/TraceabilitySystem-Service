@@ -36,6 +36,7 @@ const ScanSMTSerialSht = require("./routes/ScanSMTSerialShtRoutes.cjs");
 const AOIConfirmResult = require("./routes/AOIConfirmResultRoutes.cjs");
 const ChangPatial = require("./routes/ChangPatialRoutes.cjs");
 const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
+const FinalGate = require("./routes/FinalGateRoutes.cjs");
 const SerialReplaceRecord = require("./routes/SerialReplaceRecordTime.cjs")
 const cors = require('cors');
 app.use(cors({
@@ -88,6 +89,7 @@ app.use("/api", ScanSMTSerialSht);
 app.use("/api", PackingConfirmSheet);
 app.use("/api/ChangPatial", ChangPatial);
 app.use("/api/AOIConfirmResult", AOIConfirmResult);
+app.use("/api/FinalGate", FinalGate);
 app.use("/api", SerialReplaceRecord);
 
 
