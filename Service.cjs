@@ -41,6 +41,7 @@ const SerialReplaceRecord = require("./routes/SerialReplaceRecordTime.cjs")
 const ConfirmRollLeaf = require("./routes/ScanSMTConnectRollConfirm.cjs");
 const ChangeSerial = require("./routes/ChangeSerial.cjs");
 const SMTDeleteData = require("./routes/SMTDeleteDataRoutes.cjs");
+const ScanAVIConfirmResult = require("./routes/ScanAVIConfirmResult.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -97,6 +98,7 @@ app.use("/api", SerialReplaceRecord);
 app.use("/api", ConfirmRollLeaf);
 app.use("/api", ChangeSerial);
 app.use("/api/SMTDeleteData", SMTDeleteData);
+app.use("/api", ScanAVIConfirmResult);
 
 
 app.listen(port, () => {
