@@ -488,7 +488,7 @@ module.exports.getProductShtGroup = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -556,12 +556,18 @@ module.exports.getproductshtinspectXOut = async function (req, res) {
 module.exports.getproductshtinspectdup = async function (req, res) {
   try {
     var query = "";
+    var boolValue = false;
     const client = await ConnectPG_DB();
     const json_data = JSON.stringify(req.body);
-    query = `SELECT * FROM "Traceability".trc_000_common_getproductshtinspectdup('${json_data}');`;
+    query = `SELECT * FROM "Traceability".trc_000_common_getproductshtinspectdup('[${json_data}]');`;
     const result = await client.query(query);
+    if (result.rows.length > 0) {
+      if (result.rows[0].row_count > 0) {
+        boolValue = true;
+      }
+    }
+    res.status(200).json(boolValue);
     await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
