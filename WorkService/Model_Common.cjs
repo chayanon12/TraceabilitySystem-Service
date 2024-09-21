@@ -35,7 +35,7 @@ module.exports.GetSerialProductByProduct = async function (req, res) {
     query += `SELECT * from "Traceability".trc_000_common_getserialproductbyproduct('[${json_convertdata}]');`;
 
     const result = await client.query(query);
-console.log(result,"GetSerialProductByProduct")
+
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
   } catch (error) {
@@ -961,9 +961,11 @@ module.exports.get_spi_aoi_result = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
 
-    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','')`;
+    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','','')`;
+    console.log(query)
     const result = await client.query(query);
-    res.status(200).json(result.rows[0]._strreturn);
+    // res.status(200).json(result.rows[0]._strreturn);
+    res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
@@ -1428,6 +1430,7 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
 };
 module.exports.Getsheetdatabyserialno = async function (req, res) {
   var query = "";
+  let _dtData ="";
   try {
     const data = JSON.stringify(req.body);
     query = ` SELECT * FROM "Traceability".trc_000_common_getsheetdatabyserialno('[${data}]'); `;
@@ -1435,7 +1438,11 @@ module.exports.Getsheetdatabyserialno = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows[0]);
+    if(result.rows[0]!=undefined){
+      _dtData=result.rows[0]
+      console.log('_dtData',_dtData)
+    }
+    res.status(200).json(_dtData);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
