@@ -364,6 +364,7 @@ module.exports.GetRollLeafScrapRBMP = async function (req, res) {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { strRollNo } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETROLLLEAFSCRAP('${strRollNo}') AS SCRAP_FLG  FROM dual`;
+    console.log(query)
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
       res.status(200).json({ SCRAP_FLG: result.rows[0][0] });

@@ -587,18 +587,7 @@ module.exports.setLotSheetInsXOut = async function (req, res) {
   }
 };
 
-module.exports.getrollleafduplicate = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 
 module.exports.getserialduplicateconnectsht = async function (req, res) {
   var query = "";
@@ -995,6 +984,7 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
+    console.log(dataList)
     const json_convertdata = JSON.stringify(dataList);
     const query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
 
@@ -2038,6 +2028,41 @@ module.exports.GetLotRollLeafDataAllByLot = async function (req, res) {
     // }  
      res.status(200).json(result.rows);
       DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetRollLeafDuplicate = async function (req, res) {
+  let query = "";
+  let intCount = 0;
+  let datax =[];
+  try {
+    console.log(query,'query')
+    const { dataList,_dtRollLeaf } = req.body;
+    const json_data = JSON.stringify(dataList);
+    const client = await ConnectPG_DB();
+
+    query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
+    console.log(query,'query')
+    const result = await client.query(query);
+  
+    datax = Object.entries(_dtRollLeaf)
+    console.log(datax.length );
+    if (result.rows.length > 0 && datax.length >0) {
+      if (result.rows.length > 0 != _dtRollLeaf.length) {
+        intCount = 1;
+      } else {
+        for (let i = 0; i < result.rows.length; i++) {
+          if (result.rows[i].sheet_no != _dtRollLeaf[i].SHT_NO) {
+            intCount = 1;
+          }
+        }
+      }
+    }
+    res.status(200).json({"intCount":intCount});
+    await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
