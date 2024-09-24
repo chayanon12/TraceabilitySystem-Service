@@ -247,25 +247,31 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
       console.log(result.rows[0][0]);
-       if(result.rows[0][0] == null ){
-        res.status(200).json({ strReturn: '' });  
-      } else if (result.rows[0][0] != '' || result.rows[0][0]  != null || result.rows[0][0] != undefined) {
+      if (result.rows[0][0] == null) {
+        res.status(200).json({ strReturn: "" });
+      } else if (
+        result.rows[0][0] != "" ||
+        result.rows[0][0] != null ||
+        result.rows[0][0] != undefined
+      ) {
         _strDate = result.rows[0][0];
-        let SERIAL_DATE_START_WEEK_CODE = '01/01/1970'
+        let SERIAL_DATE_START_WEEK_CODE = "01/01/1970";
         let dtToday = convertDateFormat(_strDate);
         let dtStartDate = convertDateFormat(SERIAL_DATE_START_WEEK_CODE);
         let dtNextSaturday = new Date(dtToday);
-        dtNextSaturday.setDate(dtNextSaturday.getDate() + (6 - dtToday.getDay()));
+        dtNextSaturday.setDate(
+          dtNextSaturday.getDate() + (6 - dtToday.getDay())
+        );
         let WeekCnt = String(dtNextSaturday.getWeekNumber());
         let TempStr;
         let dtNow = new Date(dtToday);
         let strMonth = dtNow.getMonth() + 1;
         let strYear;
-        WeekCnt = Number(WeekCnt).toString().padStart(2, '0');
+        WeekCnt = Number(WeekCnt).toString().padStart(2, "0");
         if (strMonth === 12 && WeekCnt === "01") {
-            strYear = (dtNow.getFullYear() + 1).toString();
+          strYear = (dtNow.getFullYear() + 1).toString();
         } else {
-            strYear = dtNow.getFullYear().toString();
+          strYear = dtNow.getFullYear().toString();
         }
 
         let LOT_NO = strLot;
@@ -281,43 +287,51 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
           case "I":
           case "M":
           case "C":
-              if (LOT_NO !== "") {
-                  txtLot = LOT_NO;
-              }
-              txtWeek = WeekCnt;
-              if (_strWeekType === "Y") {
-                  let strFirst = strYear.slice(0, 1);
-                  TempStr = ConvertBase34(Number(dtToday.getFullYear()) - Number(strFirst + "000"));
-                  txtYear = TempStr.slice(-1);
-              } else {
-                  txtYear = strYear.slice(-1);
-              }
-              txtDay = dtToday.getDay().toString();
-  
-              _strReturn = txtYear + txtWeek + txtDay;
-              break;
+            if (LOT_NO !== "") {
+              txtLot = LOT_NO;
+            }
+            txtWeek = WeekCnt;
+            if (_strWeekType === "Y") {
+              let strFirst = strYear.slice(0, 1);
+              TempStr = ConvertBase34(
+                Number(dtToday.getFullYear()) - Number(strFirst + "000")
+              );
+              txtYear = TempStr.slice(-1);
+            } else {
+              txtYear = strYear.slice(-1);
+            }
+            txtDay = dtToday.getDay().toString();
+
+            _strReturn = txtYear + txtWeek + txtDay;
+            break;
           case "W":
             txtYear = "";
             txtDay = "";
             if (LOT_NO !== "") {
-                txtLot = LOT_NO;
-                txtLot2 = LOT_NO.slice(-3, 2);
+              txtLot = LOT_NO;
+              txtLot2 = LOT_NO.slice(-3, 2);
             }
-            txtWeek = ConvertBase34(Number(strYear.slice(-1) + WeekCnt)).toString();
+            txtWeek = ConvertBase34(
+              Number(strYear.slice(-1) + WeekCnt)
+            ).toString();
             if (txtWeek.length === 1) {
-                txtWeek = "0" + txtWeek;
+              txtWeek = "0" + txtWeek;
             }
             _strReturn = txtWeek + txtLot2;
             break;
           case "J":
             txtDay = ChangeBase34(dtToday.getDate());
             txtMonth = ChangeBase34(dtNow.getMonth() + 1);
-            txtWeek = ConvertBase34(Number(strYear.slice(-1) + WeekCnt)).toString();
+            txtWeek = ConvertBase34(
+              Number(strYear.slice(-1) + WeekCnt)
+            ).toString();
             txtYear = strYear;
             _strReturn = txtMonth + txtDay;
             break;
           case "N":
-            let intDayDiff = Math.floor((dtToday - dtStartDate) / (1000 * 60 * 60 * 24));
+            let intDayDiff = Math.floor(
+              (dtToday - dtStartDate) / (1000 * 60 * 60 * 24)
+            );
             let strDayCode = Convert000(ConvertBase34(intDayDiff));
 
             txtMonth = strDayCode;
@@ -328,29 +342,41 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
 
             _strReturn = strDayCode;
             break;
-            case "U":
+          case "U":
             txtDay = ChangeBase34(dtToday.getDate());
             txtMonth = ChangeBase34(dtNow.getMonth() + 1);
             _strReturn = txtMonth + txtDay;
             break;
 
-        case "S":
-            _strReturn = Convert0000(ConvertBase34(Number(dtToday.getFullYear().toString().slice(-2) + ('0' + (dtToday.getMonth() + 1)).slice(-2) + ('0' + dtToday.getDate()).slice(-2))));
+          case "S":
+            _strReturn = Convert0000(
+              ConvertBase34(
+                Number(
+                  dtToday.getFullYear().toString().slice(-2) +
+                    ("0" + (dtToday.getMonth() + 1)).slice(-2) +
+                    ("0" + dtToday.getDate()).slice(-2)
+                )
+              )
+            );
             break;
 
-        case "D":
-            dtStartDate = new Date(_strSerialInfo.replace(/(\d{4})\/(\d{2})\/(\d{2})/, "$1/$2/$3"));
-            _strReturn = Convert0000(Math.floor((dtToday - dtStartDate) / (1000 * 60 * 60 * 24)));
+          case "D":
+            dtStartDate = new Date(
+              _strSerialInfo.replace(/(\d{4})\/(\d{2})\/(\d{2})/, "$1/$2/$3")
+            );
+            _strReturn = Convert0000(
+              Math.floor((dtToday - dtStartDate) / (1000 * 60 * 60 * 24))
+            );
             break;
 
-        default:
+          default:
             txtLot2 = LOT_NO.substr(-3, 2);
             _strReturn = txtWeek + txtLot2;
             break;
-          }
-          res.status(200).json({ strReturn: _strReturn });
-    } 
-   }
+        }
+        res.status(200).json({ strReturn: _strReturn });
+      }
+    }
     DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -507,13 +533,13 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     };
     const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
-    let datax =[];
-    datax = Object.entries(_dtRollLeaf)
-    console.log(datax.length );
-    
+    let datax = [];
+    datax = Object.entries(_dtRollLeaf);
+    console.log(datax.length);
+
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
-    if (result.rows.length > 0 && datax.length >0) {
+    if (result.rows.length > 0 && datax.length > 0) {
       if (result.rows.length > 0 != _dtRollLeaf.length) {
         intCount = 1;
       } else {
@@ -524,7 +550,7 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
         }
       }
     }
-    res.status(200).json({"intCount":intCount});
+    res.status(200).json({ intCount: intCount });
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
@@ -582,7 +608,7 @@ module.exports.GetConnectShtPlasmaTime = async function (req, res) {
     const result = await client.query(query);
     if (result.rows.length > 0) {
       data = result.rows[0];
-      console.log(data)
+      console.log(data);
       if (data.lot_no !== "") {
         console.log(parseFloat(data.plasma_time));
         if (lot_no !== data.lot_no) {
@@ -617,9 +643,9 @@ module.exports.GetSerialDuplicateConnectSht = async function (req, res) {
     const result = await client.query(query);
     if (result.rows.length > 0) {
       var intRow = 1;
-      res.status(200).json({ intRow: intRow });
+      res.status(200).json({ intRow: intRow ,strSerialNoDup:result.rows[0].serial_no});
       await DisconnectPG_DB(client);
-    }else{
+    } else {
       res.status(200).json({ intRow: 0 });
     }
   } catch (error) {
@@ -699,7 +725,7 @@ function ConvertBase34(num) {
     StrTemp += ChangeBase34(Amari[j]);
   }
   return StrTemp;
-};
+}
 
 function ChangeBase34(intnumber) {
   const strChange = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -718,6 +744,11 @@ function Convert0000(strText) {
 function convertDateFormat(dateString) {
   var parts = dateString.split("/");
   var newDate = new Date(parts[2], parts[1] - 1, parts[0]);
-  var formattedDate = newDate.getFullYear() + '/' + (newDate.getMonth() + 1) + '/' + newDate.getDate();
+  var formattedDate =
+    newDate.getFullYear() +
+    "/" +
+    (newDate.getMonth() + 1) +
+    "/" +
+    newDate.getDate();
   return formattedDate;
 }
