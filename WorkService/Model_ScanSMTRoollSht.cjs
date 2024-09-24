@@ -63,7 +63,6 @@ module.exports.getproductrollleafdata = async function (req, res) {
 
 module.exports.GetRollLeafTotalByLot = async function (req, res) {
   try {
-    
     const { LotNo } = req.body;
     let data = {
       strLotno: LotNo,
