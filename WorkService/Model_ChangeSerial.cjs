@@ -8,12 +8,13 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
 const oracledb = require("oracledb");
 
 module.exports.GetserialnoChangserial = async function (req, res) {
-  const { strplant_code, stroldserial, strnewserial, check_type } = req.body;
-  console.log("DATA SHOW P : ",strplant_code, strnewserial );
+  const { dataList } = req.body;
+  console.log("DD : ",dataList)
+  const json_convertdata = JSON.stringify(dataList);
   var query = "";
   try {
     const client = await ConnectPG_DB();
-    query += `SELECT "Traceability".trc_028_changserial_getserialno('${strplant_code}','${strnewserial}')`;
+    query += `SELECT "Traceability".trc_028_changserial_getserialno('[${json_convertdata}]')`;
     const result = await client.query(query);
     console.log("DATA SHOW trc_028_changserial_getserialno : ",result.rows)
       res.status(200).json(result.rows);
@@ -25,12 +26,14 @@ module.exports.GetserialnoChangserial = async function (req, res) {
 };
 
 module.exports.GetserialnoChangserialoldnew = async function (req, res) {
-  const { strplant_code, stroldserial, strnewserial, check_type } = req.body;
-  console.log("DATA SHOW P : ",strplant_code, strnewserial );
+  const { dataList } = req.body;
+  console.log("GG : ",dataList)
+  const json_convertdata = JSON.stringify(dataList);
   var query = "";
   try {
     const client = await ConnectPG_DB();
-    query += `SELECT "Traceability".trc_028_changserial_getserialnooldnew('${strplant_code}', '${stroldserial}', '${strnewserial}')`;
+
+    query += `CALL "Traceability".trc_028_changserial_getserialnooldnew('[${json_convertdata}]','','','{}');`;
     const result = await client.query(query);
     console.log("DATA SHOW trc_028_changserial_getserialnooldnew : ",result.rows)
       res.status(200).json(result.rows);
@@ -52,8 +55,9 @@ module.exports.SetserialnoChangserial = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    // query += `CALL "Traceability".trc_028_changserial_insertandupdateserialno('[${json_convertdata}]','')`;
+     query += `CALL "Traceability".trc_028_changserial_insertandupdateserialno('[${json_convertdata}]','')`;
     const result = await client.query(query);
+    console.log("DATA SHOW trc_028_changserial_insertandupdateserialno : ",result.rows)
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
       DisconnectPG_DB(client);
