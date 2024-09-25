@@ -42,6 +42,7 @@ const ConfirmRollLeaf = require("./routes/ScanSMTConnectRollConfirm.cjs");
 const ChangeSerial = require("./routes/ChangeSerial.cjs");
 const SMTDeleteData = require("./routes/SMTDeleteDataRoutes.cjs");
 const ScanAVIConfirmResult = require("./routes/ScanAVIConfirmResult.cjs");
+const PieceTraceView = require("./routes/PieceTraceViewRoutes.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -99,7 +100,7 @@ app.use("/api", ConfirmRollLeaf);
 app.use("/api", ChangeSerial);
 app.use("/api/SMTDeleteData", SMTDeleteData);
 app.use("/api", ScanAVIConfirmResult);
-
+app.use("/api", PieceTraceView);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
