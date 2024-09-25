@@ -2068,3 +2068,135 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+// fnGetLotData
+module.exports.fnGetLotData = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strLOTNO } = req.body;
+    console.log(strLOTNO, "get strLOTNO");
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetLotData( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows)
+      if(result.rows[0][0].length>0){
+        data = [
+          {
+            LOT: result.rows[0][0][0][0],
+            LOT_PRD_NAME: result.rows[0][0][0][1],
+            LOT_ROLL_NO: result.rows[0][0][0][2],
+            PREVTLOT: result.rows[0][0][0][3],
+            NEXTLOT: result.rows[0][0][0][4],
+          }]
+      }
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.fnLotNoByRoll = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strRollNO } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnLotNoByRoll( '${strRollNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows[0][0].length)
+      if(result.rows[0][0].length>0){
+        console.log(result.rows[0][0],'dtdtdtdtdt1')
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          // console.log(result.rows[0][0],'dtdtdtdtdt2')
+          data.push({
+            'LOT': result.rows[0][0][dt][0],
+            'PRD_NAME': result.rows[0][0][dt][1],
+        });
+        }
+        }
+       
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.fnGetMaterialData = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strLOTNO } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetMaterialData( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows[0][0].length)
+      if(result.rows[0][0].length>0){
+        console.log(result.rows[0][0],'dtdtdtdtdt1')
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          // console.log(result.rows[0][0],'dtdtdtdtdt2')
+          data.push({
+            'MAT_CODE': result.rows[0][0][dt][0],
+            'MAT_NAME': result.rows[0][0][dt][1],
+            'MAT_CATEGORY': result.rows[0][0][dt][2],
+            'VENDER_LOT': result.rows[0][0][dt][3],
+            'SUB_VENDER_LOT': result.rows[0][0][dt][4],
+            'INVOICE_NO': result.rows[0][0][dt][5],
+            'EXPIRE_DATE': result.rows[0][0][dt][6],
+            'VENDER_NAME': result.rows[0][0][dt][7],
+        });
+        }
+        }
+       
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 
+module.exports.fnGetLotProcessDetailData = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strLOTNO } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_LotProcessDetail( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows[0][0].length)
+      if(result.rows[0][0].length>0){
+        console.log(result.rows[0][0],'dtdtdtdtdt1')
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          // console.log(result.rows[0][0],'dtdtdtdtdt2')
+          data.push({
+            'SEQ': result.rows[0][0][dt][0],
+            'FACTORY': result.rows[0][0][dt][1],
+            'PROC': result.rows[0][0][dt][2],
+            'PROC_DESC': result.rows[0][0][dt][3],
+            'PROD_DATE': result.rows[0][0][dt][4],
+            'MC_NO': result.rows[0][0][dt][5],
+            'WORKING_RECORD': result.rows[0][0][dt][6],
+            'OPER': result.rows[0][0][dt][7],
+            'EMCS': result.rows[0][0][dt][8],
+            'TTT_TOOLS_TYPE_NAME': result.rows[0][0][dt][9],
+            'TTL_TOOLS_CODE': result.rows[0][0][dt][10],
+            'PROC_ID': result.rows[0][0][dt][11],
+            'SCAN_IN': result.rows[0][0][dt][12],
+        });
+        }
+        }
+       
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
