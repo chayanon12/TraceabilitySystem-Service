@@ -2242,3 +2242,20 @@ module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.fnlotrollleafdata = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const strrollno = req.query.strrollno;
+    query += `select * from  "Traceability".trc_036_traceviewroll_fnlotrollleafdata('${strrollno}')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
