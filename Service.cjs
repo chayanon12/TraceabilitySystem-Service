@@ -38,6 +38,7 @@ const ChangPatial = require("./routes/ChangPatialRoutes.cjs");
 const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
 const FinalGate = require("./routes/FinalGateRoutes.cjs");
 const SerialReplaceRecord = require("./routes/SerialReplaceRecordTime.cjs")
+const FVIbadmark =  require("./routes/RptLotFVIBadmarkView.cjs")
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -91,6 +92,7 @@ app.use("/api/ChangPatial", ChangPatial);
 app.use("/api/AOIConfirmResult", AOIConfirmResult);
 app.use("/api/FinalGate", FinalGate);
 app.use("/api", SerialReplaceRecord);
+app.use("/api", FVIbadmark);
 
 
 app.listen(port, () => {

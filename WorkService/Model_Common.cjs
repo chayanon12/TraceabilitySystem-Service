@@ -2004,3 +2004,72 @@ module.exports.SetConfirmConnectShtPcs = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.fnGetLotData = async function (req, res) {
+  var query = "";
+  var intCount = 0;
+  let data ;
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { LOT } = req.body;
+    
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetLotData( '${LOT}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    
+    if (result.rows[0][0][0].length > 0) {
+      console.log("MMMMMMMMMMMMMMM",result.rows)
+       data= [
+        {
+          LOT_PRD_NAME: result.rows[0][0][0][1] 
+        },
+      ];
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    }
+    //}
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    
+    const { _strPrdName,_strLotNo,_strRate } = req.body;
+    console.log("MAAAAA",_strPrdName,_strLotNo,_strRate)
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetFVIBadReByLot( '${_strPrdName}','${_strLotNo}','${_strRate}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {
+      let data = [];
+      
+      for (let i = 0; i < result.rows[0][0].length; i++) {
+        data.push({
+          PRD_MODEL: result.rows[0][0][i][0],
+          DATA_ROW: result.rows[0][0][i][1],
+          DATA_COLUMN: result.rows[0][0][i][2],
+          SMP_PCS_NO: result.rows[0][0][i][3],
+          AOM_PCS_NO: result.rows[0][0][i][4],
+          AOI_PCS_NO: result.rows[0][0][i][5],
+          AOI_LEAF_NO: result.rows[0][0][i][6],
+          OST_PCS_NO: result.rows[0][0][i][7],
+          CONN_SHT_PCS_NO: result.rows[0][0][i][8],
+          Y: result.rows[0][0][i][9],
+          X: result.rows[0][0][i][10],
+          BADMARK_COUNT: result.rows[0][0][i][11],
+          TATAL_QTY: result.rows[0][0][i][12],
+          BADMARK_PCT: result.rows[0][0][i][13],
+          BADMARK_COLOR: result.rows[0][0][i][14]
+        });
+      }
+    
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
