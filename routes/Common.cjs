@@ -71,4 +71,5 @@ router.post("/fnLotNoByRoll", Common.fnLotNoByRoll);
 router.post("/fnGetMaterialData", Common.fnGetMaterialData);
 router.post("/fnGetLotProcessDetailData", Common.fnGetLotProcessDetailData);
 
+
 module.exports = router;

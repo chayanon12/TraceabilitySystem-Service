@@ -2098,7 +2098,7 @@ module.exports.fnGetLotData = async function (req, res) {
   }
 };
 
-
+// ------------------------- not have in pctttest
 module.exports.fnLotNoByRoll = async function (req, res) {
   var query = "";
   try {
@@ -2201,6 +2201,7 @@ module.exports.fnGetLotProcessDetailData = async function (req, res) {
   }
 };
 
+// not use
 module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
   var query = "";
   try {
