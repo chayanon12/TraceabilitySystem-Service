@@ -2243,3 +2243,36 @@ module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.fnlotrollleafdata = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const strrollno = req.query.strrollno;
+    query += `select * from  "Traceability".trc_036_traceviewroll_fnlotrollleafdata('${strrollno}')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetSMTSheetReflowResult = async function (req, res) {
+  var query = "";
+  try {
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getsmtsheetreflowresult('${data}'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
+  }
+};

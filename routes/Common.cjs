@@ -70,6 +70,8 @@ router.post("/GetFVIBadmarkResultByLot", Common.GetFVIBadmarkResultByLot);
 router.post("/fnLotNoByRoll", Common.fnLotNoByRoll);
 router.post("/fnGetMaterialData", Common.fnGetMaterialData);
 router.post("/fnGetLotProcessDetailData", Common.fnGetLotProcessDetailData);
+router.get("/fnGetLotRollLeafData", Common.fnlotrollleafdata);
+router.post("/GetSMTSheetReflowResult", Common.GetSMTSheetReflowResult);
 
 
 module.exports = router;
