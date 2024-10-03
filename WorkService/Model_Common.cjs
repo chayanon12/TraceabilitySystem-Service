@@ -587,18 +587,7 @@ module.exports.setLotSheetInsXOut = async function (req, res) {
   }
 };
 
-module.exports.getrollleafduplicate = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 
 module.exports.getserialduplicateconnectsht = async function (req, res) {
   var query = "";
@@ -995,6 +984,7 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
+    console.log(dataList)
     const json_convertdata = JSON.stringify(dataList);
     const query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
 
@@ -2041,5 +2031,248 @@ module.exports.GetLotRollLeafDataAllByLot = async function (req, res) {
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetRollLeafDuplicate = async function (req, res) {
+  let query = "";
+  let intCount = 0;
+  let datax =[];
+  try {
+    console.log(query,'query')
+    const { dataList,_dtRollLeaf } = req.body;
+    const json_data = JSON.stringify(dataList);
+    const client = await ConnectPG_DB();
+
+    query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
+    console.log(query,'query')
+    const result = await client.query(query);
+  
+    datax = Object.entries(_dtRollLeaf)
+    console.log(datax.length );
+    if (result.rows.length > 0 && datax.length >0) {
+      if (result.rows.length > 0 != _dtRollLeaf.length) {
+        intCount = 1;
+      } else {
+        for (let i = 0; i < result.rows.length; i++) {
+          if (result.rows[i].sheet_no != _dtRollLeaf[i].SHT_NO) {
+            intCount = 1;
+          }
+        }
+      }
+    }
+    res.status(200).json({"intCount":intCount});
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// fnGetLotData
+module.exports.fnGetLotData = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strLOTNO } = req.body;
+    console.log(strLOTNO, "get strLOTNO");
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetLotData( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows)
+      if(result.rows[0][0].length>0){
+        data = [
+          {
+            LOT: result.rows[0][0][0][0],
+            LOT_PRD_NAME: result.rows[0][0][0][1],
+            LOT_ROLL_NO: result.rows[0][0][0][2],
+            PREVTLOT: result.rows[0][0][0][3],
+            NEXTLOT: result.rows[0][0][0][4],
+          }]
+      }
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ------------------------- not have in pctttest
+module.exports.fnLotNoByRoll = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strRollNO } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnLotNoByRoll( '${strRollNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows[0][0].length)
+      if(result.rows[0][0].length>0){
+        console.log(result.rows[0][0],'dtdtdtdtdt1')
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          // console.log(result.rows[0][0],'dtdtdtdtdt2')
+          data.push({
+            'LOT': result.rows[0][0][dt][0],
+            'PRD_NAME': result.rows[0][0][dt][1],
+        });
+        }
+        }
+       
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.fnGetMaterialData = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strLOTNO } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetMaterialData( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows[0][0].length)
+      if(result.rows[0][0].length>0){
+        console.log(result.rows[0][0],'dtdtdtdtdt1')
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          // console.log(result.rows[0][0],'dtdtdtdtdt2')
+          data.push({
+            'MAT_CODE': result.rows[0][0][dt][0],
+            'MAT_NAME': result.rows[0][0][dt][1],
+            'MAT_CATEGORY': result.rows[0][0][dt][2],
+            'VENDER_LOT': result.rows[0][0][dt][3],
+            'SUB_VENDER_LOT': result.rows[0][0][dt][4],
+            'INVOICE_NO': result.rows[0][0][dt][5],
+            'EXPIRE_DATE': result.rows[0][0][dt][6],
+            'VENDER_NAME': result.rows[0][0][dt][7],
+        });
+        }
+        }
+       
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 
+module.exports.fnGetLotProcessDetailData = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strLOTNO } = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_LotProcessDetail( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+      let data=[]
+      console.log(result.rows[0][0].length)
+      if(result.rows[0][0].length>0){
+        console.log(result.rows[0][0],'dtdtdtdtdt1')
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          // console.log(result.rows[0][0],'dtdtdtdtdt2')
+          data.push({
+            'SEQ': result.rows[0][0][dt][0],
+            'FACTORY': result.rows[0][0][dt][1],
+            'PROC': result.rows[0][0][dt][2],
+            'PROC_DESC': result.rows[0][0][dt][3],
+            'PROD_DATE': result.rows[0][0][dt][4],
+            'MC_NO': result.rows[0][0][dt][5],
+            'WORKING_RECORD': result.rows[0][0][dt][6],
+            'OPER': result.rows[0][0][dt][7],
+            'EMCS': result.rows[0][0][dt][8],
+            'TTT_TOOLS_TYPE_NAME': result.rows[0][0][dt][9],
+            'TTL_TOOLS_CODE': result.rows[0][0][dt][10],
+            'PROC_ID': result.rows[0][0][dt][11],
+            'SCAN_IN': result.rows[0][0][dt][12],
+        });
+        }
+        }
+       
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// not use
+module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    
+    const { _strPrdName,_strLotNo,_strRate } = req.body;
+    console.log("MAAAAA",_strPrdName,_strLotNo,_strRate)
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetFVIBadReByLot( '${_strPrdName}','${_strLotNo}','${_strRate}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {
+      let data = [];
+      
+      for (let i = 0; i < result.rows[0][0].length; i++) {
+        data.push({
+          PRD_MODEL: result.rows[0][0][i][0],
+          DATA_ROW: result.rows[0][0][i][1],
+          DATA_COLUMN: result.rows[0][0][i][2],
+          SMP_PCS_NO: result.rows[0][0][i][3],
+          AOM_PCS_NO: result.rows[0][0][i][4],
+          AOI_PCS_NO: result.rows[0][0][i][5],
+          AOI_LEAF_NO: result.rows[0][0][i][6],
+          OST_PCS_NO: result.rows[0][0][i][7],
+          CONN_SHT_PCS_NO: result.rows[0][0][i][8],
+          Y: result.rows[0][0][i][9],
+          X: result.rows[0][0][i][10],
+          BADMARK_COUNT: result.rows[0][0][i][11],
+          TATAL_QTY: result.rows[0][0][i][12],
+          BADMARK_PCT: result.rows[0][0][i][13],
+          BADMARK_COLOR: result.rows[0][0][i][14]
+        });
+      }
+    
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.fnlotrollleafdata = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const strrollno = req.query.strrollno;
+    query += `select * from  "Traceability".trc_036_traceviewroll_fnlotrollleafdata('${strrollno}')`;
+
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetSMTSheetReflowResult = async function (req, res) {
+  var query = "";
+  try {
+    const data = JSON.stringify(req.body);
+    query = ` SELECT * FROM "Traceability".trc_000_common_getsmtsheetreflowresult('${data}'); `;
+
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
   }
 };

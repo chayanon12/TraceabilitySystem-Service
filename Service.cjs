@@ -38,10 +38,14 @@ const ChangPatial = require("./routes/ChangPatialRoutes.cjs");
 const PackingConfirmSheet = require("./routes/PackingConfirmSheet.cjs");
 const FinalGate = require("./routes/FinalGateRoutes.cjs");
 const SerialReplaceRecord = require("./routes/SerialReplaceRecordTime.cjs")
+const FVIbadmark =  require("./routes/RptLotFVIBadmarkView.cjs")
 const ConfirmRollLeaf = require("./routes/ScanSMTConnectRollConfirm.cjs");
 const ChangeSerial = require("./routes/ChangeSerial.cjs");
 const SMTDeleteData = require("./routes/SMTDeleteDataRoutes.cjs");
 const ScanAVIConfirmResult = require("./routes/ScanAVIConfirmResult.cjs");
+const PieceTraceView = require("./routes/PieceTraceViewRoutes.cjs");
+const ViewTraceLot = require("./routes/ViewTraceLotRoutes.cjs");
+const ViewTraceSheet = require("./routes/ViewTraceSheet.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -64,7 +68,7 @@ app.use("/api/Common", commonRoutes);
 app.use("/api", LoginService);
 app.use("/api", MenuService);
 app.use("/api/ScanFin/", ScanSMTFIN);
-app.use("/api", ScanSMTRollSht);
+app.use("/api/SMTRoollSht", ScanSMTRollSht);
 app.use("/api", ScanSheetMOTTime);
 app.use("/api", sheetmaster);
 app.use("/api", productmaster);
@@ -95,10 +99,14 @@ app.use("/api/ChangPatial", ChangPatial);
 app.use("/api/AOIConfirmResult", AOIConfirmResult);
 app.use("/api/FinalGate", FinalGate);
 app.use("/api", SerialReplaceRecord);
+app.use("/api", FVIbadmark);
 app.use("/api", ConfirmRollLeaf);
 app.use("/api", ChangeSerial);
 app.use("/api/SMTDeleteData", SMTDeleteData);
 app.use("/api", ScanAVIConfirmResult);
+app.use("/api", PieceTraceView);
+app.use("/api/ViewTraceLot", ViewTraceLot);
+app.use("/api", ViewTraceSheet);
 
 
 app.listen(port, () => {

@@ -61,7 +61,17 @@ const Common = require("../WorkService/Model_Common.cjs");
  router.post("/GetLotRollLeafDataAllByLot", Common.GetLotRollLeafDataAllByLot);
  router.post("/SetConfirmConnectShtPcs", Common.SetConfirmConnectShtPcs);
  router.post("/GetLotRollLeafDataAllByLot", Common.GetLotRollLeafDataAllByLot);
- 
+ router.post("/GetRollLeafDuplicate", Common.GetRollLeafDuplicate);
 //  router.post("/getfinalgatemastercheckresult", Common.GetFinalGateMasterCheckResult);
- 
+router.post("/fnGetLotData", Common.fnGetLotData);
+
+router.post("/GetFVIBadmarkResultByLot", Common.GetFVIBadmarkResultByLot);
+
+router.post("/fnLotNoByRoll", Common.fnLotNoByRoll);
+router.post("/fnGetMaterialData", Common.fnGetMaterialData);
+router.post("/fnGetLotProcessDetailData", Common.fnGetLotProcessDetailData);
+router.get("/fnGetLotRollLeafData", Common.fnlotrollleafdata);
+router.post("/GetSMTSheetReflowResult", Common.GetSMTSheetReflowResult);
+
+
 module.exports = router;
