@@ -47,6 +47,7 @@ const PieceTraceView = require("./routes/PieceTraceViewRoutes.cjs");
 const ViewTraceLot = require("./routes/ViewTraceLotRoutes.cjs");
 const ViewTraceSheet = require("./routes/ViewTraceSheet.cjs");
 const SheetBadmarkReport = require("./routes/SheetBadmarkReport.cjs");
+const ScanSMTSerialXrayConfirm = require("./routes/ScanSMTSerialXrayConfirm.cjs");
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -108,6 +109,7 @@ app.use("/api", ScanAVIConfirmResult);
 app.use("/api", PieceTraceView);
 app.use("/api/ViewTraceLot", ViewTraceLot);
 app.use("/api", ViewTraceSheet);
+app.use("/api", ScanSMTSerialXrayConfirm);
 app.use("/api/SheetBadmarkReport", SheetBadmarkReport);
 
 app.listen(port, () => {

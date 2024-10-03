@@ -5,7 +5,8 @@ const ScanAVIConfirmResult = require("../WorkService/Model_ScanAVIConfirmResult.
 router.post("/GetProductDataAVIResultConfirm",ScanAVIConfirmResult.GetProductDataAVIResultConfirm);
 router.post("/GetTestTypeAVIResultConfirm",ScanAVIConfirmResult.GetTestTypeAVIResultConfirm);
 router.post("/GetAVIResultConfirmDefault",ScanAVIConfirmResult.GetAVIResultConfirmDefault);
-
+router.post("/GetSerialNoByVendorBarcode",ScanAVIConfirmResult.GetSerialNoByVendorBarcode);
+router.post("/GetAVIResultConfirmSerial",ScanAVIConfirmResult.GetAVIResultConfirmSerial);
 
 
 
