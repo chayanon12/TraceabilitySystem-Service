@@ -73,4 +73,5 @@ router.post("/fnGetLotProcessDetailData", Common.fnGetLotProcessDetailData);
 router.get("/fnGetLotRollLeafData", Common.fnlotrollleafdata);
 router.post("/GetSMTSheetReflowResult", Common.GetSMTSheetReflowResult);
 
+
 module.exports = router;
