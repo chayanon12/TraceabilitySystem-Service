@@ -108,7 +108,6 @@ app.use("/api/SMTDeleteData", SMTDeleteData);
 app.use("/api", ScanAVIConfirmResult);
 app.use("/api", PieceTraceView);
 app.use("/api/ViewTraceLot", ViewTraceLot);
-app.use("/api", ViewTraceSheet);
 app.use("/api", ScanSMTSerialXrayConfirm);
 app.use("/api/SheetBadmarkReport", SheetBadmarkReport);
 app.use("/api/ViewTraceSheet", ViewTraceSheet);
