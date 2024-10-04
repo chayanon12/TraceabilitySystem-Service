@@ -25,6 +25,7 @@ router.post("/getxray",ViewTraceSheet.getXRAY);
 router.post("/getxray2",ViewTraceSheet.getXRAY2);
 router.post("/GetFPCPcsNoBySMPJCavity",ViewTraceSheet.GetFPCPcsNoBySMPJCavity);
 router.post("/GetSerialAVIBadmarkResult",ViewTraceSheet.GetSerialAVIBadmarkResult);
+router.post("/GetSMTConnectShtPcsCavity",ViewTraceSheet.GetSMTConnectShtPcsCavity);
 
 
 

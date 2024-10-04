@@ -490,3 +490,21 @@ module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
     return res.status(500).json({ message: error.message });
   }
 };
+
+// select * from "Traceability".trc_037_traceviewsheet_GetSMTConnectShtPcsCavity('[{"strPlantCode":"5","strPrdName":"RGOZ-379MW-0A"}]')
+
+module.exports.GetSMTConnectShtPcsCavity = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` select * from "Traceability".trc_037_traceviewsheet_GetSMTConnectShtPcsCavity('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
