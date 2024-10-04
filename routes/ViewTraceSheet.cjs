@@ -10,7 +10,6 @@ router.post("/GetAOI",ViewTraceSheet.GetAOI);
 router.post("/GetAOI_Coating",ViewTraceSheet.GetAOI_Coating);
 router.post("/Getinspection",ViewTraceSheet.Getinspection);
 router.post("/Get_LOT_SHEET_SERIAL",ViewTraceSheet.Get_LOT_SHEET_SERIAL);
-router.post("/GetXray",ViewTraceSheet.GetXray);
 router.post("/GetFPCSMPJPcsCavity",ViewTraceSheet.GetFPCSMPJPcsCavity);
 router.post("/GetSerialAOIEFPCResult",ViewTraceSheet.GetSerialAOIEFPCResult);
 router.post("/GetSerialOSTResult",ViewTraceSheet.GetSerialOSTResult);
@@ -22,6 +21,10 @@ router.post("/GetPreSPI",ViewTraceSheet.GetPreSPI);
 router.post("/GetPRD_NG_DETAIL",ViewTraceSheet.GetPRD_NG_DETAIL);
 router.post("/GetAoi_rslt",ViewTraceSheet.GetAoi_rslt);
 router.post("/GetAOI_COA_RSLT",ViewTraceSheet.GetAOI_COA_RSLT);
+router.post("/getxray",ViewTraceSheet.getXRAY);
+router.post("/getxray2",ViewTraceSheet.getXRAY2);
+router.post("/GetFPCPcsNoBySMPJCavity",ViewTraceSheet.GetFPCPcsNoBySMPJCavity);
+router.post("/GetSerialAVIBadmarkResult",ViewTraceSheet.GetSerialAVIBadmarkResult);
 
 
 

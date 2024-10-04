@@ -128,22 +128,7 @@ module.exports.GetLotSheet = async function (req, res) {
           res.status(500).json({ message: error.message });
         }
   };
-  module.exports.GetXray = async function (req, res) {
-    var query = "";
-    try {
-      const {dataList} = req.body;
-    const client = await ConnectPG_DB();
-    const json_convertdata = JSON.stringify(dataList);
-    query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_xray('[${json_convertdata}]')`;
-    const result = await client.query(query);
-    res.status(200).json(result.rows);
-    await DisconnectPG_DB(client);
-        } catch (error) {
-          writeLogError(error.message, query);
-          res.status(500).json({ message: error.message });
-        }
-  };
-  
+ 
 
   module.exports.GetFPCSMPJPcsCavity = async function (req, res) {
     var query = "";
@@ -406,3 +391,102 @@ module.exports.GetAOI_COA_RSLT = async function (req, res) {
       }
 };
 
+// select * from "Traceability".trc_037_traceviewsheet_getXRAY2('[{"strPCS":"24","strSheetNo":"A180831355RGO8010016"}]')
+module.exports.getXRAY = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList); 
+  query += ` select * from "Traceability".trc_037_traceviewsheet_getXRAY('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.getXRAY2 = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` select * from "Traceability".trc_037_traceviewsheet_getXRAY2('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+
+module.exports.GetFPCPcsNoBySMPJCavity = async function (req, res) {
+  {
+   let query = "";
+   try {
+     const{strProduct,_intPcsNo} = req.body
+     const Conn = await ConnectOracleDB("PCTTTEST");
+     query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_PcsNoBySMPJCavity('${strProduct}','${_intPcsNo}') FROM dual`;
+     const result = await Conn.execute(query);
+     if (result.rows.length > 0) {
+      let data = [
+        {
+          pcs_no : result.rows[0][0][0][0]
+        }
+      ];
+      res.status(200).json(data);
+      }
+      await DisconnectOracleDB(Conn);
+      } catch (error) {
+     writeLogError(error.message, query);
+     res.status(500).json({ message: error.message });
+   }
+ }
+}
+
+module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
+  let querypostgres = "";
+  let resultPostges = "";
+  let queryOracle = "";
+  try {
+    const { dataList } = req.body;
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    querypostgres += ` select * from "Traceability".trc_031_fvibadmark_getsmtconnectshtpcsshippingno('[${json_convertdata}]')`;
+    const result = await client.query(querypostgres);
+    resultPostges = result.rows[0].leaf_no;
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, querypostgres);
+    return res.status(500).json({ message: error.message });
+  }
+
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    console.log(resultPostges);
+    queryOracle = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_AVIBadmarkResult('${resultPostges}') FROM dual`;
+    const result = await Conn.execute(queryOracle);
+    await DisconnectOracleDB(Conn);
+
+    if (result.rows.length > 0) {
+      const data = [
+        {
+          pcs_no: result.rows[0][0][0][0],
+          sheet_no: result.rows[0][0][0][1],
+          badmark_no: result.rows[0][0][0][2],
+          badmark_date: result.rows[0][0][0][3],
+          badmark_machine: result.rows[0][0][0][4],
+        }
+      ]
+      return res.status(200).json(data);
+    } else {
+      return res.status(404).json({ message: "No data found" });
+    }
+  } catch (error) {
+    writeLogError(error.message, queryOracle);
+    return res.status(500).json({ message: error.message });
+  }
+};
