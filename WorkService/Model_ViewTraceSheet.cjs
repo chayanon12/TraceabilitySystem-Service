@@ -508,3 +508,21 @@ module.exports.GetSMTConnectShtPcsCavity = async function (req, res) {
         res.status(500).json({ message: error.message });
       }
 };
+
+// select * from "Traceability".trc_037_traceviewsheet_GetSMTSheetReflowResult('[{"strSheetNo":"A904037039RGP4350135","strPlantCode":"5"}]')
+
+module.exports.GetSMTSheetReflowResult = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` select * from "Traceability".trc_037_traceviewsheet_GetSMTSheetReflowResult('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
