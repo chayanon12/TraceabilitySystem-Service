@@ -2077,6 +2077,7 @@ module.exports.fnGetLotData = async function (req, res) {
     const { strLOTNO } = req.body;
     console.log(strLOTNO, "get strLOTNO");
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetLotData( '${strLOTNO}') AS DATA1 FROM DUAL`;
+    console.log(query)
     const result = await Conn.execute(query);
       let data=[]
       console.log(result.rows)
@@ -2176,7 +2177,7 @@ module.exports.fnGetLotProcessDetailData = async function (req, res) {
         for(let dt=0;dt<result.rows[0][0].length;dt++){
           // console.log(result.rows[0][0],'dtdtdtdtdt2')
           data.push({
-            'SEQ': result.rows[0][0][dt][0],
+            'SEQ': dt+1,
             'FACTORY': result.rows[0][0][dt][1],
             'PROC': result.rows[0][0][dt][2],
             'PROC_DESC': result.rows[0][0][dt][3],
@@ -2274,5 +2275,99 @@ module.exports.GetSMTSheetReflowResult = async function (req, res) {
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.fnGetEDOCLink = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { strEMCS,strRev } = req.body;
+    console.log("MAAAAA",strEMCS,strRev)
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetEDOCLink( '${strEMCS}','${strRev}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    let data=[]
+    
+    if(result.rows[0][0].length>0){
+
+      for(let i=0;i<result.rows[0][0].length;i++){
+        data.push({
+          EMCS_TYPE: result.rows[0][0][i][0],
+          EMCS_NO: result.rows[0][0][i][1],
+          EMCS_REV: result.rows[0][0][i][2],
+          
+        });
+      }
+    
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.fnGetDocumentLink = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("FPC");
+    
+    const { strEMCS } = req.body;
+    console.log("MAAAAA",strEMCS)
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetDocumentLink( '${strEMCS}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    let data=[]
+
+    if(result.rows[0][0].length>0){
+
+      for(let i=0;i<result.rows[0][0].length;i++){
+        data.push({
+          dcn_type: result.rows[0][0][i][0],
+          dcn_dep: result.rows[0][0][i][1],
+          dcn_filepdf: result.rows[0][0][i][2],
+          dcn_newrev: result.rows[0][0][i][3],
+          filepdf: result.rows[0][0][i][4],
+        });
+      }
+    
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.GetMeterial = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { txtLotNo } = req.body;
+    console.log("MAAAAA",txtLotNo)
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial( '${txtLotNo}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    let data=[]
+
+    if(result.rows[0][0].length>0){
+
+      for(let dt=0;dt<result.rows[0][0].length;dt++){
+        data.push({
+          VENDER_LOT: result.rows[0][0][dt][0],
+          LOT: result.rows[0][0][dt][1],
+        });
+      }
+    
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
   }
 };

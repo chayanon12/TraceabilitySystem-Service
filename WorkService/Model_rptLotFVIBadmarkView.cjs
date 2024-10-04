@@ -219,7 +219,7 @@ module.exports.GetSerialOSTResult = async function (req, res) {
   try {
     const { SerialNo, intPCSNo, strSMPJCavityFlg } = req.body;
     const Conn = await ConnectOracleDB("PCTTTEST");
-    query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', ${intPCSNo}, '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
       let data = [];

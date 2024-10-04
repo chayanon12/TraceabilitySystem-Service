@@ -72,6 +72,8 @@ router.post("/fnGetMaterialData", Common.fnGetMaterialData);
 router.post("/fnGetLotProcessDetailData", Common.fnGetLotProcessDetailData);
 router.get("/fnGetLotRollLeafData", Common.fnlotrollleafdata);
 router.post("/GetSMTSheetReflowResult", Common.GetSMTSheetReflowResult);
-
+router.post("/fnGetEDOCLink", Common.fnGetEDOCLink);
+router.post("/fnGetDocumentLink", Common.fnGetDocumentLink);
+router.post("/GetMeterial", Common.GetMeterial);
 
 module.exports = router;
