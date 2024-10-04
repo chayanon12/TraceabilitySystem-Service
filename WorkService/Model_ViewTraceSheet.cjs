@@ -292,13 +292,44 @@ module.exports.GetLotSheet = async function (req, res) {
   }
 }
 module.exports.GetSPI_Front = async function (req, res) {
-  console.log("เข้า")
   var query = "";
   try {
     const {dataList} = req.body;
   const client = await ConnectPG_DB();
   const json_convertdata = JSON.stringify(dataList);
   query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_spi_front('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+//GetSPI_RSLT
+module.exports.GetSPI_RSLT = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_spi_rslt('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+//
+module.exports.GetRslt_Header = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_rslt_header('[${json_convertdata}]')`;
   const result = await client.query(query);
   console.log("query",query)
   res.status(200).json(result.rows);
@@ -308,3 +339,70 @@ module.exports.GetSPI_Front = async function (req, res) {
         res.status(500).json({ message: error.message });
       }
 };
+//
+module.exports.GetPreSPI = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getprespi('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+//
+module.exports.GetPRD_NG_DETAIL = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getpre_rslt_detail('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+// กำลังทำ trc_037_traceviewsheet_getaoi_rslt
+module.exports.GetAoi_rslt = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getaoi_rslt('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+//1565 for .net
+module.exports.GetAOI_COA_RSLT = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getAOI_COA_RSLT('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  console.log("query",query)
+  res.status(200).json(result.rows);
+  console.log("DATA :",result.rows)
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+

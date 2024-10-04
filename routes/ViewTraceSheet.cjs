@@ -16,6 +16,16 @@ router.post("/GetSerialAOIEFPCResult",ViewTraceSheet.GetSerialAOIEFPCResult);
 router.post("/GetSerialOSTResult",ViewTraceSheet.GetSerialOSTResult);
 router.post("/GetSerialAVIResult",ViewTraceSheet.GetSerialAVIResult);
 router.post("/GetSPI_Front",ViewTraceSheet.GetSPI_Front);
+router.post("/GetSPI_RSLT",ViewTraceSheet.GetSPI_RSLT);
+router.post("/GetRslt_Header",ViewTraceSheet.GetRslt_Header);
+router.post("/GetPreSPI",ViewTraceSheet.GetPreSPI);
+router.post("/GetPRD_NG_DETAIL",ViewTraceSheet.GetPRD_NG_DETAIL);
+router.post("/GetAoi_rslt",ViewTraceSheet.GetAoi_rslt);
+router.post("/GetAOI_COA_RSLT",ViewTraceSheet.GetAOI_COA_RSLT);
+
+
+
+
 
 
 
