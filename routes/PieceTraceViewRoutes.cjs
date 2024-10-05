@@ -29,5 +29,10 @@ router.post("/getelt", PieceTraceView.getelt);
 router.post("/getkeytype", PieceTraceView.getkeytype);
 router.post("/getxrayresult", PieceTraceView.getxrayresult);
 router.post("/getbarcodegrade", PieceTraceView.getbarcodegrade);
+router.post("/GetPlasmaDataResultBySerial", PieceTraceView.GetPlasmaDataResultBySerial);
+router.post("/GetSerialAOMEFPCResult", PieceTraceView.GetSerialAOMEFPCResult);
+router.post("/GetSerialAVIResult", PieceTraceView.GetSerialAVIResult);
+router.post("/GetSerialAVIBadmarkResult", PieceTraceView.GetSerialAVIBadmarkResult);
+router.post("/GetMCNO", PieceTraceView.GetMCNO);
 
 module.exports = router;
