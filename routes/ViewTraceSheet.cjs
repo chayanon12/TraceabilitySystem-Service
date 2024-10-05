@@ -27,6 +27,10 @@ router.post("/GetFPCPcsNoBySMPJCavity",ViewTraceSheet.GetFPCPcsNoBySMPJCavity);
 router.post("/GetSerialAVIBadmarkResult",ViewTraceSheet.GetSerialAVIBadmarkResult);
 router.post("/GetSMTConnectShtPcsCavity",ViewTraceSheet.GetSMTConnectShtPcsCavity);
 router.post("/GetSMTSheetReflowResult",ViewTraceSheet.GetSMTSheetReflowResult);
+router.post("/GetAoi_rslt_short",ViewTraceSheet.GetAoi_rslt_short);
+router.post("/GetAoi_rslt_short2",ViewTraceSheet.GetAoi_rslt_short2);
+
+
 
 
 
