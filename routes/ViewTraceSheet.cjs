@@ -24,7 +24,7 @@ router.post("/GetAOI_COA_RSLT",ViewTraceSheet.GetAOI_COA_RSLT);
 router.post("/getxray",ViewTraceSheet.getXRAY);
 router.post("/getxray2",ViewTraceSheet.getXRAY2);
 router.post("/GetFPCPcsNoBySMPJCavity",ViewTraceSheet.GetFPCPcsNoBySMPJCavity);
-router.post("/GetSerialAVIBadmarkResult",ViewTraceSheet.GetSerialAVIBadmarkResult);
+// router.post("/GetSerialAVIBadmarkResult",ViewTraceSheet.GetSerialAVIBadmarkResult);
 router.post("/GetSMTConnectShtPcsCavity",ViewTraceSheet.GetSMTConnectShtPcsCavity);
 router.post("/GetSMTSheetReflowResult",ViewTraceSheet.GetSMTSheetReflowResult);
 router.post("/GetAoi_rslt_short",ViewTraceSheet.GetAoi_rslt_short);
