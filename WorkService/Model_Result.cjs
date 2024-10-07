@@ -7,6 +7,7 @@ const {
 const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
+//COA AOU Result2
 module.exports.GetAoi_Coa_Result2 = async function (req, res) {
   var query = "";
   try {
@@ -87,6 +88,7 @@ module.exports.GetAoi_Coa_Result2 = async function (req, res) {
   }
 };
 
+//SPI Result
 module.exports.SPIResult_getCheckData = async function (req, res) {
   console.log("SPIResult_getCheckData");
   var query = "";
@@ -116,7 +118,7 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_041_spiresult_getfinaldata('[${json_convertdata}]')`;
     console.log(query)
-    const result = await client.query(query);
+    const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
   } catch (error) {
@@ -124,4 +126,81 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+// Pre Result
+module.exports.PreResult_GetCheck = async function (req, res) {
+  console.log("PRE_RESULT_getCheck");
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ('[{"strPlantCode":"5","strProduct":"RGOZ-517MW"}]')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_042_PRE_RESULT_getCheck('[${json_convertdata}]')`;
+    console.log(query)
+    const result = await client.query(query); 
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.PreResult_GetDataFound = async function (req, res) {
+  console.log("PRE_RESULT_getCheck");
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ({"strPlantCode":"5","strProduct":"RGOZ-517MW","strSheetNo":"A170869092RGO6490350","strPiece_no":""})
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_042_pre_result_getdataFound('[${json_convertdata}]')`;
+    console.log(query)
+    const result = await client.query(query); 
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.PreResult_GetDataNotFound = async function (req, res) {
+  console.log("PreResult_GetDataNotFound");
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ('[{"strPlantCode":"5","strProduct":"RGOZ-517MW","strSheetNo":"A170869092RGO6490350","strPiece_no":""}]')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_042_pre_result_getdataNotFound('[${json_convertdata}]')`;
+    console.log(query)
+    const result = await client.query(query); 
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.PreResult_GetDataNotFoundFound = async function (req, res) {
+  console.log("PreResult_GetDataNotFound");
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ('[{"strPlantCode":"5","strProduct":"RGOZ-517MW","strSheetNo":"A170869092RGO6490350","strPiece_no":""}]')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_042_pre_result_getdataNotFoundfound('[${json_convertdata}]')`;
+    console.log(query)
+    const result = await client.query(query); 
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
