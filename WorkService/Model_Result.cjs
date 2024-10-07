@@ -1,27 +1,27 @@
 const {
-    ConnectPG_DB,
-    DisconnectPG_DB,
-    ConnectOracleDB,
-    DisconnectOracleDB,
-  } = require("../Conncetion/DBConn.cjs");
-  const oracledb = require("oracledb");
-  const { writeLogError } = require("../Common/LogFuction.cjs");
+  ConnectPG_DB,
+  DisconnectPG_DB,
+  ConnectOracleDB,
+  DisconnectOracleDB,
+} = require("../Conncetion/DBConn.cjs");
+const oracledb = require("oracledb");
+const { writeLogError } = require("../Common/LogFuction.cjs");
 
 module.exports.GetAoi_Coa_Result2 = async function (req, res) {
   var query = "";
   try {
-  const {dataList} = req.body;
-  let PRODUCT_NAME=dataList.PRODUCT_NAME
-  let plant_code=dataList.plant_code
-  let panel_no=dataList.panel_no
-  let sheet_no=dataList.sheet_no
-  console.log(dataList,plant_code,panel_no,sheet_no,'ppppppppp')
-  const client = await ConnectPG_DB();
-  const json_convertdata = JSON.stringify(dataList);
-  if(panel_no==''){
-    panel_no=null
-  }
-  query += ` SELECT  
+    const { dataList } = req.body;
+    let PRODUCT_NAME = dataList.PRODUCT_NAME;
+    let plant_code = dataList.plant_code;
+    let panel_no = dataList.panel_no;
+    let sheet_no = dataList.sheet_no;
+    console.log(dataList, plant_code, panel_no, sheet_no, "ppppppppp");
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    if (panel_no == "") {
+      panel_no = null;
+    }
+    query += ` SELECT  
                 CASE 
                     WHEN A.AOR_RESULT = 'NG' THEN 
                         F.SFM_AOI_IMAGE_PATH || 
@@ -77,13 +77,51 @@ module.exports.GetAoi_Coa_Result2 = async function (req, res) {
                 )
             ORDER BY 
                 A.AOR_SEQ`;
-                console.log(query)
-  const result = await client.query(query);
-  res.status(200).json(result.rows);
-  await DisconnectPG_DB(client);
-      } catch (error) {
-        writeLogError(error.message, query);
-        res.status(500).json({ message: error.message });
-      }
+    console.log(query);
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SPIResult_getCheckData = async function (req, res) {
+  console.log("SPIResult_getCheckData");
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ('[{"strPlantCode":"5","strPanelNo":"79","strProduct":"VP6000M-7900"}]')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += ` select * from "Traceability".trc_041_SPIRESULT_getCheckData('[${json_convertdata}]')`;
+    console.log(query)
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.SPIResult_Getfinaldata = async function (req, res) {
+  console.log("SPIResult_getfinaldata");
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ('[{"strPlantCode":"5","strPanelNo":"79","strProduct":"VP6000M-7900","strSheetNo":"K900035953RGP1130194","strdtCheck":"1","strExport":"0"}]')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_041_spiresult_getfinaldata('[${json_convertdata}]')`;
+    console.log(query)
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
 };
 
