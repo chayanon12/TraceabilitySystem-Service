@@ -753,3 +753,52 @@ function convertDateFormat(dateString) {
     newDate.getDate();
   return formattedDate;
 }
+
+module.exports.GetCountSerialByLotMagazine = async function (req, res) {
+  let query = "";
+  try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    const client = await ConnectPG_DB();
+    // select * from "Traceability".trc_000_common_GetCountSerialByLotMagazine('[{"strLotno": "200784420", "strMgzNo": "1"}]')
+    query += `select * from "Traceability".trc_000_common_GetCountSerialByLotMagazine('[${json_convertdata}]')`;
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// select * from "Traceability".trc_000_common_GetCountSerial('[{"strPlantCode":"5","strSheetNo":"THA9274223GL1XW43"}]')
+// call "Traceability".trc_000_common_setmanualserialno('[{"strSerialNo":"pondtest","strProduct":"pondtest","strPlantCode":"5","strLotNo":"1111","strStation":"pondtest","strMagaZine":"222"}]','')
+
+module.exports.GetCountSerial = async function (req, res) {
+  let query = "";
+  try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    const client = await ConnectPG_DB();
+    query += `select * from "Traceability".trc_000_common_GetCountSerial('[${json_convertdata}]')`;
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.setmanualserialno = async function (req, res) {
+  let query = "";
+  try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    const client = await ConnectPG_DB();
+    query += `call "Traceability".trc_000_common_setmanualserialno('[${json_convertdata}]','')`;
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
