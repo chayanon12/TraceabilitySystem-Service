@@ -249,14 +249,19 @@ module.exports.GetLotSheet = async function (req, res) {
   };
 
   module.exports.GetSerialAVIResult = async function (req, res) {
-   {
     let query = "";
+  
     try {
-      const{_strFrontSheetNo,_intPcsNo,_strSMPJCavityFlgfv} = req.body
+      const { _strFrontSheetNo, _intPcsNo, _strSMPJCavityFlgfv } = req.body;
+      console.log(_strFrontSheetNo, _intPcsNo, _strSMPJCavityFlgfv, "JJJJ");
+      
       const Conn = await ConnectOracleDB("PCTTTEST");
-      query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIResult('${_strFrontSheetNo}', '${_intPcsNo}', '${_strSMPJCavityFlgfv}') AS DATA1 FROM DUAL`;
+      query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIResult('${_strFrontSheetNo}', ${_intPcsNo}, '${_strSMPJCavityFlgfv}') AS DATA1 FROM DUAL`;
+      
       const result = await Conn.execute(query);
-      if (result.rows.length > 0) {
+      
+      // เช็คผลลัพธ์
+      if (result.rows.length > 0 && result.rows[0][0].length > 0) {
         let data = [];
   
         for (let i = 0; i < result.rows[0][0].length; i++) {
@@ -267,15 +272,21 @@ module.exports.GetLotSheet = async function (req, res) {
             AVI_RESULT: result.rows[0][0][i][3],
             AVI_MACHINE: result.rows[0][0][i][4],
           });
-        }}
-        await DisconnectOracleDB(Conn);
-        res.status(200).json(data);
+        }
+  
+        res.status(200).json(data); // ส่งกลับข้อมูลที่ได้
+      } else {
+        res.status(200).json(""); // ส่งกลับเป็นอาร์เรย์ว่าง
+      }
+  
+      await DisconnectOracleDB(Conn);
+  
     } catch (error) {
       writeLogError(error.message, query);
       res.status(500).json({ message: error.message });
     }
-  }
-}
+  };
+  
 module.exports.GetSPI_Front = async function (req, res) {
   var query = "";
   try {
@@ -447,49 +458,49 @@ module.exports.GetFPCPcsNoBySMPJCavity = async function (req, res) {
  }
 }
 
-module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
-  let querypostgres = "";
-  let resultPostges = "";
-  let queryOracle = "";
-  try {
-    const { dataList } = req.body;
-    const client = await ConnectPG_DB();
-    const json_convertdata = JSON.stringify(dataList);
-    querypostgres += ` select * from "Traceability".trc_031_fvibadmark_getsmtconnectshtpcsshippingno('[${json_convertdata}]')`;
-    const result = await client.query(querypostgres);
-    resultPostges = result.rows[0].leaf_no;
-    await DisconnectPG_DB(client);
-  } catch (error) {
-    writeLogError(error.message, querypostgres);
-    return res.status(500).json({ message: error.message });
-  }
+// module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
+//   let querypostgres = "";
+//   let resultPostges = "";
+//   let queryOracle = "";
+//   try {
+//     const { dataList } = req.body;
+//     const client = await ConnectPG_DB();
+//     const json_convertdata = JSON.stringify(dataList);
+//     querypostgres += ` select * from "Traceability".trc_031_fvibadmark_getsmtconnectshtpcsshippingno('[${json_convertdata}]')`;
+//     const result = await client.query(querypostgres);
+//     resultPostges = result.rows[0].leaf_no;
+//     await DisconnectPG_DB(client);
+//   } catch (error) {
+//     writeLogError(error.message, querypostgres);
+//     return res.status(500).json({ message: error.message });
+//   }
 
-  try {
-    const Conn = await ConnectOracleDB("PCTTTEST");
-    console.log(resultPostges);
-    queryOracle = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_AVIBadmarkResult('${resultPostges}') FROM dual`;
-    const result = await Conn.execute(queryOracle);
-    await DisconnectOracleDB(Conn);
+//   try {
+//     const Conn = await ConnectOracleDB("PCTTTEST");
+//     console.log(resultPostges);
+//     queryOracle = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_AVIBadmarkResult('${resultPostges}') FROM dual`;
+//     const result = await Conn.execute(queryOracle);
+//     await DisconnectOracleDB(Conn);
 
-    if (result.rows.length > 0) {
-      const data = [
-        {
-          pcs_no: result.rows[0][0][0][0],
-          sheet_no: result.rows[0][0][0][1],
-          badmark_no: result.rows[0][0][0][2],
-          badmark_date: result.rows[0][0][0][3],
-          badmark_machine: result.rows[0][0][0][4],
-        }
-      ]
-      return res.status(200).json(data);
-    } else {
-      return res.status(404).json({ message: "No data found" });
-    }
-  } catch (error) {
-    writeLogError(error.message, queryOracle);
-    return res.status(500).json({ message: error.message });
-  }
-};
+//     if (result.rows.length > 0) {
+//       const data = [
+//         {
+//           pcs_no: result.rows[0][0][0][0],
+//           sheet_no: result.rows[0][0][0][1],
+//           badmark_no: result.rows[0][0][0][2],
+//           badmark_date: result.rows[0][0][0][3],
+//           badmark_machine: result.rows[0][0][0][4],
+//         }
+//       ]
+//       return res.status(200).json(data);
+//     } else {
+//       return res.status(404).json({ message: "No data found" });
+//     }
+//   } catch (error) {
+//     writeLogError(error.message, queryOracle);
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
 
 // select * from "Traceability".trc_037_traceviewsheet_GetSMTConnectShtPcsCavity('[{"strPlantCode":"5","strPrdName":"RGOZ-379MW-0A"}]')
 
@@ -518,6 +529,37 @@ module.exports.GetSMTSheetReflowResult = async function (req, res) {
   const client = await ConnectPG_DB();
   const json_convertdata = JSON.stringify(dataList);
   query += ` select * from "Traceability".trc_037_traceviewsheet_GetSMTSheetReflowResult('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+module.exports.GetAoi_rslt_short = async function (req, res) {
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getaoi_rslt_short('[${json_convertdata}]')`;
+  const result = await client.query(query);
+  res.status(200).json(result.rows);
+  await DisconnectPG_DB(client);
+      } catch (error) {
+        writeLogError(error.message, query);
+        res.status(500).json({ message: error.message });
+      }
+};
+module.exports.GetAoi_rslt_short2 = async function (req, res) {
+  console.log("GetAoi_rslt_short2")
+  var query = "";
+  try {
+  const {dataList} = req.body;
+  const client = await ConnectPG_DB();
+  const json_convertdata = JSON.stringify(dataList);
+  query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getaoi_rslt_short2('[${json_convertdata}]')`;
   const result = await client.query(query);
   res.status(200).json(result.rows);
   await DisconnectPG_DB(client);
