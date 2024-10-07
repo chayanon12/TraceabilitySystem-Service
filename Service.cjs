@@ -106,7 +106,7 @@ app.use("/api", ConfirmRollLeaf);
 app.use("/api", ChangeSerial);
 app.use("/api/SMTDeleteData", SMTDeleteData);
 app.use("/api", ScanAVIConfirmResult);
-app.use("/api", PieceTraceView);
+app.use("/api/ViewTracePiece", PieceTraceView);
 app.use("/api/ViewTraceLot", ViewTraceLot);
 app.use("/api", ScanSMTSerialXrayConfirm);
 app.use("/api/SheetBadmarkReport", SheetBadmarkReport);
