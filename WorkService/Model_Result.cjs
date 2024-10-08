@@ -149,6 +149,7 @@ module.exports.PreResult_GetCheck = async function (req, res) {
 module.exports.PreResult_GetDataFound = async function (req, res) {
   console.log("PRE_RESULT_getCheck");
   var query = "";
+  let data=[]
   try {
     const { dataList } = req.body;
     // ({"strPlantCode":"5","strProduct":"RGOZ-517MW","strSheetNo":"A170869092RGO6490350","strPiece_no":""})
@@ -157,7 +158,11 @@ module.exports.PreResult_GetDataFound = async function (req, res) {
     query += `select * from "Traceability".trc_042_pre_result_getdataFound('[${json_convertdata}]')`;
     console.log(query)
     const result = await client.query(query); 
-    res.status(200).json(result.rows);
+    console.log(result.rows)
+    if(result.rows[0].trc_042_pre_result_getdatafound!=null){
+      data=result.rows[0].trc_042_pre_result_getdatafound
+    }
+    res.status(200).json(data);
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
