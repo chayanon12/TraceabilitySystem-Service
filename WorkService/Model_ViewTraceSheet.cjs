@@ -253,7 +253,6 @@ module.exports.GetLotSheet = async function (req, res) {
   
     try {
       const { _strFrontSheetNo, _intPcsNo, _strSMPJCavityFlgfv } = req.body;
-      console.log(_strFrontSheetNo, _intPcsNo, _strSMPJCavityFlgfv, "JJJJ");
       
       const Conn = await ConnectOracleDB("PCTTTEST");
       query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIResult('${_strFrontSheetNo}', ${_intPcsNo}, '${_strSMPJCavityFlgfv}') AS DATA1 FROM DUAL`;
@@ -327,7 +326,6 @@ module.exports.GetRslt_Header = async function (req, res) {
   const json_convertdata = JSON.stringify(dataList);
   query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_rslt_header('[${json_convertdata}]')`;
   const result = await client.query(query);
-  console.log("query",query)
   res.status(200).json(result.rows);
   await DisconnectPG_DB(client);
       } catch (error) {
@@ -392,9 +390,7 @@ module.exports.GetAOI_COA_RSLT = async function (req, res) {
   const json_convertdata = JSON.stringify(dataList);
   query += ` SELECT * from "Traceability".trc_037_traceviewsheet_getAOI_COA_RSLT('[${json_convertdata}]')`;
   const result = await client.query(query);
-  console.log("query",query)
   res.status(200).json(result.rows);
-  console.log("DATA :",result.rows)
   await DisconnectPG_DB(client);
       } catch (error) {
         writeLogError(error.message, query);
@@ -553,7 +549,6 @@ module.exports.GetAoi_rslt_short = async function (req, res) {
       }
 };
 module.exports.GetAoi_rslt_short2 = async function (req, res) {
-  console.log("GetAoi_rslt_short2")
   var query = "";
   try {
   const {dataList} = req.body;
