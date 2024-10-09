@@ -2234,11 +2234,12 @@ module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
           BADMARK_COLOR: result.rows[0][0][i][14]
         });
       }
-    
-      res.status(200).json(data);
-      DisconnectOracleDB(Conn);
+   
     
     }
+     
+    res.status(200).json(data);
+    DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
@@ -2299,10 +2300,11 @@ module.exports.fnGetEDOCLink = async function (req, res) {
         });
       }
     
-      res.status(200).json(data);
-      DisconnectOracleDB(Conn);
+     
     
     }
+    res.status(200).json(data);
+    DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
@@ -2332,10 +2334,11 @@ module.exports.fnGetDocumentLink = async function (req, res) {
         });
       }
     
-      res.status(200).json(data);
-      DisconnectOracleDB(Conn);
-    
+  
     }
+    res.status(200).json(data);
+    DisconnectOracleDB(Conn);
+  
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
@@ -2362,10 +2365,11 @@ module.exports.GetMeterial = async function (req, res) {
         });
       }
     
-      res.status(200).json(data);
-      DisconnectOracleDB(Conn);
-    
+
     }
+    res.status(200).json(data);
+    DisconnectOracleDB(Conn);
+  
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });

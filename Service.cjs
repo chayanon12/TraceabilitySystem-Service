@@ -79,7 +79,7 @@ app.use("/api", serialmaster);
 app.use("/api", ScanShtInspect);
 app.use('/api', ScanSheetBakeTime);
 app.use("/api", ScanShtInspectXOut);
-app.use("/api", ConfirmBarcodeGrade);
+app.use("/api/Barcode", ConfirmBarcodeGrade);
 app.use("/api", ScanSheetOvenTime);
 app.use("/api", Rejcet);
 app.use("/api", ELTmaster)

@@ -205,3 +205,185 @@ const {
       res.status(500).json({ message: error.message });
     }
   };
+
+  module.exports.GetDatatLotTrace = async function (req, res) {
+    var query = "";
+    let data=[]
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { txtLotNo } = req.body;
+      console.log("MAAAAA",txtLotNo)
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetDatatLotTrace( '${txtLotNo}') AS DATA1 FROM DUAL`;
+      console.log(query)
+      const result = await Conn.execute(query);
+      console.log(result.rows)
+    
+      if(result.rows[0][0].length>0){
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          data.push({
+            LOT_PRD_NAME: result.rows[0][0][dt][0],
+            LOT_ROLL_NO: result.rows[0][0][dt][1],
+          });
+        }
+       
+      }
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+
+  module.exports.ReferPREVIUSLOT = async function (req, res) {
+    var query = "";
+    let data=[]
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { txtLotNo } = req.body;
+      console.log("MAAAAA",txtLotNo)
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_ReferPREVIUSLOT( '${txtLotNo}') AS DATA1 FROM DUAL`;
+      console.log(query)
+      const result = await Conn.execute(query);
+      console.log(result.rows)
+    
+      if(result.rows[0][0].length>0){
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          data.push({
+            LOT: result.rows[0][0][dt][0],
+          });
+        }
+       
+      }
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  module.exports.ReferNEXTLOT = async function (req, res) {
+    var query = "";
+    let data=[]
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { txtLotNo } = req.body;
+      console.log("MAAAAA",txtLotNo)
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_RefernextLot( '${txtLotNo}') AS DATA1 FROM DUAL`;
+      console.log(query)
+      const result = await Conn.execute(query);
+      console.log(result.rows)
+    
+      if(result.rows[0][0].length>0){
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          data.push({
+            LOT: result.rows[0][0][dt][0],
+          });
+        }
+       
+      }
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  module.exports.GetMaterial2 = async function (req, res) {
+    var query = "";
+    let data=[]
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { txtLotNo } = req.body;
+      console.log("MAAAAA",txtLotNo)
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMaterial2( '${txtLotNo}') AS DATA1 FROM DUAL`;
+      console.log(query)
+      const result = await Conn.execute(query);
+      console.log(result.rows)
+    
+      if(result.rows[0][0].length>0){
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          data.push({
+            ITEM_CODE: result.rows[0][0][dt][0],
+            ITEM_DESC: result.rows[0][0][dt][1],
+            PROCESS: result.rows[0][0][dt][2],
+            VENDER_LOT: result.rows[0][0][dt][3],
+            SUB_LOT: result.rows[0][0][dt][4],
+          });
+        }
+       
+      }
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  module.exports.GetMaterial1 = async function (req, res) {
+    var query = "";
+    let data=[]
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { txtLotNo } = req.body;
+      console.log("MAAAAA",txtLotNo)
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMaterial1( '${txtLotNo}') AS DATA1 FROM DUAL`;
+      console.log(query)
+      const result = await Conn.execute(query);
+      console.log(result.rows)
+    
+      if(result.rows[0][0].length>0){
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          data.push({
+            ITEM_CODE: result.rows[0][0][dt][0],
+            ITEM_DESC: result.rows[0][0][dt][1],
+            PROCESS: result.rows[0][0][dt][2],
+            VENDER_LOT: result.rows[0][0][dt][3],
+            SUB_LOT: result.rows[0][0][dt][4],
+          });
+        }
+       
+      }
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  module.exports.GetDetail = async function (req, res) {
+    var query = "";
+    let data=[]
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { txtLotNo } = req.body;
+      console.log("MAAAAA",txtLotNo)
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetDetail( '${txtLotNo}') AS DATA1 FROM DUAL`;
+      console.log(query)
+      const result = await Conn.execute(query);
+      console.log(result.rows)
+    
+      if(result.rows[0][0].length>0){
+        for(let dt=0;dt<result.rows[0][0].length;dt++){
+          data.push({
+            SEQ: result.rows[0][0][dt][0],
+            FACTORY_CODE: result.rows[0][0][dt][1],
+            PROC_DISP: result.rows[0][0][dt][2],
+            SCAN_DATE: result.rows[0][0][dt][3],
+            PROC_SEQ: result.rows[0][0][dt][4],
+          });
+        }
+       
+      }
+      res.status(200).json(data);
+      DisconnectOracleDB(Conn);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
