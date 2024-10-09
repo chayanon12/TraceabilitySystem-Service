@@ -47,8 +47,6 @@ module.exports.getFetch_menudata = async function (req, res) {
 ////Search MenuName only////////////////////////
 
 module.exports.postMenuname = async function (req, res) {
-
-
   const { System, ParentMenuName, MenuName } = req.body;
   const client = await ConnectPG_DB();
   if (MenuName != undefined) {
@@ -99,29 +97,60 @@ module.exports.Menuname = async function (req, res) {
          NMRU.LOGIN_ID = '${login_id}'
         AND NM.APP_ID = '16'
         AND NM.PARENT_ID IS NOT NULL
+        AND NM.ACTIVE_FLAG <> 'N'
       ORDER BY NM.SEQ `;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
-  //  res.json(result);
-  const jsonResult = result.rows.map(row => ({
-    menu_id: row[0],
-    menu_name: row[1],
-    url: row[2],
-    seq: row[3],
-    active_flag: row[4],
-    visible_flag: row[5],
-    parent_id: row[6],
-    count_work: row[7],
-    count_maintain: row[8],
-    count_viewdata: row[9],
-    page_title: row[10]
-  }));
-   res.json(jsonResult);
+    //  res.json(result);
+    const jsonResult = result.rows.map((row) => ({
+      menu_id: row[0],
+      menu_name: row[1],
+      url: row[2],
+      seq: row[3],
+      active_flag: row[4],
+      visible_flag: row[5],
+      parent_id: row[6],
+      count_work: row[7],
+      count_maintain: row[8],
+      count_viewdata: row[9],
+      page_title: row[10],
+    }));
+    res.json(jsonResult);
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
   }
 };
-
+module.exports.MenuTitle = async function (req, res) {
+  try {
+    const { login_id } = req.body;
+    const connect = await ConnectOracleDB("FPC");
+    const query = `
+      SELECT
+         NM.URL ,  
+        NM.PAGE_TITLE
+      FROM
+         NAP_MAP_ROLE_USER NMRU
+      INNER JOIN NAP_MAP_ROLE_MENU NMRM ON
+         NMRM.ROLE_ID = NMRU.ROLE_ID
+      INNER JOIN NAP_MENU NM ON
+         NM.MENU_ID = NMRM.MENU_ID
+      WHERE
+         NMRU.LOGIN_ID = '${login_id}'
+        AND NM.APP_ID = '16'
+        AND NM.PARENT_ID IS NOT NULL
+      ORDER BY NM.SEQ `;
+    const result = await connect.execute(query);
+    DisconnectOracleDB(connect);
+    //  res.json(result);
+    const jsonResult = result.rows.map((row) => ({
+      url: row[0],
+      page_title: row[1],
+    }));
+    res.json(jsonResult);
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+  }
+};
 
 module.exports.MenuHome = async function (req, res) {
   try {
@@ -140,20 +169,21 @@ module.exports.MenuHome = async function (req, res) {
   WHERE
     APP_ID = '16'
     AND VISIBLE_FLAG = 'N'
+    AND ACTIVE_FLAG <> 'N'
     AND PARENT_ID IS NOT NULL`;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
     // res.json(result.rows);
-    const jsonResult = result.rows.map(row => ({
+    const jsonResult = result.rows.map((row) => ({
       parent_id: row[0],
       menu_name: row[1],
       url: row[2],
       count_work: row[3],
       count_maintain: row[4],
       count_viewdata: row[5],
-      page_title: row[6]
+      page_title: row[6],
     }));
-    res.json(jsonResult)
+    res.json(jsonResult);
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
   }
