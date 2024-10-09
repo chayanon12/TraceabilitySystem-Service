@@ -48,7 +48,8 @@ const ViewTraceLot = require("./routes/ViewTraceLotRoutes.cjs");
 const ViewTraceSheet = require("./routes/ViewTraceSheet.cjs");
 const SheetBadmarkReport = require("./routes/SheetBadmarkReport.cjs");
 const ScanSMTSerialXrayConfirm = require("./routes/ScanSMTSerialXrayConfirm.cjs");
-const Result = require("./routes/Result.cjs");
+const SPIAOITimeView = require("./routes/SPIAOITimeView.cjs");
+
 const cors = require('cors');
 app.use(cors({
   origin: '*', 
@@ -112,7 +113,7 @@ app.use("/api/ViewTraceLot", ViewTraceLot);
 app.use("/api", ScanSMTSerialXrayConfirm);
 app.use("/api/SheetBadmarkReport", SheetBadmarkReport);
 app.use("/api/ViewTraceSheet", ViewTraceSheet);
-app.use("/api/Result", Result);
+app.use("/api/SPIAOITimeView", SPIAOITimeView);
 
 
 app.listen(port, () => {
