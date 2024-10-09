@@ -15,6 +15,10 @@ router.post("/GetSerialDuplicateConnectSht", ScanSMTFIN.GetSerialDuplicateConnec
 router.post("/SetSerialRecordTimeTrayTable", ScanSMTFIN.SetSerialRecordTimeTrayTable);
 router.post("/SetSerialLotShtTable", ScanSMTFIN.SetSerialLotShtTable);
 router.post("/SetRollLeafTrayTable", ScanSMTFIN.SetRollLeafTrayTable);
+router.post("/GetCountSerialByLotMagazine", ScanSMTFIN.GetCountSerialByLotMagazine);
+router.post("/SetManualSerialNo", ScanSMTFIN.setmanualserialno);
+router.post("/GetCountSerial", ScanSMTFIN.GetCountSerial);
+
 
 
 module.exports = router;
