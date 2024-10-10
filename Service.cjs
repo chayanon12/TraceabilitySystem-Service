@@ -51,6 +51,7 @@ const ScanSMTSerialXrayConfirm = require("./routes/ScanSMTSerialXrayConfirm.cjs"
 const SPIAOITimeView = require("./routes/SPIAOITimeView.cjs");
 const FinalGateP1 = require("./routes/FinalGateP1.cjs");
 const Result = require("./routes/Result.cjs");
+const SheetInspection = require("./routes/SheetInspection.cjs");
 
 const cors = require('cors');
 app.use(cors({
@@ -118,6 +119,7 @@ app.use("/api/ViewTraceSheet", ViewTraceSheet);
 app.use("/api/SPIAOITimeView", SPIAOITimeView);
 app.use("/api/FinalGateP1", FinalGateP1); 
 app.use("/api/Result", Result); 
+app.use("/api/SheetInspec", SheetInspection); 
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
