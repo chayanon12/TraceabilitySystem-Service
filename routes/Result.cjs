@@ -14,7 +14,7 @@ router.post("/PreResult_GetDataNotFoundFound",Result.PreResult_GetDataNotFoundFo
 router.post("/OSTResult_GetData1",Result.OSTResult_GetData1);
 router.post("/OSTResult_GetData2",Result.OSTResult_GetData2);
 router.post("/XrayResult",Result.XrayResult);
-
+  
 
 
 

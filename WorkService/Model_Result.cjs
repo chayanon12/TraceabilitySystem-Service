@@ -232,4 +232,4 @@ module.exports.XrayResult = async function (req, res) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
-};
+};  
