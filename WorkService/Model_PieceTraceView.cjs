@@ -728,3 +728,254 @@ async function GetSMTConnectShtPcsShippingNO(dataList) {
     }
 }
 
+module.exports.getfinalgatehistory = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_035_traceviewpiece_getfinalgatehistory('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getaoiresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_043_aoiresult_getaoiresult('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.GetOSTResultPiece = async function (req, res) {
+    {
+        let query = "";
+        try {
+            const {
+                strSheetNo, intPCSNo
+            } = req.body;
+            const Conn = await ConnectOracleDB("PCTTTEST");
+
+            query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetOSTRSTPiece('${strSheetNo}', ${intPCSNo}) AS DATA1 FROM DUAL`;
+
+            const result = await Conn.execute(query);
+
+            if (result.rows.length > 0) {
+                let data = [];
+
+                for (let i = 0; i < result.rows[0][0].length; i++) {
+                    data.push({
+                        SHEET_NO: result.rows[0][0][i][0],
+                        PRODUCT_NAME: result.rows[0][0][i][1],
+                        LOT_NO: result.rows[0][0][i][2],
+                        ROLL_LEAF_NO: result.rows[0][0][i][3],
+                        LEAF_SEQ: result.rows[0][0][i][4],
+                        MACHINE_NO: result.rows[0][0][i][5],
+                        MODEL_NO: result.rows[0][0][i][6],
+                        TESTER_NO: result.rows[0][0][i][7],
+                        FIXTURE_NO: result.rows[0][0][i][8],
+                        PCS_NO: result.rows[0][0][i][9],
+                        OST_RESULT: result.rows[0][0][i][10],
+                        OST_DATE: result.rows[0][0][i][11],
+                    });
+                }
+                res.status(200).json(data);
+                await DisconnectOracleDB(Conn);
+            }
+
+        } catch (error) {
+            writeLogError(error.message, query);
+            res.status(500).json({ message: error.message });
+        }
+    }
+};
+
+module.exports.getposition = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_035_traceviewpiece_getposition('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getpreresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_035_traceviewpiece_getpreresult('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getpreresult2 = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_035_traceviewpiece_getpreresult2('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getpreresult3 = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_035_traceviewpiece_getpreresult3('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getrejectresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_047_reject_result_getdata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getTouchupresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_048_touchupresult_getdata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getCheckerresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_049_checkerresult_getdata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getCheckerresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_049_checkerresult_getdata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getCheckerresultdata2 = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_049_checkerresult_getdata2('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getCheckerresultdata3 = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_049_checkerresult_getdata3('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.getaoicoaresult = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_051_aoicoaresult_getdata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+

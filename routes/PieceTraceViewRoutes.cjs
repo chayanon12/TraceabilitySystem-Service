@@ -34,5 +34,18 @@ router.post("/GetSerialAOMEFPCResult", PieceTraceView.GetSerialAOMEFPCResult);
 router.post("/GetSerialAVIResult", PieceTraceView.GetSerialAVIResult);
 router.post("/GetSerialAVIBadmarkResult", PieceTraceView.GetSerialAVIBadmarkResult);
 router.post("/GetMCNO", PieceTraceView.GetMCNO);
+router.post("/getfinalgatehistory", PieceTraceView.getfinalgatehistory);
+router.post("/getaoiresult", PieceTraceView.getaoiresult);
+router.post("/GetOSTResultPiece", PieceTraceView.GetOSTResultPiece);
+router.post("/getposition", PieceTraceView.getposition);
+router.post("/getpreresult", PieceTraceView.getpreresult);
+router.post("/getpreresult2", PieceTraceView.getpreresult2);
+router.post("/getpreresult3", PieceTraceView.getpreresult3);
+router.post("/getrejectresult", PieceTraceView.getrejectresult);
+router.post("/getTouchupresult", PieceTraceView.getTouchupresult);
+router.post("/getCheckerresult", PieceTraceView.getCheckerresult);
+router.post("/getCheckerresultdata2", PieceTraceView.getCheckerresultdata2);
+router.post("/getCheckerresultdata3", PieceTraceView.getCheckerresultdata3);
+router.post("/getaoicoaresult", PieceTraceView.getaoicoaresult);
 
 module.exports = router;
