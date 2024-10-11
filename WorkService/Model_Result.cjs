@@ -45,7 +45,7 @@ module.exports.GetAoi_Coa_Result2_Export = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+// ------------------------------------------------------
 //SPI Result
 module.exports.SPIResult_getCheckData = async function (req, res) {
   console.log("SPIResult_getCheckData");
@@ -65,7 +65,7 @@ module.exports.SPIResult_getCheckData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+// ------------------------------------------------------
 module.exports.SPIResult_Getfinaldata = async function (req, res) {
   console.log("SPIResult_getfinaldata");
   var query = "";
@@ -84,6 +84,7 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+// ------------------------------------------------------
 // Pre Result
 module.exports.PreResult_GetCheck = async function (req, res) {
   console.log("PRE_RESULT_getCheck");
@@ -173,7 +174,7 @@ module.exports.PreResult_GetDataNotFoundFound = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+// ------------------------------------------------------
 //OST
 module.exports.OSTResult_GetData1 = async function (req, res) {
   console.log("trc_044_ost_result_getdata1");
@@ -193,7 +194,7 @@ module.exports.OSTResult_GetData1 = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+// ------------------------------------------------------
 // OST BADMARK
 module.exports.OSTResult_GetData2 = async function (req, res) {
   console.log("trc_044_ost_result_getdata2");
@@ -213,7 +214,7 @@ module.exports.OSTResult_GetData2 = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+// ------------------------------------------------------
 // XrayResult 
 module.exports.XrayResult = async function (req, res) {
   console.log("trc_044_ost_result_getdata2");
@@ -233,3 +234,4 @@ module.exports.XrayResult = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };  
+// ------------------------------------------------------
