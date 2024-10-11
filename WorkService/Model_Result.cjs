@@ -13,11 +13,9 @@ module.exports.GetAoi_Coa_Result2 = async function (req, res) {
   try {
     const { dataList } = req.body;
     // ('{"strplantcode":"5","strsheetno":"A903104669RGP4630077","strprdname":"RGOZ-517MW","panelno":21}')
-    console.log(dataList,"ppppppppp");
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_051_aoicoaresult2_getdata2('${json_convertdata}')` 
-    console.log(query);
     const result = await client.query(query);
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -32,11 +30,9 @@ module.exports.GetAoi_Coa_Result2_Export = async function (req, res) {
   try {
     const { dataList } = req.body;
     // ('{"strplantcode":"5","strsheetno":"A903104669RGP4630077","strprdname":"RGOZ-517MW","panelno":21}')
-    console.log(dataList,"ppppppppp");
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_051_aoicoaresult_getdata('${json_convertdata}')` 
-    console.log(query);
     const result = await client.query(query);
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -48,7 +44,6 @@ module.exports.GetAoi_Coa_Result2_Export = async function (req, res) {
 // ------------------------------------------------------
 //SPI Result
 module.exports.SPIResult_getCheckData = async function (req, res) {
-  console.log("SPIResult_getCheckData");
   var query = "";
   try {
     const { dataList } = req.body;
@@ -56,7 +51,6 @@ module.exports.SPIResult_getCheckData = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += ` select * from "Traceability".trc_041_SPIRESULT_getCheckData('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query);
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -75,7 +69,6 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_041_spiresult_getfinaldata('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
