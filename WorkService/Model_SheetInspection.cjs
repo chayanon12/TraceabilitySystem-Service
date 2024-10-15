@@ -45,3 +45,35 @@ module.exports.GetSerialAVIResult = async function (req, res) {
         }
     }
 };
+
+module.exports.GetSheetInspectXOutData = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_053_sheetinspection_getsheetinspectxoutdata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports.GetSheetInspectSheetNoData = async function (req, res) {
+    var query = "";
+    try {
+        const p_data = JSON.stringify(req.body);
+        query = `SELECT * FROM "Traceability".trc_053_sheetinspection_getsheetinspectsheetnodata('${p_data}'); `;
+
+        const client = await ConnectPG_DB();
+        const result = await client.query(query);
+        await DisconnectPG_DB(client);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        writeLogError(err.message, query);
+        res.status(500).json({ message: err.message });
+    }
+};
