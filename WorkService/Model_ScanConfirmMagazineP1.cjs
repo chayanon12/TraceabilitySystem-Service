@@ -41,23 +41,22 @@ module.exports.SetManualConfirmMagazine = async function (req, res) {
   }
 };
 
-
-
 module.exports.GetSerialMagazineByLot = async function (req, res) {
-  const { dataList } = req.body;
-  const json_convertdata = JSON.stringify(dataList);
-  console.log("GetSerialMagazineByLot",dataList);
-  var query = "";
+  let query = "";
   try {
+    const { dataList } = req.body;
+    const json_convertdata = JSON.stringify(dataList);
+    console.log("SetManualConfirmMagazine",dataList);
     const client = await ConnectPG_DB();
-    query += `CALL "Traceability".trc_055_getserialmagazinebylot('[${json_convertdata}]','','{}');`;
+    query += `SELECT * from "Traceability".trc_055_getserialmagazinebylot('[${json_convertdata}]')`;
     const result = await client.query(query);
-    console.log("DATA SHOW trc_055_getserialmagazinebylot : ",result.rows)
-      res.status(200).json(result.rows);
-      DisconnectPG_DB(client);
+    const filteredResult = result.rows.map(row => row.response);
+    console.log("DATA SHOW trc_055_getserialmagazinebylot : ",filteredResult)
+    res.status(200).json(filteredResult);
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
+
 
