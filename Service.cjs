@@ -54,6 +54,7 @@ const Result = require("./routes/Result.cjs");
 const SheetInspection = require("./routes/SheetInspection.cjs");
 const P1ConnectBoard = require("./routes/P1ConnectBoardRoutes.cjs");
 const ScanConfirmMagazineP1 = require("./routes/ScanConfirmMagazineP1.cjs");
+const ScanAOISheetNo = require("./routes/ScanAOISheetNo.cjs");
 
 const cors = require('cors');
 app.use(cors({
@@ -124,6 +125,7 @@ app.use("/api/Result", Result);
 app.use("/api/SheetInspec", SheetInspection); 
 app.use("/api/P1ConnectBoard", P1ConnectBoard); 
 app.use("/api", ScanConfirmMagazineP1); 
+app.use("/api/ScanAOISheetNo", ScanAOISheetNo);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
