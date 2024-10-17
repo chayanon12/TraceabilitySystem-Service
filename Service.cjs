@@ -56,6 +56,7 @@ const P1ConnectBoard = require("./routes/P1ConnectBoardRoutes.cjs");
 const ScanConfirmMagazineP1 = require("./routes/ScanConfirmMagazineP1.cjs");
 const ScanAOISheetNo = require("./routes/ScanAOISheetNo.cjs");
 const AOIManualConfirmP1 = require("./routes/AOIManualConfirmP1.cjs");
+const ScanSMTConfirmMOTP1 = require("./routes/ScanSMTConfirmMOTP1.cjs");
 
 const cors = require('cors');
 app.use(cors({
@@ -128,7 +129,7 @@ app.use("/api/P1ConnectBoard", P1ConnectBoard);
 app.use("/api", ScanConfirmMagazineP1); 
 app.use("/api/ScanAOISheetNo", ScanAOISheetNo);
 app.use("/api/", AOIManualConfirmP1);
-
+app.use("/api/ConfirmMOTP1", ScanSMTConfirmMOTP1);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
