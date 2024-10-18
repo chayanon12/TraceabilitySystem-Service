@@ -2375,3 +2375,19 @@ module.exports.GetMeterial = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports.get_spi_aoi_result_p1 = async function (req, res) {
+  var query = "";
+  try {
+    const data = JSON.stringify(req.body);
+    console.log(data) 
+    query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1('${data}','','',''); `;
+    const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -75,5 +75,6 @@ router.post("/GetSMTSheetReflowResult", Common.GetSMTSheetReflowResult);
 router.post("/fnGetEDOCLink", Common.fnGetEDOCLink);
 router.post("/fnGetDocumentLink", Common.fnGetDocumentLink);
 router.post("/GetMeterial", Common.GetMeterial);
+router.post("/get_spi_aoi_result_p1", Common.get_spi_aoi_result_p1);
 
 module.exports = router;
