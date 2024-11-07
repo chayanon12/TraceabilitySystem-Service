@@ -625,16 +625,20 @@ module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
     var query = "";
     try {
         const { strSheetNo, intPCSNo, strSMPJCavityFlg } = req.body;
+        console.log(strSheetNo, intPCSNo, strSMPJCavityFlg ,"เข้า")
         let _strShippingNo = await GetSMTConnectShtPcsShippingNO(strSheetNo);
         if (_strShippingNo === "") {
             _strShippingNo = strSheetNo;
         }
+        console.log(strSheetNo,"strSheetNo")
         const client = await ConnectOracleDB("PCTTTEST");
         query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIBadmark( ${intPCSNo},'${strSMPJCavityFlg}','${_strShippingNo}') AS DATA1 FROM DUAL`;
         const result = await client.execute(query);
+        console.log(result.rows,"ROW")
         if (result.rows.length > 0) {
+            
             let data = [];
-
+            console.log("data",data)
             for (let i = 0; i < result.rows[0][0].length; i++) {
                 data.push({
                     PCS_NO: result.rows[0][0][i][0],

@@ -293,6 +293,7 @@ const {
   };
 
   module.exports.GetMaterial2 = async function (req, res) {
+    console.log("มาแล้ว")
     var query = "";
     let data=[]
     try {
@@ -302,7 +303,6 @@ const {
       query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMaterial2( '${txtLotNo}') AS DATA1 FROM DUAL`;
       console.log(query)
       const result = await Conn.execute(query);
-      console.log(result.rows)
     
       if(result.rows[0][0].length>0){
         for(let dt=0;dt<result.rows[0][0].length;dt++){
