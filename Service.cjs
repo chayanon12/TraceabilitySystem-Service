@@ -93,7 +93,7 @@ app.use("/api", ScanSheetOvenTime);
 app.use("/api", Rejcet);
 app.use("/api", ELTmaster)
 app.use("/api", SheetBinCheck)
-app.use("/api", Dispenser);
+app.use("/api/Dispenser", Dispenser);
 app.use("/api", ScanSMTPlasma);
 app.use("/api", ScanSMTSerialControl);
 app.use("/api", SpotHeat);

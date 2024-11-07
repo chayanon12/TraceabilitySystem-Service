@@ -18,7 +18,6 @@ module.exports.SET_SMT_PROC_FLOW_DISPENSER_CB = async function (req, res) {
   let V_HOLDING_TIME;
   try {
     // first check data in Postgres
-    console.log("Fac:", Fac, strSheetNo, strUser, strStation);
     try {
       const connect = await ConnectPG_DB();
       queryPG += `SELECT MT.ART_LOT_NO AS MOT_LOT_NO FROM "Traceability".TRC_AOI_RECORD_TIME MT WHERE MT.ART_PLANT_CODE = '${Fac}' 
@@ -161,6 +160,43 @@ module.exports.SET_SMT_PROC_FLOW_DISPENSER_CB = async function (req, res) {
   } catch (error) {
     console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
     // writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports.GetDispenserRecordTimeData = async function (req, res) {
+  let query = "";
+  try {
+    const Conn = await ConnectOracleDB("FPC");
+    let strSheetNo  = req.query.strSheetNo;
+    query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetDispenserRcTime('${strSheetNo}') AS x FROM dual`;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {    
+      res.status(200).json({ROW_COUNT:result.rows[0]?.[0]?.[0]?.[0] || ''});
+      DisconnectOracleDB(Conn);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.DeleteDispenserRecordTimeData = async function (req, res) {
+  let query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    let {strSheetNo}  = req.body;
+    query += `DELETE
+                FROM FPCF_PROC_FLOW_HOLDTIME_DET S
+                WHERE S.FPHD_FLOW_ID = '0012'
+                AND S.FPHD_CONTROL_NO = '${strSheetNo}'
+                AND S.FPHD_END_DATE IS NULL
+             `;
+    const result = await Conn.execute(query);
+    if (result.rows.length > 0) {    
+      res.status(200).json({ROW_COUNT:result.rows[0]?.[0]?.[0]?.[0] || ''});
+      DisconnectOracleDB(Conn);
+    }
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
