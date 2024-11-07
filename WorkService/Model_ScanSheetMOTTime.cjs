@@ -74,10 +74,9 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
         P_CB_NO :CB_NO||'',
         P_SUS_NO:SUS_NO||'',
       };
-     
-     await InsertCallFPCSheetLeadTimeResult(data)
+     console.log(data,'data1111')
+    //  await InsertCallFPCSheetLeadTimeResult(data)
   
-    
       if(data.P_ERROR!=null&&data.P_ERROR!=''){
         console.log(data.P_ERROR,"pppp")
         strReturn=data.P_ERROR
