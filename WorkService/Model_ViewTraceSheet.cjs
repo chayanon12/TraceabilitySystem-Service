@@ -435,13 +435,14 @@ module.exports.GetFPCPcsNoBySMPJCavity = async function (req, res) {
    let query = "";
    try {
      const{strProduct,_intPcsNo} = req.body
+     console.log("เข้าจ้า",strProduct,_intPcsNo)
      const Conn = await ConnectOracleDB("PCTTTEST");
-     query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_PcsNoBySMPJCavity('${strProduct}','${_intPcsNo}') FROM dual`;
+     query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetFPCPcsNBySMPJCVY('${strProduct}','${_intPcsNo}') FROM dual`;
      const result = await Conn.execute(query);
      if (result.rows.length > 0) {
       let data = [
         {
-          pcs_no : result.rows[0][0][0][0]
+           pcs_no: result.rows?.[0]?.[0]?.[0]?.[0] || ''
         }
       ];
       res.status(200).json(data);

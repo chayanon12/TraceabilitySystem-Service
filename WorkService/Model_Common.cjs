@@ -2110,7 +2110,6 @@ module.exports.fnLotNoByRoll = async function (req, res) {
       let data=[]
       console.log(result.rows[0][0].length)
       if(result.rows[0][0].length>0){
-        console.log(result.rows[0][0],'dtdtdtdtdt1')
         for(let dt=0;dt<result.rows[0][0].length;dt++){
           // console.log(result.rows[0][0],'dtdtdtdtdt2')
           data.push({
@@ -2133,12 +2132,11 @@ module.exports.fnGetMaterialData = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { strLOTNO } = req.body;
+    console.log(strLOTNO,"strLOTNO")
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetMaterialData( '${strLOTNO}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
       let data=[]
-      console.log(result.rows[0][0].length)
       if(result.rows[0][0].length>0){
-        console.log(result.rows[0][0],'dtdtdtdtdt1')
         for(let dt=0;dt<result.rows[0][0].length;dt++){
           // console.log(result.rows[0][0],'dtdtdtdtdt2')
           data.push({
@@ -2171,9 +2169,7 @@ module.exports.fnGetLotProcessDetailData = async function (req, res) {
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_LotProcessDetail( '${strLOTNO}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
       let data=[]
-      console.log(result.rows[0][0].length)
       if(result.rows[0][0].length>0){
-        console.log(result.rows[0][0],'dtdtdtdtdt1')
         for(let dt=0;dt<result.rows[0][0].length;dt++){
           // console.log(result.rows[0][0],'dtdtdtdtdt2')
           data.push({
@@ -2209,7 +2205,6 @@ module.exports.GetFVIBadmarkResultByLot = async function (req, res) {
     const Conn = await ConnectOracleDB("PCTTTEST");
     
     const { _strPrdName,_strLotNo,_strRate } = req.body;
-    console.log("MAAAAA",_strPrdName,_strLotNo,_strRate)
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetFVIBadReByLot( '${_strPrdName}','${_strLotNo}','${_strRate}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
@@ -2317,7 +2312,6 @@ module.exports.fnGetDocumentLink = async function (req, res) {
     const Conn = await ConnectOracleDB("FPC");
     
     const { strEMCS } = req.body;
-    console.log("MAAAAA",strEMCS)
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_fnGetDocumentLink( '${strEMCS}') AS DATA1 FROM DUAL`;
     const result = await Conn.execute(query);
     let data=[]
