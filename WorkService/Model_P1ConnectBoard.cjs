@@ -63,4 +63,4 @@ const {
       writeLogError(error.message, query);
       res.status(500).json({ message: error.message });
     }
-  };  
+  };    
