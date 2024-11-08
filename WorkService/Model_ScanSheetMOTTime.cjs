@@ -75,7 +75,7 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
         P_SUS_NO:SUS_NO||'',
       };
      console.log(data,'data1111')
-    //  await InsertCallFPCSheetLeadTimeResult(data)
+     await InsertCallFPCSheetLeadTimeResult(data)
   
       if(data.P_ERROR!=null&&data.P_ERROR!=''){
         console.log(data.P_ERROR,"pppp")
@@ -97,13 +97,14 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
     let _intRowCount=0
     try {
       console.log('เข้าาา1')
-      const { SheetNo } = req.body;
-      let data={
-        strSheetNo:SheetNo,
-        strProcId:'1840',
-        strPlantCode:'5'
-      }
-      const json_convertdata = JSON.stringify(data);
+      const { dataList } = req.body;
+      // let data={
+      //   strSheetNo:SheetNo,
+      //   strProcId:'1840',
+      //   strPlantCode:'5'
+      // }
+      console.log(dataList,'GetMOT')
+      const json_convertdata = JSON.stringify(dataList);
       const client = await ConnectPG_DB();
       query += `SELECT * from "Traceability".trc_000_common_getmotrecordtimedata('[${json_convertdata}]')`;
       console.log(query)
@@ -147,6 +148,7 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
       const client = await ConnectPG_DB();
       query = `call "Traceability".trc_000_common_DeleteMOTRecordTimeData('[${json_convertdata}]','');`;
       const result = await client.query(query);
+      console.log(result.rows,'Delete')
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
     } catch (error) {

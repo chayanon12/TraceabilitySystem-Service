@@ -8,6 +8,7 @@ const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
 module.exports.GetSerialAVIResult = async function (req, res) {
+   
     {
         let query = "";
         let strLot = "";
@@ -16,10 +17,11 @@ module.exports.GetSerialAVIResult = async function (req, res) {
                 strInvNoFrom,
                 strInvNoTo,
             } = req.body;
+           
             const Conn = await ConnectOracleDB("PCTTTEST");
 
             if (strInvNoFrom !== "" && strInvNoTo !== "") {
-
+                
                 query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetLotByInvoice('${strInvNoFrom}', '${strInvNoTo}') AS DATA1 FROM DUAL`;
 
                 const result = await Conn.execute(query);
