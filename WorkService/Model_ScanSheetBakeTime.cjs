@@ -36,10 +36,12 @@ module.exports.CallSMTBakingRecordTimeResult = async function (req, res) {
   };
 
   module.exports.DeleteBakingRecordTimeData = async function (req, res) {
+    
     let query = "";
     let json_convertdata = "";
     try {
       const {dataList} = req.body;
+      console.log("DeleteBakingRecordTimeData",dataList)
       const client = await ConnectPG_DB();
       const json_convertdata = JSON.stringify(dataList);
       query = `CALL "Traceability".trc_006_common_DeleteBakingRecordTimeData('[${json_convertdata}]','')`;
