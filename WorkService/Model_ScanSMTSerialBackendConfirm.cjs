@@ -27,7 +27,7 @@ module.exports.getSerialSheetManyTable = async function (req, res) {
             });
         }
         await DisconnectPG_DB(client);
-        res.status(200).json(processedRows);
+        res.status(200).json(processedRows[0]);
         console.log(processedRows)
     } catch (err) {
         writeLogError(err.message, query);
