@@ -1454,9 +1454,10 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
     //query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable( '{"strPlantCode":"5","strPrdname":"RGOZ-960ML-2D","strWeekCodeType":"U","strSerial":"THA9276167M21387Y"}', '{}');
     const { dataList, dtSerial } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable('${json_convertdata}','','{}')`;
+    query += `CALL "Traceability".trc_000_common_getserialtestresultmanytable3('${json_convertdata}','','{}')`;
     const client = await ConnectPG_DB();
     const result = await client.query(query);
+    // console.log('dtserial0',result.rows[0])
     await DisconnectPG_DB(client);
     let response = result.rows[0].response;
     if (response != null) {
@@ -1595,10 +1596,12 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
 //     res.status(500).json({ message: err.message });
 //   }
 // };
+
 module.exports.GetCheckSumSerial = async function (req, res) {
   let boolResult = true;
   try {
     const { _str_Serial, _str_DateType, _intEngRevEndDigit } = req.body;
+    console.log( _str_Serial, _str_DateType, _intEngRevEndDigit ,'GetCheckSumSerial')
     const MaxEvenNumber =
       Math.trunc(_intEngRevEndDigit / 2) * 2 +
       ((_intEngRevEndDigit % 2) * 2 - 1);
@@ -1612,9 +1615,9 @@ module.exports.GetCheckSumSerial = async function (req, res) {
     let SevNumber = 0;
     if (["Y", "W", "R", "B", "I", "M"].includes(_str_DateType)) {
       if (_str_Serial.length >= _intEngRevEndDigit) {
-        const SerialNumber = _str_Serial.substring(0, _intEngRevEndDigit);
+        const SerialNumber = _str_Serial.substring(0,parseInt(_intEngRevEndDigit)+1);
         const strSerialCheckSum = _str_Serial.charAt(_intEngRevEndDigit);
-
+        console.log('charat',SerialNumber,strSerialCheckSum)
         EvenNumber = 0;
         for (let j = 1; j <= MaxEvenNumber; j += 2) {
           EvenNumber += ConvertBase34to10(SerialNumber.charAt(j - 1));
@@ -1629,10 +1632,12 @@ module.exports.GetCheckSumSerial = async function (req, res) {
         SixNumber = FivNumber * 34;
         SevNumber = SixNumber - FouNumber;
 
-        if (ConvertBase34(SevNumber) !== strSerialCheckSum) {
+        if (await ConvertBase34(SevNumber) !== strSerialCheckSum) {
+          console.log('ตรงนี้1',ConvertBase34(SevNumber),strSerialCheckSum)
           boolResult = false;
         }
       } else {
+        console.log('ตรงนี้2')
         boolResult = false;
       }
     }

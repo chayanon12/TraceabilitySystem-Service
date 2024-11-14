@@ -75,11 +75,17 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
         P_SUS_NO:SUS_NO||'',
       };
      console.log(data,'data1111')
-     await InsertCallFPCSheetLeadTimeResult(data)
+     let insert = await InsertCallFPCSheetLeadTimeResult(data)
   
-      if(data.P_ERROR!=null&&data.P_ERROR!=''){
+      if(data.P_ERROR!=null&&data.P_ERROR!=' '){
         console.log(data.P_ERROR,"pppp")
         strReturn=data.P_ERROR
+      }
+
+      if(insert!=' '&&insert!=null){
+        console.log(insert,"BBBB")
+        strReturn=insert
+        
       }
       res.status(200).json({strReturn:strReturn,strStatus:data.P_STATUS}); 
   
@@ -122,16 +128,18 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
 
   async function InsertCallFPCSheetLeadTimeResult(data) {
     let query = "";
+ 
     try {
-      console.log("InsertCallFPCSheetLeadTimeResult", data);
+      console.log("InsertCallFPCSheetLeadTimeResult2222", data);
       const json_convertdata = JSON.stringify(data);
       const client = await ConnectPG_DB();
       query = `call "Traceability".trc_000_common_insertcallfpcsheetleadtimeresult('[${json_convertdata}]','');`;
      
       const result = await client.query(query);
       await DisconnectPG_DB(client);
-  
-      return result.rows[0].roll_leaf; 
+  console.log(result.rows,result.rows.length,'insert')
+
+      return result.rows[0]._strerror; 
     } catch (error) {
       writeLogError(error.message, query);
       return error.message;
