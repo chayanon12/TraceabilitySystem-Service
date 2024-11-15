@@ -63,7 +63,7 @@ const cors = require('cors');
 app.use(cors({
   origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'], // เพิ่ม headers ที่จำเป็น
+  allowedHeaders: ['Content-Type', 'Authorization'], 
 }));
 app.use(express.json());
 

@@ -6,7 +6,6 @@ const {
 } = require("../Conncetion/DBConn.cjs");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 const oracledb = require("oracledb");
-const { param } = require("../routes/ScanSheetOvenTime.cjs");
 
 module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
   let queryPG = "";
