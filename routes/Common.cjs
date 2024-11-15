@@ -76,5 +76,7 @@ router.post("/fnGetEDOCLink", Common.fnGetEDOCLink);
 router.post("/fnGetDocumentLink", Common.fnGetDocumentLink);
 router.post("/GetMeterial", Common.GetMeterial);
 router.post("/get_spi_aoi_result_p1", Common.get_spi_aoi_result_p1);
+router.post("/GetCavitySerialBarcodeGrade", Common.GetCavitySerialBarcodeGrade);
 
+router.post("/SetSerialRecordTimeTrayTableTest", Common.SetSerialRecordTimeTrayTableTest);
 module.exports = router;
