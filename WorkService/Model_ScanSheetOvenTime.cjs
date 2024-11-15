@@ -6,6 +6,7 @@ const {
 } = require("../Conncetion/DBConn.cjs");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 const oracledb = require("oracledb");
+const { param } = require("../routes/ScanSheetOvenTime.cjs");
 
 module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
   let queryPG = "";
@@ -84,37 +85,62 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
     try {
       const connect = await ConnectOracleDB("PCTTTEST");
       // queryFPC += `call FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN('${strSheetNo}','${strUser}','${strStation}','${V_LOT_NO}','${V_PRODUCT}','${Fac}','');`;
-      const queryFPC = `DECLARE
-      P_SHEET_NO VARCHAR2(100) := '${strSheetNo}';
-      P_USER VARCHAR2(100) := '${strUser}';
-      P_STATION VARCHAR2(100) := '${strStation}';
-      V_LOT_NO VARCHAR2(100) := '${V_LOT_NO}';
-      V_PRODUCT VARCHAR2(100) := '${V_PRODUCT}';
-      V_PLANT_CODE VARCHAR2(100) := 'THA';
-      P_ERROR VARCHAR2(100);
-  BEGIN
-      FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN(
-          P_SHEET_NO,
-          P_USER,
-          P_STATION,
-          V_LOT_NO,
-          V_PRODUCT,
-          V_PLANT_CODE,
-          P_ERROR
-      );
-      DBMS_OUTPUT.PUT_LINE('P_ERROR: ' || P_ERROR);
-  END;`;
-  console.log(queryFPC);
-      const result = await connect.execute(queryFPC);
+      //     const queryFPC = `DECLARE
+      //      P_SHEET_NO VARCHAR2(100) := :strSheetNo;
+      //     P_USER VARCHAR2(100) := :strUser;
+      //     P_STATION VARCHAR2(100) := :strStation;
+      //     V_LOT_NO VARCHAR2(100) := :V_LOT_NO;
+      //     V_PRODUCT VARCHAR2(100) := :V_PRODUCT;
+      //     V_PLANT_CODE VARCHAR2(100) := :strPlantCode;
+      //     P_ERROR VARCHAR2(100);
+      // BEGIN
+      //     FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN(
+      //         P_SHEET_NO,
+      //         P_USER,
+      //         P_STATION,
+      //         V_LOT_NO,
+      //         V_PRODUCT,
+      //         V_PLANT_CODE,
+      //         P_ERROR
+      //     );
+      //     :P_ERROR := P_ERROR;
+      // END;`;
+      const queryFPC = `
+              BEGIN
+                  FPC.TRC_COMMON_TRACEABILITY.TRC_007_SET_SMT_PROC_FLOW_OVEN(
+                      :strSheetNo,
+                      :strUser,
+                      :strStation,
+                      :V_LOT_NO,
+                      :V_PRODUCT,
+                      :strPlantCode,
+                      :P_ERROR
+                  );
+              END;`;
+      const binds = {
+        strSheetNo: strSheetNo,
+        strUser: strUser,
+        strStation: strStation,
+        V_LOT_NO: V_LOT_NO,
+        V_PRODUCT: V_PRODUCT,
+        strPlantCode: "THA",
+        P_ERROR: {
+          dir: oracledb.BIND_OUT,
+          type: oracledb.STRING,
+          maxSize: 100,
+        },
+      };
+
+      const result = await connect.execute(queryFPC, binds);
+      const p_error = result.outBinds.P_ERROR;
+      console.log("P_ERROR:", p_error);
       // console.log(result);
       // res.status(200).json({ p_error: result });
 
-      if (result.rows == "") {
-        
+      if (p_error == "") {
         res.status(200).json({ p_error: "" });
       } else {
-        console.log('x',result)
-        // res.status(409).json({ p_error: result.rows[0][0] });
+        res.status(200).json({ p_error: p_error });
       }
     } catch (error) {
       console.log(error.message);
