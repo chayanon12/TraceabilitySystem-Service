@@ -866,6 +866,32 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   }
 };
 
+module.exports.SetSerialRecordTimeTrayTableTest = async function (req, res) {
+  var query = "";
+  var json_convertdata = "";
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList } = req.body;
+    json_convertdata = JSON.stringify(dataList);
+    console.log('json_convertdatatest',json_convertdata)
+    query = `call "Traceability".trc_000_TestInsert($1::json,'');`;
+    // CALL "Traceability".trc_000_testinsert(:data_json);
+    const result = await client.query(query, [json_convertdata]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows);
+      await DisconnectPG_DB(client);
+      return;
+    } else {
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    query += `${json_convertdata}`;
+    writeLogError(error.message, query);
+    console.log(error, "error");
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
   var query = "";
   try {
@@ -915,7 +941,7 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
   const { dataList } = req.body;
   try {
     const json_convertdata = JSON.stringify(dataList);
-
+    console.log('SetSerialLotShtGradeTable',dataList)
     const client = await ConnectPG_DB();
     query = `CALL "Traceability".trc_006_common_SetSerialLotShtGradeTable('${json_convertdata}','')`;
     const result = await client.query(query);
@@ -2380,6 +2406,25 @@ module.exports.get_spi_aoi_result_p1 = async function (req, res) {
     console.log(data) 
     query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1('${data}','','',''); `;
     const client = await ConnectPG_DB();
+    const result = await client.query(query);
+    await DisconnectPG_DB(client);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+// SELECT * from "Traceability".trc_000_common_getcavityserialbarcodegrade('{"strProduct":"RGPZ-445ML-0D","plant_code":"5"}');
+module.exports.GetCavitySerialBarcodeGrade = async function (req, res) {
+  var query = "";
+  try {
+    const data = JSON.stringify(req.body);
+    const client = await ConnectPG_DB();
+    console.log(data) 
+    query = ` select * from "Traceability".trc_000_common_getcavityserialbarcodegrade('${data}'); `;
+
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     res.status(200).json(result.rows);
