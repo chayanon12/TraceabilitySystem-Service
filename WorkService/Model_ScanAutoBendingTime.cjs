@@ -22,22 +22,19 @@ const {
         }
   };
   module.exports.SetSerialBendingData = async function (req, res) {
-    console.log('g-hkkkk')
     var query = "";
     let _strError ='';
     try {
       const client = await ConnectPG_DB();
       let { dataList } = req.body;
-      console.log(dataList,"daddadad")
       const json_convertdata = JSON.stringify(dataList);
-      console.log(json_convertdata,': dataList')
-      query = `CALL "Traceability".trc_014_auto_bendingtime_setserialbendingdata('${json_convertdata}','');`;
+      query = `CALL "Traceability".trc_014_auto_bendingtime_setserialbendingdata('${json_convertdata}','')`;
       const result = await client.query(query);
-      console.log(result.rows[0].p_error,'log' )
       if (result.rows[0].p_error !== "") {
         _strError=result.rows[0].p_error
       }
       res.status(200).json(_strError);
+     
     } catch (error) {
       writeLogError(error.message, query);
       res.status(500).json({ message:"Can not connect database!"});
