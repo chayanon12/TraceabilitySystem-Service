@@ -12,7 +12,6 @@ module.exports.GetDispenserRecordTimeData = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     let strSheetNo = req.query.strSheetNo;
-    console.log(strSheetNo);
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetDispenserRcTime('${strSheetNo}') AS x FROM dual`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
@@ -25,9 +24,11 @@ module.exports.GetDispenserRecordTimeData = async function (req, res) {
 };
 module.exports.DeleteDispenserRecordTimeData = async function (req, res) {
   let query = "";
+  let { strSheetNo } = req.body;
+  console.log('inDeleet')
+  console.log(strSheetNo,'strSheetNo');
   try {
-    const Conn = await ConnectOracleDB("PCTTTEST");
-    let { strSheetNo } = req.body;
+    const Conn = await ConnectOracleDB("PCTTTEST");    
     query += `DELETE
                 FROM FPCF_PROC_FLOW_HOLDTIME_DET S
                 WHERE S.FPHD_FLOW_ID = :V_FLOW_ID
@@ -40,12 +41,13 @@ module.exports.DeleteDispenserRecordTimeData = async function (req, res) {
     };
     const result = await Conn.execute(query, params, { autoCommit: true });
     if (result.rowsAffected > 0) {
-      res.status(200).json({ message: "Record deleted successfully" });
+      res.status(200).json({ message: "Record deleted successfully",p_error:'' });
     } else {
-      res.status(404).json({ message: "Record not found" });
+      res.status(404).json({ message: "Record not found",p_error:'Can not delete' });
     }
     DisconnectOracleDB(Conn);
   } catch (error) {
+    console.error("An error occurred:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -175,6 +177,7 @@ module.exports.SET_SMT_PROC_FLOW_DISPENSER_CB = async function (req, res) {
  
 module.exports.setDispencerQuery = async function (req, res) {
   const { P_SHEET_NO, P_CB_NO, P_USER, P_STATION } = req.body;
+  console.log('in')
   console.log(P_SHEET_NO, P_CB_NO, P_USER, P_STATION,'P_SHEET_NO, P_CB_NO, P_USER, P_STATION');
   let V_APP_ID = "1";
   let V_FLOW_ID = "0012";
@@ -439,7 +442,7 @@ module.exports.setDispencerQuery = async function (req, res) {
             autoCommit: true,
           }
         );
-        console.log(updateResult.rowsAffected);
+        // console.log(updateResult.rowsAffected,'Update');
       } catch (error) {
         connection.rollback();
       } finally {
@@ -691,7 +694,7 @@ async function executeOracleQuery(query) {
   try {
     connection = await ConnectOracleDB("PCTTTEST");
     const result = await connection.execute(query);
-    console.log(result, "result");
+    // console.log(result, "result");
     if (result != []) {
       return result.rows[0];
     } else {

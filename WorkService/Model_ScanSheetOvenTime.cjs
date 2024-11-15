@@ -12,6 +12,7 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
   let queryFPC = "";
   let Fac = process.env.FacA1;
   let { strSheetNo, strUser, strStation } = req.body;
+  console.log(req.body);
   let ART_LOT_NO;
   let MOT_PRODUCT_NAME;
   let V_LOT_NO;
@@ -37,7 +38,7 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
     queryFPC = "";
     // second check data in Oracle FPC
     try {
-      const connect = await ConnectOracleDB("FPC");
+      const connect = await ConnectOracleDB("PCTTTEST");
       queryFPC += `SELECT L.LOT_PRD_NAME AS MOT_PRODUCT_NAME FROM FPC_LOT L WHERE L.LOT = '${ART_LOT_NO}' `;
       const result = await connect.execute(queryFPC);
       if (result.rows.length != 0) {
@@ -103,17 +104,20 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
       );
       DBMS_OUTPUT.PUT_LINE('P_ERROR: ' || P_ERROR);
   END;`;
-      console.log(queryFPC);
+  console.log(queryFPC);
       const result = await connect.execute(queryFPC);
       // console.log(result);
       // res.status(200).json({ p_error: result });
 
       if (result.rows == "") {
+        
         res.status(200).json({ p_error: "" });
       } else {
-        res.status(409).json({ p_error: result.rows[0][0] });
+        console.log('x',result)
+        // res.status(409).json({ p_error: result.rows[0][0] });
       }
     } catch (error) {
+      console.log(error.message);
       res.status(500).json({ message: error.message });
     }
   } catch (error) {
