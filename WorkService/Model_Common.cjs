@@ -1388,7 +1388,7 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query, [datalist]);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows[0]);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
