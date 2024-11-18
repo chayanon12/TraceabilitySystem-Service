@@ -906,7 +906,7 @@ module.exports.SetSerialLotShtGradeTable = async function (req, res) {
   const { dataList } = req.body;
   try {
     const json_convertdata = JSON.stringify(dataList);
-    console.log('SetSerialLotShtGradeTable',dataList)
+    // console.log('SetSerialLotShtGradeTable',dataList)
     const client = await ConnectPG_DB();
     query = `CALL "Traceability".trc_006_common_SetSerialLotShtGradeTable('${json_convertdata}','')`;
     const result = await client.query(query);
@@ -1388,7 +1388,7 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query, [datalist]);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result.rows);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -1541,6 +1541,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         dtSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     }
+    console.log('GetSerialTestResultManyTable',dtSerial)
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
@@ -2342,7 +2343,7 @@ module.exports.GetCavitySerialBarcodeGrade = async function (req, res) {
   try {
     const data = JSON.stringify(req.body);
     const client = await ConnectPG_DB();
-    console.log(data) 
+    // console.log(data) 
     query = ` select * from "Traceability".trc_000_common_getcavityserialbarcodegrade('${data}'); `;
 
     const result = await client.query(query);
