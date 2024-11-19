@@ -1703,7 +1703,7 @@ module.exports.GetCheckSumSerial = async function (req, res) {
         SevNumber = SixNumber - FouNumber;
 
         if (await ConvertBase34(SevNumber) !== strSerialCheckSum) {
-          console.log('ตรงนี้1',await ConvertBase34(SevNumber),strSerialCheckSum)
+          console.log('ตรงนี้1',ConvertBase34(SevNumber),strSerialCheckSum)
           boolResult = false;
         }
       } else {
