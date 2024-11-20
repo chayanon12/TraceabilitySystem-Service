@@ -29,6 +29,7 @@ const {
         Conn = await ConnectPG_DB();
         const { dataList } = req.body;
         const json_convertdata = JSON.stringify(dataList);
+        console.log(json_convertdata,"json_convertdata")
 
         // เรียกใช้ PROCEDURE ใน PostgreSQL
         const result = await Conn.query(
@@ -42,13 +43,5 @@ const {
     } catch (error) {
         writeLogError(error.message, '');
         res.status(500).json({ message: 'Internal server error', error: error.message });
-    } finally {
-        if (Conn) {
-            try {
-                await DisconnectOracleDB(Conn);
-            } catch (closeError) {
-                console.error('Failed to close the database connection:', closeError.message);
-            }
-        }
-    }
+    } 
 };

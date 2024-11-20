@@ -1378,22 +1378,45 @@ async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
 }
 
 
+// module.exports.Getsheetnobyserialno = async function (req, res) {
+//   var query = "";
+//   try {
+//     const { data } = req.body
+//     const datalist = JSON.stringify(data);
+//     query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno($1); `;
+
+//     const client = await ConnectPG_DB();
+//     const result = await client.query(query, [datalist]);
+//     await DisconnectPG_DB(client);
+//     res.status(200).json(result.rows[0]);
+//   } catch (err) {
+//     writeLogError(err.message, query);
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
 module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
   try {
     const { data } = req.body
     const datalist = JSON.stringify(data);
     query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno($1); `;
-
+ 
     const client = await ConnectPG_DB();
     const result = await client.query(query, [datalist]);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows[0]);
+    if(result.rows[0]!=undefined){
+      console.log(result.rows[0], "result")
+      res.status(200).json(result.rows[0]);
+    }else{
+      res.status(200).json({_strsheet: ""});
+    }
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
   }
 };
+
 module.exports.Getsheetdatabyserialno = async function (req, res) {
   var query = "";
   let _dtData ="";
@@ -2352,5 +2375,71 @@ module.exports.GetCavitySerialBarcodeGrade = async function (req, res) {
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
+  }
+};
+module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
+
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList, dtSerial } = req.body;
+
+    const json_convertdata = JSON.stringify(dataList);
+
+    query += `CALL "Traceability".trc_000_common_getserialboxtestresultmanytable('[${json_convertdata}]','','{}')`;
+    const result = await client.query(query);
+
+    let response = result.rows[0].response;
+    if (response != null) {
+
+      if (response.TEST_RESULT != null || response.TEST_RESULT != "") {
+        dtSerial.TEST_RESULT = response.TEST_RESULT;
+      }
+      if (response.TYPE_TEST_RESULT != null || response.TYPE_TEST_RESULT != "") {
+        dtSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+      }
+      if (response.PLASMA_TIME != null || response.PLASMA_TIME != "") {
+        dtSerial.PLASMA_TIME = response.PLASMA_TIME;
+      }
+      if (response.REJECT != null || response.REJECT != "") {
+        dtSerial.REJECT = response.REJECT;
+      }
+      if (response.TOUCH_UP != null || response.TOUCH_UP != "") {
+        dtSerial.TOUCH_UP = response.TOUCH_UP;
+      }
+      if (response.REJECT2 != null || response.REJECT2 != "") {
+        dtSerial.REJECT2 = response.REJECT2;
+      }
+      if (response.REJECT_CODE != null || response.REJECT_CODE != "") {
+        dtSerial.REJECT_CODE = response.REJECT_CODE;
+      }
+      if (response.REMARK != null || response.REMARK != "") {
+        dtSerial.REMARK = response.REMARK;
+      }
+      if (response.UPDATE_FLG != null || response.UPDATE_FLG != "") {
+        dtSerial.UPDATE_FLG = response.UPDATE_FLG;
+      }
+      if (response.ROW_COUNT != null || response.ROW_COUNT != "") {
+        dtSerial.ROW_COUNT = response.ROW_COUNT;
+      }
+      if (response.FRONT_SHEET_NO != null || response.FRONT_SHEET_NO != "") {
+        dtSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+      }
+      if (response.BACK_SHEET_NO != null || response.BACK_SHEET_NO != "") {
+        dtSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+      }
+      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+      }
+      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+      }
+    }
+    res.status(200).json(dtSerial);
+
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
   }
 };

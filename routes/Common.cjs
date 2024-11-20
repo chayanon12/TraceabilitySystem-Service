@@ -79,4 +79,5 @@ router.post("/get_spi_aoi_result_p1", Common.get_spi_aoi_result_p1);
 router.post("/GetCavitySerialBarcodeGrade", Common.GetCavitySerialBarcodeGrade);
 
 router.post("/SetSerialRecordTimeTrayTableTest", Common.SetSerialRecordTimeTrayTableTest);
+router.post("/GetSerialBoxTestResultManyTable", Common.GetSerialBoxTestResultManyTable);
 module.exports = router;
