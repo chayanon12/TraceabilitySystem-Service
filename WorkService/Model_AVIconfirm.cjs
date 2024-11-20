@@ -41,7 +41,7 @@ module.exports.UpdateData = async function (req, res) {
       query += ` CALL "Traceability".trc_017_aviconfirm_updatedata('[${json_convertdata}]','') `;
   
       const result = await client.query(query);
-      console.log(result.rows[0])
+      console.log(result.rows[0],'error')
       if (result.rows[0].p_error == ''){
         res.status(200).json({result:'Update Success'});
       }else{
