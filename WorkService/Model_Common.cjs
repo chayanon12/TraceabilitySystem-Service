@@ -1486,39 +1486,24 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
   let data = [{}];
   try {
     let { dataList, dtSerial } = req.body;
-
-    // ตรวจสอบว่า dataList และ dtSerial มีค่าหรือไม่
-    if (!dataList || !dtSerial || dtSerial.length === 0) {
-      return res.status(400).json({ message: 'Missing necessary data.' });
-    }
-
-    // ปรับปรุง query และทำให้สามารถประมวลผลได้เร็วขึ้น
     const queries = [];
     for (let i = 0; i < dtSerial.length; i++) {
-      let strSerial = dtSerial[i].SERIAL || '';  // เช็คว่า SERIAL มีค่าหรือไม่
-
-      // อัปเดตข้อมูลใน dataList
+      let strSerial = dtSerial[i].SERIAL || ''; 
       if (dataList[0] && strSerial !== '') {
         dataList[0].strSerial = strSerial;
       } else if (dataList[0] && strSerial === '') {
         dataList[0].strSerial = '';
       }
-
-      // สร้าง query ในรูปแบบ string
       const json_convertdata = JSON.stringify(dataList);
       const query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
       queries.push(query);
     }
-
-    // เชื่อมต่อกับฐานข้อมูลและทำ query พร้อมกันทั้งหมด
     const client = await ConnectPG_DB();
-    const result = await Promise.all(queries.map(query => client.query(query))); // รัน query ทั้งหมดพร้อมกัน
+    const result = await Promise.all(queries.map(query => client.query(query))); 
     await DisconnectPG_DB(client);
 
-    // ผลลัพธ์จากฐานข้อมูล
     result.forEach((res, index) => {
       const response = res.rows[0].response;
-
       if (response) {
         const updatedSerial = dtSerial[index];
         if (response.SERIAL) updatedSerial.SERIAL = response.SERIAL;
@@ -1536,11 +1521,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         if (response.ROLL_LEAF_NO) updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
-
-    // ส่งข้อมูลกลับไปยัง client
-    console.log('GetSerialTestResultManyTable', dtSerial);
     res.status(200).json(dtSerial);
-
   } catch (err) {
     writeLogError(err.message, query);
     console.error(err.message);
