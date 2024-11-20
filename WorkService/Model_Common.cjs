@@ -161,7 +161,7 @@ module.exports.getconnectshtplasmatime = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    query = `SELECT * FROM "Traceability".trc_000_common_getconnectshtplasmatime('[${json_convertdata}]')`;
+    query = `SELECT * FROM "Traceability".trc_000_common_getconneSctshtplasmatime('[${json_convertdata}]')`;
     const result = await client.query(query);
     await DisconnectPG_DB(client);
     if (result.rows.length > 0) {
@@ -179,6 +179,7 @@ module.exports.getconnectshtplasmatime = async function (req, res) {
     }
     res.status(200).json(_strError);
   } catch (error) {
+    console.log("error", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -625,18 +626,18 @@ module.exports.getserialtouchupdata = async function (req, res) {
   }
 };
 
-module.exports.getsheetdatabyserialno = async function (req, res) {
-  try {
-    var query = "";
-    const client = await ConnectPG_DB();
-    query = ``;
-    const result = await client.query(query);
-    await DisconnectPG_DB(client);
-    res.status(200).json({ Result: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// module.exports.getsheetdatabyserialno = async function (req, res) {
+//   try {
+//     var query = "";
+//     const client = await ConnectPG_DB();
+//     query = ``;
+//     const result = await client.query(query);
+//     await DisconnectPG_DB(client);
+//     res.status(200).json({ Result: result });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 module.exports.getsheetduplicateconnectshttyped = async function (req, res) {
   try {
@@ -885,6 +886,7 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
+    console.log('SetSerialLotShtELTTable',json_convertdata)
     query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','')`;
 
     const result = await client.query(query);
@@ -1382,13 +1384,21 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
   var query = "";
   try {
     const { data } = req.body
+    console.log(data, "data")
     const datalist = JSON.stringify(data);
     query = ` SELECT * FROM "Traceability".trc_000_common_getsheetnobyserialno($1); `;
 
     const client = await ConnectPG_DB();
     const result = await client.query(query, [datalist]);
     await DisconnectPG_DB(client);
-    res.status(200).json(result.rows[0]);
+    
+    if(result.rows[0]!=undefined){
+      console.log(result.rows[0], "result")
+      res.status(200).json(result.rows[0]);
+    }else{
+      res.status(200).json({_strsheet: ""});
+    }
+    // res.status(200).json(result.rows[0]);
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
@@ -1399,6 +1409,7 @@ module.exports.Getsheetdatabyserialno = async function (req, res) {
   let _dtData ="";
   try {
     const data = JSON.stringify(req.body);
+    console.log(data, "data")
     query = ` SELECT * FROM "Traceability".trc_000_common_getsheetdatabyserialno('[${data}]'); `;
 
     const client = await ConnectPG_DB();
