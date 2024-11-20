@@ -365,6 +365,7 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
       strSheetnoB: strSheetnoB,
       strPlantCode: "5",
     };
+    console.log(jsondata,strSheetType);
     if (strSheetType == "D") {
       const json_convertdata = JSON.stringify(jsondata);
       query += `SELECT * FROM "Traceability".trc_000_common_getsheetduplicateconnectshttyped('[${json_convertdata}]');`;
