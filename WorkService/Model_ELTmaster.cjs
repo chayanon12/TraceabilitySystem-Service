@@ -32,9 +32,7 @@ const {
         const {dataList} = req.body;
       const client = await ConnectPG_DB();
       const json_convertdata = JSON.stringify(dataList);
-      query += ` select * from "Traceability".trc_009_eltmaster_getseaech(
-    '[${json_convertdata}]'
-    ); `;
+      query += ` select * from "Traceability".trc_009_eltmaster_getseaech('[${json_convertdata}]'); `;
   
       const result = await client.query(query);
   
