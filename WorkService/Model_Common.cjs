@@ -953,7 +953,6 @@ module.exports.getSerialPassByLot = async function (req, res) {
   try {
     const data = JSON.stringify(req.body);
     query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylot('${data}'); `;
-
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
@@ -1488,32 +1487,24 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
 
 module.exports.GetSerialTestResultManyTable = async function (req, res) {
   let data = [{}];
+  let query=''
   try {
     let { dataList, dtSerial } = req.body;
-
-    if (!dataList || !dtSerial || dtSerial.length === 0) {
-      return res.status(400).json({ message: "Missing necessary data." });
-    }
-
     const queries = [];
     for (let i = 0; i < dtSerial.length; i++) {
-      let strSerial = dtSerial[i].SERIAL || "";
-
-      if (dataList[0] && strSerial !== "") {
+      let strSerial = dtSerial[i].SERIAL || ''; 
+      if (dataList[0] && strSerial !== '') {
         dataList[0].strSerial = strSerial;
       } else if (dataList[0] && strSerial === "") {
         dataList[0].strSerial = "";
       }
-
       const json_convertdata = JSON.stringify(dataList);
-      const query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
+       query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
+
       queries.push(query);
     }
-
     const client = await ConnectPG_DB();
-    const result = await Promise.all(
-      queries.map((query) => client.query(query))
-    );
+    const result = await Promise.all(queries.map(query => client.query(query))); 
     await DisconnectPG_DB(client);
 
     result.forEach((res, index) => {
@@ -1543,8 +1534,6 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
           updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
-
-    console.log("GetSerialTestResultManyTable", dtSerial);
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
