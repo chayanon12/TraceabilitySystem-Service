@@ -1410,7 +1410,7 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
     const result = await client.query(query, [datalist]);
     await DisconnectPG_DB(client);
     if(result.rows[0]!=undefined){
-      console.log(result.rows[0], "result")
+      // console.log(result.rows[0], "result")
       res.status(200).json(result.rows[0]);
     }else{
       res.status(200).json({_strsheet: ""});
@@ -1522,11 +1522,12 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await Promise.all(queries.map(query => client.query(query))); 
     await DisconnectPG_DB(client);
-
+   
     result.forEach((res, index) => {
       const response = res.rows[0].response;
 
       if (response) {
+        console.log(response,'testtt')
         const updatedSerial = dtSerial[index];
         if (response.SERIAL) updatedSerial.SERIAL = response.SERIAL;
         if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
@@ -1535,7 +1536,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
         if (response.REJECT2) updatedSerial.REJECT2 = response.REJECT2;
         if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
-        if (response.REMARK) updatedSerial.REMARK = response.REMARK;
+       if (response.REMARK) updatedSerial.REMARK = response.REMARK;
         if (response.UPDATE_FLG) updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
         if (response.FRONT_SHEET_NO) updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
         if (response.BACK_SHEET_NO) updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
@@ -1543,6 +1544,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         if (response.ROLL_LEAF_NO) updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
+    console.log(dtSerial,'maja2')
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);

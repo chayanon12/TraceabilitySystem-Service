@@ -69,6 +69,7 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_041_spiresult_getfinaldata('[${json_convertdata}]')`;
+    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
