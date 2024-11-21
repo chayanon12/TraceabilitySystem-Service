@@ -957,7 +957,6 @@ module.exports.getSerialPassByLot = async function (req, res) {
   try {
     const data = JSON.stringify(req.body);
     query = ` SELECT * FROM "Traceability".trc_000_common_getserialpassbylot('${data}'); `;
-
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
@@ -1504,6 +1503,7 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
 
 module.exports.GetSerialTestResultManyTable = async function (req, res) {
   let data = [{}];
+  let query=''
   try {
     let { dataList, dtSerial } = req.body;
     const queries = [];
@@ -1515,7 +1515,8 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         dataList[0].strSerial = '';
       }
       const json_convertdata = JSON.stringify(dataList);
-      const query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
+       query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
+
       queries.push(query);
     }
     const client = await ConnectPG_DB();
@@ -1524,6 +1525,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
 
     result.forEach((res, index) => {
       const response = res.rows[0].response;
+
       if (response) {
         const updatedSerial = dtSerial[index];
         if (response.SERIAL) updatedSerial.SERIAL = response.SERIAL;
