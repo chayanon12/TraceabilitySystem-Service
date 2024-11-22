@@ -1534,7 +1534,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
           updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
-    console.log(dtSerial,'maja2')
+    console.log(dtSerial[0].REMARK,'maja2')
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
