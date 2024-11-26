@@ -93,3 +93,32 @@ module.exports.DeleteAOISheetNo = async function (req, res) {
         res.status(500).json({ message: err.message });
     }
 };
+
+module.exports.fnGetAOISheetRejectData = async function (req, res) {
+    var query = "";
+    try {
+      const Conn = await ConnectOracleDB("PCTTTEST");
+      const { dtSerial, strseq, strleaf } = req.body;
+      query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetAOIShtRejectData('${dtSerial}') AS DATA1 FROM DUAL`;
+      const result = await Conn.execute(query);
+      let data = [];
+      if (result.rows[0][0].length > 0) {
+        data = [
+          {
+            SEQ: strseq,
+            LEAF: strleaf,
+            SERIAL: dtSerial,
+            SIDE: result.rows[0][0][0][4],
+            PCS_NO: result.rows[0][0][0][10],
+            REJECT_CODE: result.rows[0][0][0][11],
+            REJECT_NAME: result.rows[0][0][0][12],
+          },
+        ];
+      }
+      DisconnectOracleDB(Conn);
+      res.status(200).json(data);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };

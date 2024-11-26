@@ -7,5 +7,6 @@ router.post("/GetAOISheetDataByLot", ScanAOISheetNo.GetAOISheetDataByLot);
 router.post("/GetAOISheetCount", ScanAOISheetNo.GetAOISheetCount);
 router.post("/SetAOISheetNo", ScanAOISheetNo.SetAOISheetNo);
 router.post("/DeleteAOISheetNo", ScanAOISheetNo.DeleteAOISheetNo);
+router.post("/fnGetAOISheetRejectData", ScanAOISheetNo.fnGetAOISheetRejectData);
 
 module.exports = router;
