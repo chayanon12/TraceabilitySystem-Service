@@ -937,7 +937,8 @@ module.exports.get_spi_aoi_result = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
 
-    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','','')`;
+    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result_test('[${json_convertdata}]','','')`;
+
     const result = await client.query(query);
     // res.status(200).json(result.rows[0]._strreturn);
     res.status(200).json(result.rows[0]);
@@ -1581,6 +1582,27 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
 //     res.status(500).json({ message: err.message });
 //   }
 // };
+module.exports.SetSerialLotTrayTableGood2 = async function (req, res) {
+  var query = "";
+
+  try {
+    const client = await ConnectPG_DB();
+    const { dataList,data } = req.body;
+    console.log('SetSerialLotTrayTableGood111',dataList)
+    const json_convertdata = JSON.stringify(dataList);
+
+    const query = `CALL "Traceability".trc_022_packing_gate_onlygood_setseriallottraytablegood2('[${json_convertdata}]', '')`;
+    console.log(query,'query111')
+    const result = await client.query(query);
+    if (result.rows != "") {
+      res.status(200).json(result.rows[0]);
+      await DisconnectPG_DB(client);
+    }
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports.SetSerialLotTrayTableGood = async function (req, res) {
   var query = "";
@@ -1588,7 +1610,9 @@ module.exports.SetSerialLotTrayTableGood = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
+    
     const json_convertdata = JSON.stringify(dataList);
+
     const query = `CALL "Traceability".trc_022_packing_gate_onlygood_setseriallottraytablegood($1, '')`;
 
     const result = await client.query(query, [json_convertdata]);
