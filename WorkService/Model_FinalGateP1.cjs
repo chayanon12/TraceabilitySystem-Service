@@ -6,7 +6,7 @@ const {
 } = require("../Conncetion/DBConn.cjs");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 
-module.exports.Get_SPI_AOI_RESULT_P1 = async function (req, res) {
+module.exports.Get_SPI_AOI_RESULT_P1 = async function (req, res) { // can use trc_000_common_get_spi_aoi_result_p1_new
   var query = "";
   let _frontSheetNumber = "";
   let _rearSheetNumber = "";
