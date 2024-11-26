@@ -1395,7 +1395,7 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
       // console.log(result.rows[0], "result")
       res.status(200).json(result.rows[0]);
     } else {
-      res.status(200).json({ _strsheet: "" });
+      res.status(200).json({ _strsheet: "" ,sheet_no_back: "",pcs_no: "",lot_no: ""});
     }
   } catch (err) {
     writeLogError(err.message, query);
