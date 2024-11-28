@@ -27,6 +27,7 @@ const {
         query = `CALL "Traceability".trc_020_finalgate_getserialtestresultmanytableconfirm('${json_convertdata}','','{}')`;
   
         queries.push(query);
+        console.log('queryyyyy',queries)
       }
       const client = await ConnectPG_DB();
       const result = await Promise.all(queries.map(query => client.query(query))); 
