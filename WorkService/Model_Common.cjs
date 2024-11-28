@@ -773,7 +773,7 @@ module.exports.getLotSerialRecordTimeData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
+ 
 module.exports.getleafduplicateconnectroll = async function (req, res) {
   var query = "";
   intCount = 0;
@@ -953,9 +953,10 @@ module.exports.get_spi_aoi_result = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
 
-    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','','')`;
+    query += `CALL "Traceability".trc_006_common_get_spi_aoi_result_test('[${json_convertdata}]','','')`;
 
     const result = await client.query(query);
+    console.log("result", result.rows);
     // res.status(200).json(result.rows[0]._strreturn);
     res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
@@ -1064,7 +1065,6 @@ module.exports.GetSerialFinInspectResult = async function (req, res) {
     // }
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    console.log(json_convertdata, "get");
     query += `select * from "Traceability".trc_000_common_getserialfininspectresult('[${json_convertdata}]');`;
     const client = await ConnectPG_DB();
     const result = await client.query(query);
@@ -1181,45 +1181,22 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
   let result_ = _strResult;
   result_ = "OK";
 
-  if (_strAOMFlg == "Y") {
-  }
   if (_strAOIFlg == "Y") {
     var dtDataAOI;
     var strAOIResult = "";
-    dtDataAOI = await GetSerialAOIEFPCResult(
-      _strPlantCode,
-      _strFrontSheetNo,
-      _intPcsNo,
-      _strProduct,
-      "N"
-    );
+    dtDataAOI = await GetSerialAOIEFPCResult(_strPlantCode,_strFrontSheetNo,_intPcsNo,_strProduct,"N");
     if (dtDataAOI.length > 0) {
-      strAOIResult = dtDataAOI[0]["AOI_RESULT"]; //ยังไม่ถูก
-      if (
-        strAOIResult != "" &&
-        strAOIResult != "OK" &&
-        strAOIResult != "PASS" &&
-        strAOIResult != "GOOD"
-      ) {
+      strAOIResult = dtDataAOI[0][3]; 
+      console.log()
+      if (strAOIResult != "" &&strAOIResult != "OK" &&strAOIResult != "PASS" &&strAOIResult != "GOOD") {
         result_ = "NG";
         _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
       }
-    } else {
-      dtDataAOI = await GetSerialAOIEFPCResult(
-        _strPlantCode,
-        _strBackSheetNo,
-        _intPcsNo,
-        _strProduct,
-        "N"
-      );
+    } else {      
+      dtDataAOI = await GetSerialAOIEFPCResult(_strPlantCode,_strBackSheetNo,_intPcsNo,_strProduct,"N");
       if (dtDataAOI.length > 0) {
-        strAOIResult = dtDataAOI[0]["AOI_RESULT"]; //ยังไม่ถูก
-        if (
-          strAOIResult != "" &&
-          strAOIResult != "OK" &&
-          strAOIResult != "PASS" &&
-          strAOIResult != "GOOD"
-        ) {
+        strAOIResult = dtDataAOI[0]["AOI_RESULT"]; 
+        if (strAOIResult != "" &&strAOIResult != "OK" &&strAOIResult != "PASS" &&strAOIResult != "GOOD") {
           result_ = "NG";
           _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
         }
@@ -1229,38 +1206,18 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
   if (_strOSTFlg == "Y") {
     var dtOSTData;
     var strOSTResult = "";
-    dtOSTData = await GetSerialOSTResult(
-      _strPlantCode,
-      _strFrontSheetNo,
-      _intPcsNo,
-      "N"
-    );
+    dtOSTData = await GetSerialOSTResult(_strFrontSheetNo,parseInt(_intPcsNo),"N");
     if (dtOSTData.length > 0) {
-      strOSTResult = dtOSTData[0]["OST_RESULT"];
-      if (
-        strOSTResult != "" &&
-        strOSTResult != "OK" &&
-        strOSTResult != "PASS" &&
-        strOSTResult != "GOOD"
-      ) {
+      strOSTResult = dtOSTData[0][2];
+      if (strOSTResult != "" &&strOSTResult != "OK" &&strOSTResult != "PASS" &&strOSTResult != "GOOD") {
         result_ = "NG";
         _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
       }
     } else {
-      dtOSTData = await GetSerialOSTResult(
-        _strPlantCode,
-        _strBackSheetNo,
-        _intPcsNo,
-        "N"
-      );
+      dtOSTData = await GetSerialOSTResult(_strBackSheetNo,_intPcsNo,"N");
       if (dtOSTData.length > 0) {
-        strOSTResult = dtOSTData[0]["OST_RESULT"];
-        if (
-          strOSTResult != "" &&
-          strOSTResult != "OK" &&
-          strOSTResult != "PASS" &&
-          strOSTResult != "GOOD"
-        ) {
+        strOSTResult = dtOSTData[0][2];
+        if (strOSTResult != "" &&strOSTResult != "OK" &&strOSTResult != "PASS" &&strOSTResult != "GOOD") {
           result_ = "NG";
           _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
         }
@@ -1272,41 +1229,33 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
     var strAVIResult = "";
     dtAVIData = await GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N");
     if (dtAVIData.length > 0) {
-      strAVIResult = dtAVIData[0]["AVI_RESULT"];
-      if (
-        strAVIResult != "" &&
-        strAVIResult != "OK" &&
-        strAVIResult != "PASS" &&
-        strAVIResult != "GOOD"
-      ) {
+      strAVIResult = dtAVIData[0][0];
+      if (strAVIResult != "" &&strAVIResult != "OK" &&strAVIResult != "PASS" &&strAVIResult != "GOOD") {
         result_ = "NG";
         _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
       }
     } else {
       dtAVIData = await GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N");
       if (dtAVIData.length > 0) {
-        strAVIResult = dtAVIData[0]["AVI_RESULT"];
-        if (
-          strAVIResult != "" &&
-          strAVIResult != "OK" &&
-          strAVIResult != "PASS" &&
-          strAVIResult != "GOOD"
-        ) {
+        strAVIResult = dtAVIData[0][2];
+        if (strAVIResult != "" &&strAVIResult != "OK" &&strAVIResult != "PASS" &&strAVIResult != "GOOD") {
           result_ = "NG";
           _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
         }
       }
     }
   }
-  res.status(200).json(_strRemark);
+  res.status(200).json({remark:_strRemark,result:result_});
 };
-
+ 
 async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
   let query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialOSTResult('${SerialNo}', '${intPCSNo}', '${strSMPJCavityFlg}') AS DATA1 FROM DUAL`;
+    console.log(query, "query");
     const result = await Conn.execute(query);
+    console.log(result, "ressult");
     await DisconnectOracleDB(Conn);
     return result.rows[0][0];
   } catch (error) {
@@ -1315,16 +1264,11 @@ async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
   }
 }
 
-async function GetSerialAOIEFPCResult(
-  _strPlantCode,
-  _strFrontSheetNo,
-  _intPcsNo,
-  _strProduct,
-  _strSMPJCavityFlg
-) {
+async function GetSerialAOIEFPCResult(_strPlantCode,_strFrontSheetNo,_intPcsNo,_strProduct,_strSMPJCavityFlg) {
   let query = "";
   try {
     let roll_leaf = await GetRollLeafBySheetNo(_strPlantCode, _strFrontSheetNo);
+    console.log("roll_leaf", roll_leaf);
     const Conn = await ConnectOracleDB("PCTTTEST");
     if (roll_leaf !== "") {
       query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSeAOIEFPCResult('${_strPlantCode}', '${_strFrontSheetNo}', ${_intPcsNo},'${_strProduct}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
@@ -1359,18 +1303,15 @@ async function GetSerialAVIResult(
 async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
   let query = "";
   let roll_leaf = "";
+  const FacA1 = process.env.FacA1;
   try {
     const client = await ConnectPG_DB();
-    query = `SELECT * FROM "Traceability".GetRollLeafBySheetNo('[{"strPlantCode": "${strPlantCode}", "strSheetNo": "${strSheetNo}"}]')`;
+    query = `SELECT * FROM "Traceability".GetRollLeafBySheetNo('[{"strPlantCode": "${FacA1}", "strSheetNo": "${strSheetNo}"}]')`;
 
     // Execute the query
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    if (
-      result.rows[0].roll_leaf != "" ||
-      result.rows[0].roll_leaf != undefined ||
-      result.rows[0].roll_leaf == null
-    ) {
+    if(result.rowCount > 0){
       roll_leaf = result.rows[0].roll_leaf;
     }
     return roll_leaf;
