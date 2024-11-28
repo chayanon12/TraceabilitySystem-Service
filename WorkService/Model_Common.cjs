@@ -8,6 +8,7 @@ const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
 const dateFns = require("date-fns");
 const { Query } = require("pg");
+const { el } = require("date-fns/locale");
 
 ///------Example
 module.exports.xxxxxx = async function (req, res) {
@@ -812,16 +813,11 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     json_convertdata = JSON.stringify(dataList);
+    console.log("json_convertdatatest", json_convertdata);
     query = `call "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'');`;
-
     const result = await client.query(query, [json_convertdata]);
-    if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0]);
-      await DisconnectPG_DB(client);
-      return;
-    } else {
-      await DisconnectPG_DB(client);
-    }
+    res.status(200).json(result.rows[0]);
+    await DisconnectPG_DB(client);
   } catch (error) {
     query += `${json_convertdata}`;
     writeLogError(error.message, query);
@@ -857,23 +853,43 @@ module.exports.SetSerialRecordTimeTrayTableTest = async function (req, res) {
 
 module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
   var query = "";
+  let result = "";
   try {
-    const data = JSON.stringify(req.body);
-
-    query = `SELECT * FROM "Traceability".trc_000_common_getserialrecordtimetraytable('[${data}]');`;
-
     const client = await ConnectPG_DB();
-    const result = await client.query(query);
+    const { strPlantCode, dtSerial } = req.body;
+    const allResults = [];
+    for (let i = 0; i < dtSerial.length; i++) {
+      dtSerial[i].strPlantCode = strPlantCode;
+  
 
-    if (result.rows !== "") {
-      res.status(200).json(result.rows[0]);
-      await DisconnectPG_DB(client);
+      const json_convertdata = JSON.stringify(dtSerial[i]);
+  
+      query = `SELECT * FROM "Traceability".trc_000_common_getserialrecordtimetraytable('${json_convertdata}');`;
+
+  
+      const result = await client.query(query);
+
+  
+      allResults.push(...result.rows);
     }
+   
+    for (let i = 0; i < allResults.length; i++) {
+      if(allResults[i].row_count>0){
+        dtSerial[i].UPDATE_FLG = 'Y';
+      }
+      else{
+        dtSerial[i].UPDATE_FLG = 'N';
+      }
+    }
+
+  res.status(200).json(dtSerial);
   } catch (err) {
+    console.error(err);
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 module.exports.SetSerialLotShtELTTable = async function (req, res) {
   var query = "";
@@ -1500,6 +1516,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         dataList[0].strSerial = "";
       }
       const json_convertdata = JSON.stringify(dataList);
+
        query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
 
       queries.push(query);
@@ -1535,7 +1552,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
           updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
-    console.log(dtSerial[0].REMARK,'maja2')
+
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
