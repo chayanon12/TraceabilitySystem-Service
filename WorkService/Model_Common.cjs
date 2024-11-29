@@ -811,6 +811,7 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
+   
     json_convertdata = JSON.stringify(dataList);
     query = `call "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'');`;
 
@@ -867,6 +868,7 @@ module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
 
     if (result.rows !== "") {
       res.status(200).json(result.rows[0]);
+    
       await DisconnectPG_DB(client);
     }
   } catch (err) {
@@ -935,9 +937,11 @@ module.exports.get_spi_aoi_result = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
+   
     const json_convertdata = JSON.stringify(dataList);
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','','')`;
+   
     const result = await client.query(query);
     // res.status(200).json(result.rows[0]._strreturn);
     res.status(200).json(result.rows[0]);
@@ -970,6 +974,7 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
+
     const query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
 
     const result = await client.query(query, [json_convertdata]);
@@ -1433,7 +1438,7 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
     const { prdName } = req.body;
     query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSBProductByPd('${prdName}')  FROM DUAL `;
     const result = await Conn.execute(query);
-    if (result.rows.length > 0) {
+    if (result.rows[0][0].length > 0) {
       let data = [
         {
           SLM_PRD_NAME: result.rows[0][0][0][0],
@@ -1759,76 +1764,135 @@ const ConvertBase34to10 = (strText) => {
   return parseInt(result);
 };
 
-module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (
-  req,
-  res
-) {
+module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res) {
   var query = "";
   try {
-    const client = await ConnectPG_DB();
-    const { dataList, dtSerial } = req.body;
+    let { dataList, dtSerial } = req.body;
 
-    const json_convertdata = JSON.stringify(dataList);
-
-    query += `CALL "Traceability".trc_000_common_getserialboxtestresultmanytableonlygood('[${json_convertdata}]','','{}')`;
-    const result = await client.query(query);
-
-    let response = result.rows[0].response;
-    if (response != null) {
-      if (response.TEST_RESULT != null || response.TEST_RESULT != "") {
-        dtSerial.TEST_RESULT = response.TEST_RESULT;
-      }
-      if (
-        response.TYPE_TEST_RESULT != null ||
-        response.TYPE_TEST_RESULT != ""
-      ) {
-        dtSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
-      }
-      if (response.PLASMA_TIME != null || response.PLASMA_TIME != "") {
-        dtSerial.PLASMA_TIME = response.PLASMA_TIME;
-      }
-      if (response.REJECT != null || response.REJECT != "") {
-        dtSerial.REJECT = response.REJECT;
-      }
-      if (response.TOUCH_UP != null || response.TOUCH_UP != "") {
-        dtSerial.TOUCH_UP = response.TOUCH_UP;
-      }
-      if (response.REJECT2 != null || response.REJECT2 != "") {
-        dtSerial.REJECT2 = response.REJECT2;
-      }
-      if (response.REJECT_CODE != null || response.REJECT_CODE != "") {
-        dtSerial.REJECT_CODE = response.REJECT_CODE;
-      }
-      if (response.REMARK != null || response.REMARK != "") {
-        dtSerial.REMARK = response.REMARK;
-      }
-      if (response.UPDATE_FLG != null || response.UPDATE_FLG != "") {
-        dtSerial.UPDATE_FLG = response.UPDATE_FLG;
-      }
-      if (response.ROW_COUNT != null || response.ROW_COUNT != "") {
-        dtSerial.ROW_COUNT = response.ROW_COUNT;
-      }
-      if (response.FRONT_SHEET_NO != null || response.FRONT_SHEET_NO != "") {
-        dtSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
-      }
-      if (response.BACK_SHEET_NO != null || response.BACK_SHEET_NO != "") {
-        dtSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
-      }
-      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
-        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
-      }
-      if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
-        dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
-      }
+    if (!dataList || !dtSerial || dtSerial.length === 0) {
+      return res.status(400).json({ message: "Missing necessary data." });
     }
-    res.status(200).json(dtSerial);
 
+    const queries = [];
+    for (let i = 0; i < dtSerial.length; i++) {
+      let strSerial = dtSerial[i].SERIAL || "";
+
+      if (dataList[0] && strSerial !== "") {
+        dataList[0].strSerial = strSerial;
+      } else if (dataList[0] && strSerial === "") {
+        dataList[0].strSerial = "";
+      }
+
+      const json_convertdata = JSON.stringify(dataList);
+      console.log(json_convertdata,'eyeeee')
+      const query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytableonlygood('${json_convertdata}','','{}')`;
+      queries.push(query);
+    }
+
+    const client = await ConnectPG_DB();
+    const result = await Promise.all(
+      queries.map((query) => client.query(query))
+    );
     await DisconnectPG_DB(client);
-  } catch (error) {
-    writeLogError(error.message, query);
-    res.status(500).json({ message: error.message });
+
+    result.forEach((res, index) => {
+      const response = res.rows[0].response;
+
+      if (response) {
+        const updatedSerial = dtSerial[index];
+        if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
+        if (response.TYPE_TEST_RESULT)updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+        if (response.PLASMA_TIME) updatedSerial.PLASMA_TIME = response.PLASMA_TIME;
+        if (response.REJECT) updatedSerial.REJECT = response.REJECT;
+        if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
+        if (response.REJECT2)updatedSerial.REJECT2 = response.REJECT2;
+        if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REMARK) updatedSerial.REMARK = response.REMARK;
+        if (response.UPDATE_FLG)updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
+        if (response.ROW_COUNT) updatedSerial.ROW_COUNT = response.ROW_COUNT;
+        if (response.FRONT_SHEET_NO)updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+        if (response.BACK_SHEET_NO)updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+        if (response.SHEET_PCS_NO)updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+       
+      }
+    });
+
+    console.log("GetSerialTestResultManyTable", dtSerial);
+    res.status(200).json(dtSerial);
+  } catch (err) {
+    writeLogError(err.message, query);
+    console.error(err.message);
+    res.status(500).json({ message: err.message });
   }
+  // try {
+  //   const client = await ConnectPG_DB();
+  //   const { dataList, dtSerial } = req.body;
+
+  //   const json_convertdata = JSON.stringify(dataList);
+
+  //   query += `CALL "Traceability".trc_000_common_getserialboxtestresultmanytableonlygood('[${json_convertdata}]','','{}')`;
+  //   const result = await client.query(query);
+
+  //   let response = result.rows[0].response;
+  //   if (response != null) {
+  //     if (response.TEST_RESULT != null || response.TEST_RESULT != "") {
+  //       dtSerial.TEST_RESULT = response.TEST_RESULT;
+  //     }
+  //     if (
+  //       response.TYPE_TEST_RESULT != null ||
+  //       response.TYPE_TEST_RESULT != ""
+  //     ) {
+  //       dtSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+  //     }
+  //     if (response.PLASMA_TIME != null || response.PLASMA_TIME != "") {
+  //       dtSerial.PLASMA_TIME = response.PLASMA_TIME;
+  //     }
+  //     if (response.REJECT != null || response.REJECT != "") {
+  //       dtSerial.REJECT = response.REJECT;
+  //     }
+  //     if (response.TOUCH_UP != null || response.TOUCH_UP != "") {
+  //       dtSerial.TOUCH_UP = response.TOUCH_UP;
+  //     }
+  //     if (response.REJECT2 != null || response.REJECT2 != "") {
+  //       dtSerial.REJECT2 = response.REJECT2;
+  //     }
+  //     if (response.REJECT_CODE != null || response.REJECT_CODE != "") {
+  //       dtSerial.REJECT_CODE = response.REJECT_CODE;
+  //     }
+  //     if (response.REMARK != null || response.REMARK != "") {
+  //       dtSerial.REMARK = response.REMARK;
+  //     }
+  //     if (response.UPDATE_FLG != null || response.UPDATE_FLG != "") {
+  //       dtSerial.UPDATE_FLG = response.UPDATE_FLG;
+  //     }
+  //     if (response.ROW_COUNT != null || response.ROW_COUNT != "") {
+  //       dtSerial.ROW_COUNT = response.ROW_COUNT;
+  //     }
+  //     if (response.FRONT_SHEET_NO != null || response.FRONT_SHEET_NO != "") {
+  //       dtSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+  //     }
+  //     if (response.BACK_SHEET_NO != null || response.BACK_SHEET_NO != "") {
+  //       dtSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+  //     }
+  //     if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+  //       dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+  //     }
+  //     if (response.SHEET_PCS_NO != null || response.SHEET_PCS_NO != "") {
+  //       dtSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+  //     }
+  //   }
+  //   res.status(200).json(dtSerial);
+
+  //   await DisconnectPG_DB(client);
+  // } catch (error) {
+  //   writeLogError(error.message, query);
+  //   res.status(500).json({ message: error.message });
+  // }
+
+  
 };
+
+
 
 module.exports.SetBoxPackingSerialTray = async function (req, res) {
   let Conn;
@@ -1870,6 +1934,7 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
       );
 
       _strErrorAll = result.outBinds.P_ERROR;
+      console.log(_strErrorAll,"_strErrorAll")
     }
     res.status(200).json(_strErrorAll);
   } catch (error) {
@@ -2358,6 +2423,7 @@ module.exports.get_spi_aoi_result_p1 = async function (req, res) {
   try {
     const data = JSON.stringify(req.body);
     query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1('${data}','','',''); `;
+   
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
@@ -2409,6 +2475,7 @@ module.exports.GetSerialBoxTestResultManyTable222 = async function (req, res) {
       const json_convertdata = JSON.stringify(dataList);
       const query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytable('${json_convertdata}','','{}')`;
       queries.push(query);
+    
     }
      
     const client = await ConnectPG_DB();
@@ -2523,6 +2590,7 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
       console.log(json_convertdata,'mmmmm')
       const query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytable('${json_convertdata}','','{}')`;
       queries.push(query);
+      console.log(query,"queryhhh")
     }
 
     const client = await ConnectPG_DB();
