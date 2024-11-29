@@ -90,7 +90,6 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
     const result = await client.query(query);
     ("Schemas");
-
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
       await DisconnectPG_DB(client);
@@ -2248,7 +2247,8 @@ module.exports.get_spi_aoi_result_p1 = async function (req, res) {
   var query = "";
   try {
     const data = JSON.stringify(req.body);
-    query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1('${data}','','',''); `;
+    console.log(data);
+    query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1_new('${data}','','',''); `;
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
