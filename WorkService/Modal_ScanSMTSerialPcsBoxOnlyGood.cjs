@@ -11,13 +11,14 @@ const { el } = require("date-fns/locale");
   module.exports.GetExistsBoxSerial = async function (req, res) {
     let query = "";
     let connection;
-  
+  console.log("เข้าจ้าาาาาา1")
     try {
       // เชื่อมต่อกับฐานข้อมูล Oracle
       connection = await ConnectOracleDB("PCTTTEST");
-  
+      console.log("เข้าจ้าาาาาา2",connection)
       const { dtSerial } = req.body;
       if (!dtSerial || dtSerial.length === 0) {
+        console.log("เข้าจ้าาาาาา3",dtSerial)
         return res.status(400).json({ message: "Missing or empty dtSerial array." });
       }
   
