@@ -549,14 +549,13 @@ module.exports.GetSerialAOMEFPCResult = async function (req, res) {
                 _strPrdName,
                 _strSMPJCavityFlg,
             } = req.body;
+           
             let roll_leaf = await GetRollLeafBySheetNo(
                 _strPlantCode,
                 _strSheetNo
             );
             const Conn = await ConnectOracleDB("PCTTTEST");
-
             query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAOMEFPCRST('${_strPlantCode}', '${_strSheetNo}', ${_intPcsNo},'${_strPrdName}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
-
             const result = await Conn.execute(query);
 
             if (result.rows.length > 0) {
@@ -693,10 +692,11 @@ module.exports.GetMCNO = async function (req, res) {
 async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
     let query = "";
     let roll_leaf = "";
+    console.log(strPlantCode, strSheetNo,"MAILLL")
     try {
         const client = await ConnectPG_DB();
         query = `SELECT * FROM "Traceability".GetRollLeafBySheetNo('[{"strPlantCode": "${strPlantCode}", "strSheetNo": "${strSheetNo}"}]')`;
-
+console.log(query,"query123")
         // Execute the query
         const result = await client.query(query);
         await DisconnectPG_DB(client);
@@ -750,10 +750,11 @@ module.exports.getfinalgatehistory = async function (req, res) {
 
 module.exports.getaoiresult = async function (req, res) {
     var query = "";
+
     try {
         const p_data = JSON.stringify(req.body);
+        console.log(p_data,"p_data")
         query = `SELECT * FROM "Traceability".trc_043_aoiresult_getaoiresult('${p_data}'); `;
-
         const client = await ConnectPG_DB();
         const result = await client.query(query);
         await DisconnectPG_DB(client);
