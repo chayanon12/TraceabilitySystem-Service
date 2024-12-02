@@ -13,6 +13,7 @@ const {
           const client = await ConnectPG_DB();
           const json_convertdata = JSON.stringify(dataList);
           query += ` SELECT * from "Traceability".trc_030_getsearchdata_record('[${json_convertdata}]')`;
+          console.log(query,"queryYYYYY")
           const result = await client.query(query);
           res.status(200).json(result.rows);
           await DisconnectPG_DB(client);
