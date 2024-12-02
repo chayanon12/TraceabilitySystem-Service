@@ -17,7 +17,7 @@ module.exports.GetProductDataByLot = async function (req, res) {
     var FINAL_GATE_LOT_PRIORITY_SKIP = process.env.FINAL_GATE_LOT_PRIORITY_SKIP;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductDataByLot('${strLot}','${FINAL_GATE_LOT_PRIORITY_SKIP}') AS x FROM dual`;
     const result = await Conn.execute(query);
-    if (result.rows.length > 0) {
+    if (result.rows && result.rows[0] && result.rows[0][0] && result.rows[0][0] != '' && result.rows[0][0] != []) {
       var resultx = result.rows[0][0][0];
       var products = {
         PRD_NAME: resultx[0],
@@ -26,9 +26,12 @@ module.exports.GetProductDataByLot = async function (req, res) {
         LOT_ALL: resultx[3],
       };
       res.status(200).json(products);
-      DisconnectOracleDB(Conn);
+    }else{
+      res.status(200).json({ PRD_NAME: "", ROLL_NO: "", LOT_EN: "", LOT_ALL: "" });
     }
+    DisconnectOracleDB(Conn);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -38,7 +41,6 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { strLot, strProc } = req.body;
-    console.log(strLot, strProc);
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetWeekCodebyLot('${strLot}','${strProc}') as PRN_DATE  FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {

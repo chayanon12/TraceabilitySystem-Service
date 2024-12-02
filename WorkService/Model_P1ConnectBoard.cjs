@@ -47,7 +47,6 @@ const {
   };
 
   module.exports.GetCheckConfirmMagazineBySerial = async function (req, res) {
-    console.log("GetCheckConfirmMagazineBySerial");
     var query = "";
     try {
       const { dataList } = req.body;

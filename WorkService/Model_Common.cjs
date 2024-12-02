@@ -90,7 +90,6 @@ module.exports.GetMOTRecordTimeData = async function (req, res) {
     query += `select * from "Traceability".trc_000_common_GetMOTRecordTimeData('[${json_convertdata}]');`;
     const result = await client.query(query);
     ("Schemas");
-
     if (result.rows.length > 0) {
       res.status(200).json(result.rows);
       await DisconnectPG_DB(client);
@@ -894,10 +893,12 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
 
     const result = await client.query(query);
     if (result.rows != "") {
-      res.status(200).json(result.rows);
+      console.log(result.rows[0].p_error)
+      res.status(200).json({p_error:result.rows[0].p_error});
       await DisconnectPG_DB(client);
     }
   } catch (error) {
+    console.log(error.message);
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
@@ -2104,6 +2105,7 @@ module.exports.fnGetMaterialData = async function (req, res) {
           INVOICE_NO: result.rows[0][0][dt][5],
           EXPIRE_DATE: result.rows[0][0][dt][6],
           VENDER_NAME: result.rows[0][0][dt][7],
+          PROCESS: result.rows[0][0][dt][8],
         });
       }
     }
@@ -2311,8 +2313,7 @@ module.exports.get_spi_aoi_result_p1 = async function (req, res) {
   var query = "";
   try {
     const data = JSON.stringify(req.body);
-    query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1('${data}','','',''); `;
-   
+    query = ` call "Traceability".trc_000_common_get_spi_aoi_result_p1_new('${data}','','',''); `;
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
