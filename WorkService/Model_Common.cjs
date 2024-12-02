@@ -893,10 +893,12 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
 
     const result = await client.query(query);
     if (result.rows != "") {
-      res.status(200).json(result.rows);
+      console.log(result.rows[0].p_error)
+      res.status(200).json({p_error:result.rows[0].p_error});
       await DisconnectPG_DB(client);
     }
   } catch (error) {
+    console.log(error.message);
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
