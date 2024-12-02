@@ -2041,6 +2041,7 @@ module.exports.fnGetMaterialData = async function (req, res) {
           INVOICE_NO: result.rows[0][0][dt][5],
           EXPIRE_DATE: result.rows[0][0][dt][6],
           VENDER_NAME: result.rows[0][0][dt][7],
+          PROCESS: result.rows[0][0][dt][8],
         });
       }
     }
