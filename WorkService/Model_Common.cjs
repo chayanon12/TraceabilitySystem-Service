@@ -713,6 +713,7 @@ module.exports.CallSMTReflowRecordTimeResult = async function (req, res) {
 
     const result = await client.query(query, [json_convertdata]);
     // const result = await client.query(query);
+    console.log(result.rows[0]);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
@@ -889,6 +890,7 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
+    console.log(json_convertdata,'ELT');
     query += `call "Traceability".trc_000_common_SetSerialLotShtELTTable('[${json_convertdata}]','')`;
 
     const result = await client.query(query);
@@ -1891,8 +1893,7 @@ module.exports.GetShippingSerialNo = async function (req, res) {
     let _intSeq = 1;
     let _strShetSeq = "";
 
-    const _strLotBase34_1 = ConvertBase34(
-      parseInt(strLotNo.substring(0, 1)) +
+    const _strLotBase34_1 = ConvertBase34(parseInt(strLotNo.substring(0, 1)) +
         parseInt(strLotNo.substring(1, 2)) +
         parseInt(strLotNo.substring(2, 3))
     );
