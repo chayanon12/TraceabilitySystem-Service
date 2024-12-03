@@ -1785,6 +1785,7 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res
 module.exports.SetBoxPackingSerialTray = async function (req, res) {
   let Conn;
   let _strErrorAll = "";
+  console.log("มาจ้าอิอิ")
   try {
     Conn = await ConnectOracleDB("PCTTTEST");
 
