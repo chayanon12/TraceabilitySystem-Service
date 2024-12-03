@@ -2471,3 +2471,69 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
     res.status(500).json({ message: err.message });
   }
 };
+
+module.exports.GetSerialTestResultManyOnlyGood = async function (req,res) {
+  var query = "";
+  try {
+    let { dataList, dtSerial } = req.body;
+
+    if (!dataList || !dtSerial || dtSerial.length === 0) {
+      return res.status(400).json({ message: "Missing necessary data." });
+    }
+
+    const queries = [];
+    for (let i = 0; i < dtSerial.length; i++) {
+      let strSerial = dtSerial[i].SERIAL || "";
+      let intSEQ = dtSerial[i].SEQ || "";
+
+      if (dataList[0] && strSerial !== "") {
+        dataList[0].strSerial = strSerial;
+      } else if (dataList[0] && strSerial === "") {
+        dataList[0].strSerial = "";
+      }
+
+      if (dataList[0] && intSEQ !== 0) {
+        dataList[0].intSEQ = intSEQ;
+      } else if (dataList[0] && intSEQ === 0) {
+        dataList[0].intSEQ = 0;
+      }
+
+      const json_convertdata = JSON.stringify(dataList);
+      //console.log(json_convertdata,'milkk')
+      const query = `CALL "Traceability".trc_000_common_getserialtestresultmanyonlygood('${json_convertdata}','','{}')`;
+      queries.push(query);
+    }
+
+    const client = await ConnectPG_DB();
+    const result = await Promise.all(
+      queries.map((query) => client.query(query))
+    );
+    await DisconnectPG_DB(client);
+
+    result.forEach((res, index) => {
+      const response = res.rows[0].response;
+     //console.log(response, "response4")
+      if (response) {
+        const updatedSerial = dtSerial[index];
+        if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
+        if (response.TYPE_TEST_RESULT)updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+        if (response.REJECT) updatedSerial.REJECT = response.REJECT;
+        if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
+        if (response.REJECT2)updatedSerial.REJECT2 = response.REJECT2;
+        if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REMARK) updatedSerial.REMARK = response.REMARK;
+        if (response.UPDATE_FLG)updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
+        if (response.FRONT_SHEET_NO)updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+        if (response.BACK_SHEET_NO)updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+        if (response.SHEET_PCS_NO)updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+        if (response.ROLL_LEAF_NO)updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
+      }
+    });
+
+    //console.log("GetSerialTestResultManyOnlyGood", dtSerial);
+    res.status(200).json(dtSerial);
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
+  }
+};
