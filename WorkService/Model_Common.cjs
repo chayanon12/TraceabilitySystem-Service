@@ -895,12 +895,10 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
 
     const result = await client.query(query);
     if (result.rows != "") {
-      console.log(result.rows[0].p_error)
       res.status(200).json({p_error:result.rows[0].p_error});
       await DisconnectPG_DB(client);
     }
   } catch (error) {
-    console.log(error.message);
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
@@ -1676,7 +1674,6 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res
       }
 
       const json_convertdata = JSON.stringify(dataList);
-      console.log(json_convertdata,'eyeeee')
       const query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytableonlygood('${json_convertdata}','','{}')`;
       queries.push(query);
     }
@@ -1709,7 +1706,6 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res
       }
     });
 
-    console.log("GetSerialTestResultManyTable", dtSerial);
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
@@ -1826,9 +1822,8 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
       );
 
       _strErrorAll = result.outBinds.P_ERROR;
-      console.log(_strErrorAll,"_strErrorAll")
     }
-    res.status(200).json(_strErrorAll);
+    res.status(200).json({p_error:_strErrorAll});
   } catch (error) {
     writeLogError(error.message, "");
     res
@@ -2405,6 +2400,8 @@ module.exports.GetSerialBoxTestResultManyTable222 = async function (req, res) {
 
 module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
   let data = [{}];
+  let queries = [];
+  let query =''
   try {
     let { dataList, dtSerial } = req.body;
 
@@ -2412,7 +2409,7 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
       return res.status(400).json({ message: "Missing necessary data." });
     }
 
-    const queries = [];
+    
     for (let i = 0; i < dtSerial.length; i++) {
       let strSerial = dtSerial[i].SERIAL || "";
 
@@ -2423,9 +2420,8 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
       }
 
       const json_convertdata = JSON.stringify(dataList);
-      const query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytable('${json_convertdata}','','{}')`;
+      query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytable('${json_convertdata}','','{}')`;
       queries.push(query);
-      console.log(query,"queryhhh")
     }
 
     const client = await ConnectPG_DB();
@@ -2467,7 +2463,7 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
-    console.error(err.message);
+    console.error(err.message,'resError');
     res.status(500).json({ message: err.message });
   }
 };
