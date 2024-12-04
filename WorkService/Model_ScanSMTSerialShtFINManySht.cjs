@@ -367,13 +367,13 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
       strSheetnoB: strSheetnoB,
       strPlantCode: "5",
     };
-    console.log(jsondata,strSheetType);
+    console.log(jsondata,strSheetType,'Type');
     if (strSheetType == "D") {
       const json_convertdata = JSON.stringify(jsondata);
       query += `SELECT * FROM "Traceability".trc_000_common_getsheetduplicateconnectshttyped('[${json_convertdata}]');`;
       const result = await client.query(query);
       if (result.rows.length > 0) {
-        res.status(200).json(result.rows[0]);
+        res.status(200).json(result.rows[0].sheet_count);
         await DisconnectPG_DB(client);
       }
     } else {
@@ -381,7 +381,7 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
       query += `SELECT * FROM "Traceability".trc_000_common_getsheetduplicateconnectshtnotype('[${json_convertdata}]');`;
       const result = await client.query(query);
       if (result.rows.length > 0) {
-        res.status(200).json(result.rows.sheet_count);
+        res.status(200).json(result.rows[0].sheet_count);
         await DisconnectPG_DB(client);
       }
     }

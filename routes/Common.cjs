@@ -84,4 +84,5 @@ router.post("/GetCavitySerialBarcodeGrade", Common.GetCavitySerialBarcodeGrade);
 
 router.post("/SetSerialRecordTimeTrayTableTest", Common.SetSerialRecordTimeTrayTableTest);
 router.post("/GetSerialBoxTestResultManyTable", Common.GetSerialBoxTestResultManyTable);
+router.post("/GetSerialTestResultManyOnlyGood", Common.GetSerialTestResultManyOnlyGood);
 module.exports = router;
