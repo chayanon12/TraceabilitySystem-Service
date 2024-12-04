@@ -61,7 +61,6 @@ module.exports.SPIResult_getCheckData = async function (req, res) {
 };
 // ------------------------------------------------------
 module.exports.SPIResult_Getfinaldata = async function (req, res) {
-  console.log("SPIResult_getfinaldata");
   var query = "";
   try {
     const { dataList } = req.body;
@@ -69,7 +68,6 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_041_spiresult_getfinaldata('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -81,7 +79,6 @@ module.exports.SPIResult_Getfinaldata = async function (req, res) {
 // ------------------------------------------------------
 // Pre Result
 module.exports.PreResult_GetCheck = async function (req, res) {
-  console.log("PRE_RESULT_getCheck");
   var query = "";
   try {
     const { dataList } = req.body;
@@ -89,7 +86,6 @@ module.exports.PreResult_GetCheck = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_042_PRE_RESULT_getCheck('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -100,7 +96,6 @@ module.exports.PreResult_GetCheck = async function (req, res) {
 };
 
 module.exports.PreResult_GetDataFound = async function (req, res) {
-  console.log("PRE_RESULT_getCheck");
   var query = "";
   let data=[]
   try {
@@ -109,9 +104,7 @@ module.exports.PreResult_GetDataFound = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_042_pre_result_getdataFound('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
-    console.log(result.rows)
     if(result.rows[0].trc_042_pre_result_getdatafound!=null){
       data=result.rows[0].trc_042_pre_result_getdatafound
     }
@@ -124,7 +117,6 @@ module.exports.PreResult_GetDataFound = async function (req, res) {
 };
 
 module.exports.PreResult_GetDataNotFound = async function (req, res) {
-  console.log("PreResult_GetDataNotFound");
   var query = "";
   let data=[]
   try {
@@ -133,7 +125,6 @@ module.exports.PreResult_GetDataNotFound = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_042_pre_result_getdataNotFound('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     if(result.rows[0].trc_042_pre_result_getdatafound!=null){
       data=result.rows[0].trc_042_pre_result_getdatanotfound
@@ -147,7 +138,6 @@ module.exports.PreResult_GetDataNotFound = async function (req, res) {
 };
 
 module.exports.PreResult_GetDataNotFoundFound = async function (req, res) {
-  console.log("PreResult_GetDataNotFound");
   var query = "";
   let data=[]
   try {
@@ -156,7 +146,6 @@ module.exports.PreResult_GetDataNotFoundFound = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_042_pre_result_getdataNotFoundfound('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     if(result.rows[0].trc_042_pre_result_getdatafound!=null){
       data=result.rows[0].trc_042_pre_result_getdatanotfoundfound
@@ -171,7 +160,6 @@ module.exports.PreResult_GetDataNotFoundFound = async function (req, res) {
 // ------------------------------------------------------
 //OST
 module.exports.OSTResult_GetData1 = async function (req, res) {
-  console.log("trc_044_ost_result_getdata1");
   var query = "";
   try {
     const { dataList } = req.body;
@@ -179,7 +167,6 @@ module.exports.OSTResult_GetData1 = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_044_ost_result_getdata1('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -191,7 +178,6 @@ module.exports.OSTResult_GetData1 = async function (req, res) {
 // ------------------------------------------------------
 // OST BADMARK
 module.exports.OSTResult_GetData2 = async function (req, res) {
-  console.log("trc_044_ost_result_getdata2");
   var query = "";
   try {
     const { dataList } = req.body;
@@ -199,7 +185,6 @@ module.exports.OSTResult_GetData2 = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_044_ost_result_getdata2('[${json_convertdata}]')`;
-    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
@@ -211,7 +196,6 @@ module.exports.OSTResult_GetData2 = async function (req, res) {
 // ------------------------------------------------------
 // XrayResult 
 module.exports.XrayResult = async function (req, res) {
-  console.log("trc_044_ost_result_getdata2");
   var query = "";
   try {
     const { dataList } = req.body;
@@ -219,7 +203,6 @@ module.exports.XrayResult = async function (req, res) {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(dataList);
     query += `select * from "Traceability".trc_052_xrayresult_getdata('${json_convertdata}')`;
-    console.log(query)
     const result = await client.query(query); 
     res.status(200).json(result.rows);
     await DisconnectPG_DB(client);
