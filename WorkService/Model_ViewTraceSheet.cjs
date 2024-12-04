@@ -435,7 +435,6 @@ module.exports.GetFPCPcsNoBySMPJCavity = async function (req, res) {
    let query = "";
    try {
      const{strProduct,_intPcsNo} = req.body
-     console.log("เข้าจ้า",strProduct,_intPcsNo)
      const Conn = await ConnectOracleDB("PCTTTEST");
      query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetFPCPcsNBySMPJCVY('${strProduct}','${_intPcsNo}') FROM dual`;
      const result = await Conn.execute(query);
@@ -455,51 +454,7 @@ module.exports.GetFPCPcsNoBySMPJCavity = async function (req, res) {
  }
 }
 
-// module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
-//   let querypostgres = "";
-//   let resultPostges = "";
-//   let queryOracle = "";
-//   try {
-//     const { dataList } = req.body;
-//     const client = await ConnectPG_DB();
-//     const json_convertdata = JSON.stringify(dataList);
-//     querypostgres += ` select * from "Traceability".trc_031_fvibadmark_getsmtconnectshtpcsshippingno('[${json_convertdata}]')`;
-//     const result = await client.query(querypostgres);
-//     resultPostges = result.rows[0].leaf_no;
-//     await DisconnectPG_DB(client);
-//   } catch (error) {
-//     writeLogError(error.message, querypostgres);
-//     return res.status(500).json({ message: error.message });
-//   }
 
-//   try {
-//     const Conn = await ConnectOracleDB("PCTTTEST");
-//     console.log(resultPostges);
-//     queryOracle = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_AVIBadmarkResult('${resultPostges}') FROM dual`;
-//     const result = await Conn.execute(queryOracle);
-//     await DisconnectOracleDB(Conn);
-
-//     if (result.rows.length > 0) {
-//       const data = [
-//         {
-//           pcs_no: result.rows[0][0][0][0],
-//           sheet_no: result.rows[0][0][0][1],
-//           badmark_no: result.rows[0][0][0][2],
-//           badmark_date: result.rows[0][0][0][3],
-//           badmark_machine: result.rows[0][0][0][4],
-//         }
-//       ]
-//       return res.status(200).json(data);
-//     } else {
-//       return res.status(404).json({ message: "No data found" });
-//     }
-//   } catch (error) {
-//     writeLogError(error.message, queryOracle);
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
-
-// select * from "Traceability".trc_037_traceviewsheet_GetSMTConnectShtPcsCavity('[{"strPlantCode":"5","strPrdName":"RGOZ-379MW-0A"}]')
 
 module.exports.GetSMTConnectShtPcsCavity = async function (req, res) {
   var query = "";
