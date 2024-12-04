@@ -2046,6 +2046,39 @@ module.exports.fnGetMaterialData = async function (req, res) {
   }
 };
 
+
+module.exports.MaterialDataSearch = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
+    const { Venderlot ,Invoice} = req.body;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_MaterialDataSearch( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
+    const result = await Conn.execute(query);
+    let data = [];
+    if (result.rows[0][0].length > 0) {
+      for (let dt = 0; dt < result.rows[0][0].length; dt++) {
+        data.push({
+          MAT_CODE: result.rows[0][0][dt][0],
+          MAT_NAME: result.rows[0][0][dt][1],
+          MAT_CATEGORY: result.rows[0][0][dt][2],
+          VENDER_LOT: result.rows[0][0][dt][3],
+          SUB_VENDER_LOT: result.rows[0][0][dt][4],
+          INVOICE_NO: result.rows[0][0][dt][5],
+          EXPIRE_DATE: result.rows[0][0][dt][6],
+          VENDER_NAME: result.rows[0][0][dt][7],
+          PROCESS: result.rows[0][0][dt][8],
+        });
+      }
+    }
+
+    DisconnectOracleDB(Conn);
+    res.status(200).json(data);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 //
 module.exports.fnGetLotProcessDetailData = async function (req, res) {
   var query = "";
@@ -2218,7 +2251,10 @@ module.exports.GetMeterial = async function (req, res) {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { txtLotNo } = req.body;
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial( '${txtLotNo}') AS DATA1 FROM DUAL`;
+    console.log(query,'query')
+    console.log(Conn,'Conn')
     const result = await Conn.execute(query);
+    console.log( result.rows,'result.rows[0][0]')
     let data = [];
 
     if (result.rows[0][0].length > 0) {
@@ -2228,8 +2264,9 @@ module.exports.GetMeterial = async function (req, res) {
           LOT: result.rows[0][0][dt][1],
         });
       }
+      res.status(200).json(data);
     }
-    res.status(200).json(data);
+    
     DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);

@@ -46,7 +46,7 @@ module.exports.GetSerialMagazineByLot = async function (req, res) {
   try {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    console.log("SetManualConfirmMagazine",dataList);
+    console.log("GetSerialMagazineByLot",dataList);
     const client = await ConnectPG_DB();
     query += `SELECT * from "Traceability".trc_055_getserialmagazinebylot('[${json_convertdata}]')`;
     const result = await client.query(query);
