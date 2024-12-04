@@ -129,10 +129,9 @@ const {
       const { dataList} = req.body;
       console.log(dataList,'fnlotresultfinalgatedata')
       const json_convertdata = JSON.stringify(dataList);
-      query += `select * from  "Traceability".trc_034_traceviewlot_ ('[${json_convertdata}]')`;
+      query += `select * from  "Traceability".trc_034_traceviewlot_fnlotrollleafbylotdata ('[${json_convertdata}]')`;
       console.log('1111111',query)
       const result = await client.query(query);
-     
         res.status(200).json(result.rows);
        
         DisconnectPG_DB(client);
