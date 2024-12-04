@@ -19,4 +19,6 @@ router.post("/ReferNEXTLOT",ViewTraceLot.ReferNEXTLOT);
 router.post("/GetMaterial1",ViewTraceLot.GetMaterial1);
 router.post("/GetMaterial2",ViewTraceLot.GetMaterial2);
 router.post("/GetDetail",ViewTraceLot.GetDetail);
+router.post("/fnLotSheetData",ViewTraceLot.fnLotSheetData);
+
 module.exports = router;

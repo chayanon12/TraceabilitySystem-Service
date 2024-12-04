@@ -206,6 +206,22 @@ const {
     }
   };
 
+  module.exports.fnLotSheetData = async function (req, res) {
+    var query = "";
+    try {
+      const client = await ConnectPG_DB();
+      const { strLOTNO} = req.body;
+      console.log( strLOTNO)
+      query += `select * from  "Traceability".trc_034_traceviewlot_fnlotsheetdata('${strLOTNO}')`;
+      const result = await client.query(query);
+        res.status(200).json(result.rows);
+        DisconnectPG_DB(client);
+    } catch (error) {
+      writeLogError(error.message, query);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   module.exports.GetDatatLotTrace = async function (req, res) {
     var query = "";
     let data=[]
