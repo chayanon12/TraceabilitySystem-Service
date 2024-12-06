@@ -14,6 +14,10 @@ router.post("/PreResult_GetDataNotFoundFound",Result.PreResult_GetDataNotFoundFo
 router.post("/OSTResult_GetData1",Result.OSTResult_GetData1);
 router.post("/OSTResult_GetData2",Result.OSTResult_GetData2);
 router.post("/XrayResult",Result.XrayResult);
+router.post("/getAOI_RESULT",Result.getAOI_RESULT);
+router.post("/Get_AOI_Export",Result.Get_AOI_Export);
+
+
   
 
 

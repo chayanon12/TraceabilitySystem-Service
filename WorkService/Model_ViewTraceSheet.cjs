@@ -170,8 +170,8 @@ module.exports.GetLotSheet = async function (req, res) {
         const Conn = await ConnectOracleDB("PCTTTEST");
   
         query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSeAOIEFPCResult('${_strPlantCode}', '${_strFrontSheetNo}', ${_intPcsNo},'${_strProduct}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
-  
         const result = await Conn.execute(query);
+        
         if (result.rows.length > 0) {
           let data = [];
   
@@ -294,6 +294,7 @@ module.exports.GetSPI_Front = async function (req, res) {
   const json_convertdata = JSON.stringify(dataList);
   query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_spi_front('[${json_convertdata}]')`;
   const result = await client.query(query);
+  console.l
   res.status(200).json(result.rows);
   await DisconnectPG_DB(client);
       } catch (error) {

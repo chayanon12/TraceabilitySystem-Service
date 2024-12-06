@@ -212,3 +212,37 @@ module.exports.XrayResult = async function (req, res) {
   }
 };  
 // ------------------------------------------------------
+// AOI DATA 
+module.exports.getAOI_RESULT = async function (req, res) {
+  var query = "";
+  console.log("OKจ้า")
+  try {
+    const { dataList } = req.body;
+    // ('{"strplantcode":"5","strsheetno":"A903104669RGP4630077","strprdname":"RGOZ-517MW","panelno":21}')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_051_aoi_getdata2('${json_convertdata}')`
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports.Get_AOI_Export = async function (req, res) {
+  var query = "";
+  try {
+    const { dataList } = req.body;
+    // ('{"strplantcode":"5","strsheetno":"A903104669RGP4630077","strprdname":"RGOZ-517MW","panelno":21}')
+    const client = await ConnectPG_DB();
+    const json_convertdata = JSON.stringify(dataList);
+    query += `select * from "Traceability".trc_051_aoiresult_export('${json_convertdata}')` 
+    const result = await client.query(query);
+    res.status(200).json(result.rows);
+    await DisconnectPG_DB(client);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
