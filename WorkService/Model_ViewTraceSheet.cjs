@@ -294,7 +294,6 @@ module.exports.GetSPI_Front = async function (req, res) {
   const json_convertdata = JSON.stringify(dataList);
   query += ` SELECT * from "Traceability".trc_037_traceviewsheet_get_spi_front('[${json_convertdata}]')`;
   const result = await client.query(query);
-  console.l
   res.status(200).json(result.rows);
   await DisconnectPG_DB(client);
       } catch (error) {
