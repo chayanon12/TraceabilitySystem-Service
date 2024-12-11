@@ -2499,3 +2499,25 @@ module.exports.GetSerialTestResultManyOnlyGood = async function (req,res) {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+module.exports.GetDataConfig = async function (req, res) {
+  var query = "";
+  try {
+    const client = await ConnectPG_DB();
+    query = `SELECT * FROM "Traceability".trc_000_common_dataconfig();`;
+    const result = await client.query(query);
+
+    // รวมผลลัพธ์ให้เป็นอ็อบเจกต์เดียว
+    let data = result.rows.reduce((acc, row) => {
+      acc[row.CONFIG_NAME] = row.CONFIG_VALUE;
+      return acc;
+    }, {});
+
+    await DisconnectPG_DB(client);
+    res.status(200).json(data);
+  } catch (err) {
+    writeLogError(err.message, query);
+    res.status(500).json({ message: err.message });
+  }
+};
