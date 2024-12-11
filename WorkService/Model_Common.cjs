@@ -2052,21 +2052,139 @@ module.exports.MaterialDataSearch = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { Venderlot ,Invoice} = req.body;
-    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_MaterialDataSearch( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
+    console.log(Venderlot,Invoice);
+    // query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_MaterialDataSearch( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
+    query = `	SELECT DISTINCT VL.VDL_ITEM_CODE AS MAT_CODE  
+		                   , VL.VDL_DESC1 AS MAT_NAME
+		                   , VL.VDL_DESC2 AS MAT_CATEGORY
+		                   , NVL(UPPER(TRIM(VL.VDL_VENDER_LOT)),' ') AS VENDER_LOT
+		                   , NVL(UPPER(TRIM(VM.VDM_SUB_VD_LOT)),' ') AS SUB_VENDER_LOT
+		                   , NVL(VL.VDL_INVOICE_NO,' ') AS INVOICE_NO
+		                   , TO_CHAR(NVL(VL.VDL_LAST_EXPIRE_DATE,VL.VDL_EXPIRE_DATE),'DD/MM/YYYY') AS EXPIRE_DATE
+		                   , NVL(VL.VDL_SUPPLIER,' ') AS VENDER_NAME
+		                   , PR.PROC_DISP
+		              FROM FPC.FPCM_EMOS_POS_PREPARED MP  
+		                   , FPC.FPCM_GROUP_PREPARED_MOS_DETAIL GP
+		                   , FPC.FPCM_GROUP_PREPARED_MOS GM
+		                   , FPC.FPCM_VENDER_LOT VL
+		                   , FPC.FPCM_VENDER_LOT_MOS VM
+		                   , FPC.FPC_LOT LO
+		                   , FPC.FPC_PROCESS PR
+		                   , FPC.FPCM_EMOS_WO MW
+		             WHERE ( MP.EPP_GROUP_ID = GP.GPD_GROUP_ID )    
+		                   AND ( GP.GPD_MOS_ID = VM.VDM_MOS_ID )  
+		                   AND ( VM.VDM_BARCODE_ID = VL.VDL_BARCODE_ID )
+		                   AND ( MP.EPP_LOT = LO.LOT )
+		                   AND ( MP.EPP_GROUP_ID = GM.GPM_GROUP_ID )  
+		                   AND ( MW.EMW_MOS_ID = GP.GPD_MOS_ID )  
+		                   AND ( MW.EMW_PROC_ID = GM.GPM_PROC_ID)  
+		                   AND ( GM.GPM_PROC_ID = PR.PROC_ID )
+		                   AND ('${Venderlot}'  = '' OR VL.VDL_VENDER_LOT = '${Venderlot}' OR '${Venderlot}' IS NULL )
+--		  				   AND (Invoice IS NULL OR VL.VDL_INVOICE_NO = Invoice)
+		                   AND ('${Invoice}' = '' OR VL.VDL_INVOICE_NO = '${Invoice}' OR '${Invoice}' IS NULL)
+		           UNION ALL  
+		          SELECT DISTINCT VL.VDL_ITEM_CODE AS MAT_CODE  
+		                   , VL.VDL_DESC1 AS MAT_NAME
+		                   , VL.VDL_DESC2 AS MAT_CATEGORY
+		                   , NVL(UPPER(TRIM(VL.VDL_VENDER_LOT)),' ') AS VENDER_LOT
+		                   , NVL(UPPER(TRIM(VM.VDM_SUB_VD_LOT)),' ') AS SUB_VENDER_LOT
+		                   , NVL(VL.VDL_INVOICE_NO,' ') AS INVOICE_NO
+		                   , TO_CHAR(NVL(VL.VDL_LAST_EXPIRE_DATE,VL.VDL_EXPIRE_DATE),'DD/MM/YYYY') AS EXPIRE_DATE
+		                   , NVL(VL.VDL_SUPPLIER,' ') AS VENDER_NAME
+		                   , PR.PROC_DISP
+		              FROM FPC.FPCM_EMOS_POS_NO_PREPARED MP
+		                   , FPC.FPCM_VENDER_LOT VL
+		                   , FPC.FPCM_VENDER_LOT_MOS VM
+		                   , FPC.FPC_LOT LO
+		                   , FPC.FPC_PROCESS PR
+		                   , FPC.FPCM_MACHINE_LOT ML
+		                   , FPC.FPCM_MACHINE_CONDITION MC
+		                   , FPC.NAP_USER_LOGIN UL
+		             WHERE ( MP.EPN_BARCODE_ID = VL.VDL_BARCODE_ID )  
+		                   AND ( MP.EPN_BARCODE_ID = VM.VDM_BARCODE_ID(+))  
+		                   AND ( MP.EPN_LOT = VM.VDM_MOS_ID (+) )
+		                   AND ( MP.EPN_PROC_ID = VM.VDM_PROC_ID (+) )
+		                   AND ( MP.EPN_LOT = LO.LOT )  
+		                   AND ( MP.EPN_PROC_ID = PR.PROC_ID)  
+		                   AND ( MP.EPN_LOT = ML.MCL_LOT (+))  
+		                   AND ( MP.EPN_BARCODE_ID =  ML.MCL_VENDER_LOT_ID (+))
+		                   AND ( ML.MCL_CONDITION_ID = MC.MCI_CONDITION_ID (+))  
+		                   AND ( ML.MCL_CHECK_BY = UL.LOGIN_ID(+))  
+		                   AND ('${Venderlot}'  = '' OR VL.VDL_VENDER_LOT = '${Venderlot}' OR '${Venderlot}' IS NULL  )
+--		  				   AND ('${Invoice}' IS NULL OR VL.VDL_INVOICE_NO = '${Invoice}')
+		                   AND ('${Invoice}' = '' OR VL.VDL_INVOICE_NO = '${Invoice}' OR '${Invoice}' IS NULL )
+		           UNION ALL  
+		           SELECT DISTINCT LO2.LOT_ITEM_CODE AS MAT_CODE  
+		                   , LO2.LOT_PRD_NAME AS MAT_NAME
+		                   , ' ' AS MAT_CATEGORY
+		                   , NVL(MP.EPN_BARCODE_ID,' ') AS VENDER_LOT
+		                   , ' ' AS SUB_VENDER_LOT
+		                   , ' ' AS INVOICE_NO
+		                   , ' ' AS EXPIRE_DATE
+		                   , ' ' AS VENDER_NAME
+		                   , PR.PROC_DISP
+		              FROM FPC.FPCM_EMOS_POS_NO_PREPARED MP
+		                   , FPC.FPC_LOT LO
+		                   , FPC.FPC_PROCESS PR
+		                   , FPC.FPC_LOT LO2
+		                    , FPC.FPCM_VENDER_LOT VL
+		             WHERE ( MP.EPN_BARCODE_ID = LO2.LOT )
+		             AND ( MP.EPN_BARCODE_ID = VL.VDL_BARCODE_ID )  
+		                   AND ( MP.EPN_LOT = LO.LOT )  
+		                   AND ( MP.EPN_PROC_ID = PR.PROC_ID)   
+		                     AND ('${Venderlot}' = ''  OR VL.VDL_VENDER_LOT = '${Venderlot}' OR '${Venderlot}' IS NULL )
+--		  				   AND ('${Invoice}' IS NULL OR VL.VDL_INVOICE_NO = '${Invoice}')
+		                     AND ('${Invoice}' = '' OR VL.VDL_INVOICE_NO = '${Invoice}' OR '${Invoice}' IS NULL)
+		          UNION ALL  
+		          SELECT DISTINCT VL.VDL_ITEM_CODE AS MAT_CODE  
+		                   , VL.VDL_DESC1 AS MAT_NAME
+		                   , VL.VDL_DESC2 AS MAT_CATEGORY
+		                   , NVL(UPPER(TRIM(VL.VDL_VENDER_LOT)),' ') AS VENDER_LOT
+		                   , NVL(UPPER(TRIM(VM.VDM_SUB_VD_LOT)),' ') AS SUB_VENDER_LOT
+		                   , NVL(VL.VDL_INVOICE_NO,' ') AS INVOICE_NO
+		                   , TO_CHAR(NVL(VL.VDL_LAST_EXPIRE_DATE,VL.VDL_EXPIRE_DATE),'DD/MM/YYYY') AS EXPIRE_DATE
+		                   , NVL(VL.VDL_SUPPLIER,' ') AS VENDER_NAME
+		                   , PR.PROC_DISP
+		              FROM FPC.FPCM_EMOS_POS_PREPARED MP  
+		                   , FPC.FPCM_GROUP_PREPARED_MOS_DETAIL GP
+		                   , FPC.FPCM_GROUP_PREPARED_MOS GM
+		                   , FPC.FPCM_VENDER_LOT VL
+		                   , FPC.FPCM_VENDER_LOT_MOS VM
+		                   , FPC.FPC_LOT LO
+		                   , FPC.FPC_PROCESS PR
+		                   , FPC.FPCM_EMOS_WO MW
+		                   , FPC.FPCM_EMOS_COMBINE MC
+		             WHERE ( MP.EPP_GROUP_ID = GP.GPD_GROUP_ID )  
+		                   AND ( GP.GPD_MOS_ID = MC.EMC_MAIN_MOS_ID)  
+		                   AND ( MC.EMC_SUB_MOS_ID = VM.VDM_MOS_ID )  
+		                   AND ( VM.VDM_BARCODE_ID = VL.VDL_BARCODE_ID )
+		                   AND ( MP.EPP_LOT = LO.LOT )
+		                   AND ( MP.EPP_GROUP_ID = GM.GPM_GROUP_ID )  
+		                   AND ( MW.EMW_MOS_ID = GP.GPD_MOS_ID )  
+		                   AND ( MW.EMW_PROC_ID = GM.GPM_PROC_ID)  
+		                   AND ( GM.GPM_PROC_ID = PR.PROC_ID )
+		                  AND ('${Venderlot}' = ''  OR VL.VDL_VENDER_LOT = '${Venderlot}'  OR '${Venderlot}' IS NULL)
+--		  				   AND (Invoice IS NULL OR VL.VDL_INVOICE_NO = Invoice)
+		                  AND ('${Invoice}'= '' OR VL.VDL_INVOICE_NO = '${Invoice}'  OR '${Invoice}' IS NULL)
+		          ORDER BY 9
+		                  ,1 ASC
+		                  ,4 ASC`;
+    console.log(query);
     const result = await Conn.execute(query);
+    console.log(result.rows[0],'mamam');
     let data = [];
-    if (result.rows[0][0].length > 0) {
-      for (let dt = 0; dt < result.rows[0][0].length; dt++) {
+    if (result.rows.length > 0) {
+      for (let dt = 0; dt < result.rows.length; dt++) {
         data.push({
-          MAT_CODE: result.rows[0][0][dt][0],
-          MAT_NAME: result.rows[0][0][dt][1],
-          MAT_CATEGORY: result.rows[0][0][dt][2],
-          VENDER_LOT: result.rows[0][0][dt][3],
-          SUB_VENDER_LOT: result.rows[0][0][dt][4],
-          INVOICE_NO: result.rows[0][0][dt][5],
-          EXPIRE_DATE: result.rows[0][0][dt][6],
-          VENDER_NAME: result.rows[0][0][dt][7],
-          PROCESS: result.rows[0][0][dt][8],
+          MAT_CODE: result.rows[dt][0],
+          MAT_NAME: result.rows[dt][1],
+          MAT_CATEGORY: result.rows[dt][2],
+          VENDER_LOT: result.rows[dt][3],
+          SUB_VENDER_LOT: result.rows[dt][4],
+          INVOICE_NO: result.rows[dt][5],
+          EXPIRE_DATE: result.rows[dt][6],
+          VENDER_NAME: result.rows[dt][7],
+          PROCESS: result.rows[dt][8],
         });
       }
     }
@@ -2244,13 +2362,66 @@ module.exports.fnGetDocumentLink = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
-
 module.exports.GetMeterial = async function (req, res) {
   var query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
+    const { Venderlot,Invoice } = req.body;
+    // query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
+    query = `	SELECT DISTINCT
+			    L.VDL_VENDER_LOT AS VENDER_LOT,
+			    E.EPP_LOT AS LOT
+			FROM 
+			   FPC.FPCM_VENDER_LOT L
+			    JOIN FPC.FPCM_VENDER_LOT_MOS M ON L.VDL_BARCODE_ID = M.VDM_BARCODE_ID
+			    JOIN FPC.FPCM_GROUP_PREPARED_MOS_DETAIL D ON M.VDM_MOS_ID = D.GPD_MOS_ID
+			    JOIN FPC.FPCM_GROUP_PREPARED_MOS P ON D.GPD_GROUP_ID = P.GPM_GROUP_ID
+			    JOIN FPC.FPCM_EMOS_POS_PREPARED E ON P.GPM_GROUP_ID = E.EPP_GROUP_ID
+			WHERE
+			 (L.VDL_VENDER_LOT LIKE '${Venderlot}' OR  '${Venderlot}' IS NULL OR  '${Venderlot}' = '')
+    			AND (L.VDL_INVOICE_NO = '${Invoice}' OR '${Invoice}' IS NULL OR '${Invoice}' = '')
+
+			UNION
+			SELECT 
+			    V.VDL_VENDER_LOT AS VENDER_LOT,
+			    M.VDM_MOS_ID AS LOT
+			FROM
+			     FPC.FPCM_VENDER_LOT_MOS M
+			    JOIN FPC.FPCM_VENDER_LOT V ON M.VDM_BARCODE_ID = V.VDL_BARCODE_ID
+			WHERE
+				(V.VDL_VENDER_LOT =  '${Venderlot}' OR  '${Venderlot}' IS NULL OR  '${Venderlot}' = '')
+   				 AND (V.VDL_INVOICE_NO =  '${Invoice}' OR '${Invoice}' IS NULL OR '${Invoice}' = '')
+			    AND LENGTH(M.VDM_MOS_ID) = 9
+			ORDER BY LOT `
+    console.log(query,'query')
+    // console.log(Conn,'Conn')
+    const result = await Conn.execute(query);
+    console.log( result.rows,'result.rows[0][0]')
+    let data = [];
+
+    if (result.rows.length > 0) {
+      for (let dt = 0; dt < result.rows.length; dt++) {
+        data.push({
+          VENDER_LOT: result.rows[dt][0],
+          LOT: result.rows[dt][1],
+        });
+      }
+     
+    }
+    res.status(200).json(data);
+    DisconnectOracleDB(Conn);
+  } catch (error) {
+    writeLogError(error.message, query);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.GetMeterial1 = async function (req, res) {
+  var query = "";
+  try {
+    const Conn = await ConnectOracleDB("PCTTTEST");
     const { txtLotNo } = req.body;
-    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial( '${txtLotNo}') AS DATA1 FROM DUAL`;
+    query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial1( '${txtLotNo}') AS DATA1 FROM DUAL`;
     console.log(query,'query')
     console.log(Conn,'Conn')
     const result = await Conn.execute(query);
