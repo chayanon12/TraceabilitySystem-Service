@@ -85,6 +85,9 @@ router.post("/GetCavitySerialBarcodeGrade", Common.GetCavitySerialBarcodeGrade);
 router.post("/SetSerialRecordTimeTrayTableTest", Common.SetSerialRecordTimeTrayTableTest);
 router.post("/GetSerialBoxTestResultManyTable", Common.GetSerialBoxTestResultManyTable);
 router.post("/GetSerialTestResultManyOnlyGood", Common.GetSerialTestResultManyOnlyGood);
+
+//GET CONFIG 
+router.post("/GetDataConfig", Common.GetDataConfig);
 router.post("/GetMeterial1", Common.GetMeterial1);
 
 

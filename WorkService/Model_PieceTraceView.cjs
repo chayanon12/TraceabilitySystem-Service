@@ -549,7 +549,6 @@ module.exports.GetSerialAOMEFPCResult = async function (req, res) {
                 _strPrdName,
                 _strSMPJCavityFlg,
             } = req.body;
-           
             let roll_leaf = await GetRollLeafBySheetNo(
                 _strPlantCode,
                 _strSheetNo
@@ -557,7 +556,6 @@ module.exports.GetSerialAOMEFPCResult = async function (req, res) {
             const Conn = await ConnectOracleDB("PCTTTEST");
             query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAOMEFPCRST('${_strPlantCode}', '${_strSheetNo}', ${_intPcsNo},'${_strPrdName}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
             const result = await Conn.execute(query);
-
             if (result.rows.length > 0) {
                 let data = [];
 
@@ -633,7 +631,7 @@ module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
         const client = await ConnectOracleDB("PCTTTEST");
         query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIBadmark( ${intPCSNo},'${strSMPJCavityFlg}','${_strShippingNo}') AS DATA1 FROM DUAL`;
         const result = await client.execute(query);
-        console.log(result.rows,"ROW")
+        console.log(result.rows[0][0][0],"ROW")
         if (result.rows.length > 0) {
             
             let data = [];

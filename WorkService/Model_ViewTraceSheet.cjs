@@ -170,8 +170,8 @@ module.exports.GetLotSheet = async function (req, res) {
         const Conn = await ConnectOracleDB("PCTTTEST");
   
         query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSeAOIEFPCResult('${_strPlantCode}', '${_strFrontSheetNo}', ${_intPcsNo},'${_strProduct}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
-  
         const result = await Conn.execute(query);
+        
         if (result.rows.length > 0) {
           let data = [];
   
