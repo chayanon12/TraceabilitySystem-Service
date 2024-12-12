@@ -2352,6 +2352,7 @@ module.exports.fnGetDocumentLink = async function (req, res) {
           dcn_filepdf: result.rows[0][0][i][2],
           dcn_newrev: result.rows[0][0][i][3],
           filepdf: result.rows[0][0][i][4],
+          filepdf2: result.rows[0][0][i][5],
         });
       }
     }
