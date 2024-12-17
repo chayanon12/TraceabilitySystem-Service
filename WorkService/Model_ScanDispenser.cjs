@@ -362,7 +362,7 @@ module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
                             AND FL.FPFL_PROC_ID = :V_PROC_ID1
                             AND FL.FPFL_LOT_NO = :V_LOT_NO1`;  
       let params = {V_FLOW_ID1:V_FLOW_ID,V_PROC_ID1:V_PROC_ID,V_LOT_NO1:V_LOT_NO}
-      // let resultFPCDelete = await deleteFromOracle(queryFPCDElete,params)
+      let resultFPCDelete = await deleteFromOracle(queryFPCDElete,params)
     }else{
       let queryTRCInsert = ` INSERT INTO "Traceability".TRC_PROC_FLOW_HOLDTIME_HEAD 
                            (
