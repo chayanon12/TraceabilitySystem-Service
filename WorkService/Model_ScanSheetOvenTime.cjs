@@ -288,7 +288,7 @@ module.exports.SET_SMT_PROC_FLOW_OVEN = async function (req, res) {
     P_ERROR = "MOT NOT RECORD TIME";
   }
   console.log(res.body)
-  // console.log(P_ERROR,'response')
+ 
   res.status(200).json({
     V_LOT_NO,
     V_PRODUCT,

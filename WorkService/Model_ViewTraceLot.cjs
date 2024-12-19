@@ -111,9 +111,7 @@ const {
       query += `select * from  "Traceability".trc_034_traceviewlot_fnsheetserialbylotdata1('[${json_convertdata}]')`;
       console.log('1111111',query)
       const result = await client.query(query);
-      // res.status(200).json(Object.keys(data[0])); // หาก data เป็น array
         res.status(200).json(result.rows);
-        // res.status(200).json(Object.keys(FinalExport[0]));
         DisconnectPG_DB(client);
     } catch (error) {
       writeLogError(error.message, query);
