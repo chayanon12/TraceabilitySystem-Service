@@ -52,7 +52,7 @@ module.exports.DeleteDispenserRecordTimeData = async function (req, res) {
   }
 };
 module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
-  let { p_sheet_no, p_cb_no, p_user, p_station } = req.body;
+  let { p_sheet_no, p_cb_no, p_user, p_station,p_holding_time_flg } = req.body;
   let V_APP_ID = "1";
   let V_FLOW_ID = "0012";
   let V_PROC_NAME = " ";
@@ -233,30 +233,34 @@ module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
     if (resultFPC3.length > 0) {
       V_PAUSE_TIME = resultFPC3[0][0];
     }
-    if (V_PROC_COUNT > 0) {
-      let queryTRC4 = ` SELECT COALESCE(
-            (SELECT ROUND(EXTRACT(EPOCH FROM (NOW() - R.ret_inspect_date)) / 60, 2)
-             FROM "Traceability".trc_reflow_record_time R
-             WHERE R.ret_plant_code = '${V_PLANT_CODE}'
-               AND R.ret_sheet_no = '${p_sheet_no}'
-            ),
-            COALESCE(
-                (SELECT ROUND(EXTRACT(EPOCH FROM (NOW() - a.ART_INSPECT_DATE)) / 60, 2)
-                 FROM "Traceability".trc_aoi_record_time A
-                 WHERE A.art_plant_code = '${V_PLANT_CODE}'
-                   AND A.art_sheet_no = '${p_sheet_no}'
-                ),
-                0
-            )
-        ) AS holding_time`;
-      let resultTRC4 = await executeQueryPostgres(queryTRC4);
-      V_HOLDING_TIME = parseInt(resultTRC4.holding_time);
-      if (V_HOLDING_TIME > 0 &&V_HOLDING_TIME - V_PAUSE_TIME > V_CONTROL_TIME) {
-        P_ERROR ="REFLOW-DISPENSER HOLDING TIME OVER " + V_CONTROL_TIME / 60 + " HRS.";
-        V_RESULT = "F";
-      } else if (V_HOLDING_TIME == 0) {
-        P_ERROR = "REFLOW NOT RECORD TIME.";
-        V_RESULT = "F";
+    // เช็คเวลาว่าไหม Y N ถ้าเช็ค ให้ไปหาเวลาว่ากี่ชม ทำตัวเก็บทีท env เเละหากเป็น N skip holding time ใส่เป็นนาทีเเละหาร 60 เป็น ชม.
+    console.log(p_holding_time_flg);
+    if (p_holding_time_flg == "Y") {
+      if (V_PROC_COUNT > 0) {
+        let queryTRC4 = ` SELECT COALESCE(
+              (SELECT ROUND(EXTRACT(EPOCH FROM (NOW() - R.ret_inspect_date)) / 60, 2)
+              FROM "Traceability".trc_reflow_record_time R
+              WHERE R.ret_plant_code = '${V_PLANT_CODE}'
+                AND R.ret_sheet_no = '${p_sheet_no}'
+              ),
+              COALESCE(
+                  (SELECT ROUND(EXTRACT(EPOCH FROM (NOW() - a.ART_INSPECT_DATE)) / 60, 2)
+                  FROM "Traceability".trc_aoi_record_time A
+                  WHERE A.art_plant_code = '${V_PLANT_CODE}'
+                    AND A.art_sheet_no = '${p_sheet_no}'
+                  ),
+                  0
+              )
+          ) AS holding_time`;
+        let resultTRC4 = await executeQueryPostgres(queryTRC4);
+        V_HOLDING_TIME = parseInt(resultTRC4.holding_time);
+        if (V_HOLDING_TIME > 0 &&V_HOLDING_TIME - V_PAUSE_TIME > V_CONTROL_TIME) {
+          P_ERROR ="REFLOW-DISPENSER HOLDING TIME OVER " + V_CONTROL_TIME / 60 + " HRS.";
+          V_RESULT = "F";
+        } else if (V_HOLDING_TIME == 0) {
+          P_ERROR = "REFLOW NOT RECORD TIME.";
+          V_RESULT = "F";
+        }
       }
     }
     if(V_LOT_COUNT > 0){
@@ -443,6 +447,7 @@ module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
   } else {
     P_ERROR = "MOT NOT RECORD TIME";    
   }
+  console.log(P_ERROR);
   res.status(200).json({ P_ERROR });
 }; 
 
