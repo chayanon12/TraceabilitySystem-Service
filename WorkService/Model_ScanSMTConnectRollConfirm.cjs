@@ -31,6 +31,7 @@ module.exports.SetConfirmConnectRollLeaf = async function (req, res) {
 
 module.exports.CallFPCFlowConfirmConnectRollLeaf = async function (req, res) {
   let strSQL = "FPC_PROCESS_FLOW_API.FPC_PROC_FLOW_ROLL_LEAF";
+  
   try {
     const { P_FLOW_ID, P_LOT_NO, P_RESULT } = req.body;
     const connection = await ConnectOracleDB("PCTTTEST");
@@ -64,13 +65,5 @@ module.exports.CallFPCFlowConfirmConnectRollLeaf = async function (req, res) {
   } catch (error) {
     console.error("Error executing procedure:", error.message);
     res.status(500).send("Error executing procedure");
-  } finally {
-    if (connection) {
-      try {
-        await connection.close();
-      } catch (err) {
-        console.error("Error closing connection:", err.message);
-      }
-    }
-  }
+  } 
 };
