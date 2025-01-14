@@ -34,7 +34,7 @@ module.exports.GetDispenserRecordTimeData = async function (req, res) {
 module.exports.DeleteDispenserRecordTimeData = async function (req, res) {
   let query = "";
   let { strSheetNo } = req.body;
-  console.log(strSheetNo);
+
   try {
     let Client = await ConnectPG_DB();
     query += `DELETE FROM "Traceability".TRC_PROC_FLOW_HOLDTIME_DET D WHERE D.FPHD_FLOW_ID ='0012' and D.FPHD_CONTROL_NO = '${strSheetNo}' and D.FPHD_END_DATE is null`;
@@ -81,7 +81,7 @@ module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
   V_PRODUCT = " ";
   V_RESULT = "P";
   V_PAUSE_TIME = 0;
-  console.log(p_sheet_no, p_cb_no, p_user, p_station);
+
   // first query postgres
   let query = `
                   SELECT coalesce (MAX(M.MOT_LOT_NO),'') as lot_no
@@ -234,7 +234,7 @@ module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
       V_PAUSE_TIME = resultFPC3[0][0];
     }
     // เช็คเวลาว่าไหม Y N ถ้าเช็ค ให้ไปหาเวลาว่ากี่ชม ทำตัวเก็บทีท env เเละหากเป็น N skip holding time ใส่เป็นนาทีเเละหาร 60 เป็น ชม.
-    console.log(p_holding_time_flg);
+
     if (p_holding_time_flg == "Y") {
       if (V_PROC_COUNT > 0) {
         let queryTRC4 = ` SELECT COALESCE(
@@ -447,7 +447,6 @@ module.exports.CallSMTDispenserRecordTimeResult = async function (req, res) {
   } else {
     P_ERROR = "MOT NOT RECORD TIME";    
   }
-  console.log(P_ERROR);
   res.status(200).json({ P_ERROR });
 }; 
 
@@ -460,7 +459,7 @@ async function executeQueryPostgres(query) {
     resultresponse = result.rows[0];
     await DisconnectPG_DB(client);
   } catch (error) {
-    console.error("An error occurred:", error);
+
     writeLogError(error);
     await DisconnectPG_DB(client);
   }
@@ -474,7 +473,7 @@ async function insertIntoPostgres(query) {
     await DisconnectPG_DB(client);
     return result;
   } catch (error) {
-    console.error("An error occurred:", error);
+
     writeLogError(error);
     await DisconnectPG_DB(client);
   }
@@ -489,7 +488,7 @@ async function executeOracleQuery(query) {
     resultresponse = result.rows;
     await connection.close();
   } catch (error) {
-    console.error("An error occurred:", error);
+
     writeLogError(error);
     await connection.close();
   }
@@ -503,7 +502,6 @@ async function deleteFromOracle(query, params) {
     await connection.close();
     return result;
   } catch (error) {
-    console.error("An error occurred:", error);
     writeLogError(error);
     await connection.close();
   }

@@ -8,7 +8,7 @@ const {
 module.exports.getLot = async function (req, res) {
   try {
     const { txt_lotno } = req.body;
-    console.log("txt_lotno:", txt_lotno);
+   
 
     const connect = await ConnectOracleDB("FPC");
     let query = "";
@@ -32,13 +32,13 @@ module.exports.getLot = async function (req, res) {
     query += `NVL(L.LOT_ROLL_NO, ' '), `;
     query += `DECODE(L.LOT_PRIORITY, 'FINAL_GATE_LOT_PRIORITY_SKIP', 'Y', 'N') `;
 
-    console.log("query1:", query);
+ 
 
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
     res.json(result.rows);
   } catch (error) {
-    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    WriteLogError(error.message, query);
     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
   }
 };
@@ -49,13 +49,13 @@ module.exports.getproductrollleafdata = async function (req, res) {
     const client = await ConnectPG_DB();
     const { plantCode } = req.body;
     query += `SELECT * from  "Traceability".trc_001_getproductrollleafdata('${plantCode}')`;
-    console.log(query)
+
     const result = await client.query(query);
-    console.log(result.rows);
+ 
     await DisconnectPG_DB(client);
     res.json(result.rows);
   } catch (error) {
-    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    WriteLogError(error.message, query);
     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
   }
 };
@@ -68,7 +68,7 @@ module.exports.GetRollLeafTotalByLot = async function (req, res) {
       strLotno: LotNo,
       strPlantCode: "5",
     };
-    console.log(data,'data')
+
     const json_data = JSON.stringify(data);
     const client = await ConnectPG_DB();
     let query = `SELECT * from "Traceability".trc_000_common_getrollleaftotalbylot('[${json_data}]')`;
@@ -76,7 +76,7 @@ module.exports.GetRollLeafTotalByLot = async function (req, res) {
     await DisconnectPG_DB(client);
     res.json(result.rows.length);
   } catch (error) {
-    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    WriteLogError(error.message, query);
     res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
   }
 };

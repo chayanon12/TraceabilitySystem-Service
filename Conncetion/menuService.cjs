@@ -1,3 +1,4 @@
+const { writeLogError } = require("../Common/LogFuction.cjs");
 const {
   ConnectPG_DB,
   DisconnectPG_DB,
@@ -12,7 +13,6 @@ module.exports.getCurrentDate = async function (req, res) {
     DisconnectPG_DB(connection);
     res.status(200).json({ date: currentDate });
   } catch (error) {
-    console.error("Error fetching current date:", error);
     res.status(500).json({ error: "An error occurred" });
   }
 };
@@ -37,10 +37,7 @@ module.exports.getFetch_menudata = async function (req, res) {
     res.json(rows);
     await DisconnectPG_DB(client);
   } catch (error) {
-    console.error("Error querying PostgreSQL:", error.message);
-    res
-      .status(500)
-      .json({ error: "An error occurred while querying the database." });
+    res.status(500).json({ error: "An error occurred while querying the database." });
   }
 };
 
@@ -62,10 +59,7 @@ module.exports.postMenuname = async function (req, res) {
       res.json(foundDataArray);
       await DisconnectPG_DB(client);
     } catch (error) {
-      console.error("Error searching data:", error);
-      res
-        .status(500)
-        .json({ message: "An error occurred while searching data" });
+      res.status(500).json({ message: "An error occurred while searching data" });
     }
   }
 };
@@ -117,7 +111,7 @@ module.exports.Menuname = async function (req, res) {
     }));
     res.json(jsonResult);
   } catch (error) {
-    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    writeLogError(error.message);
   }
 };
 module.exports.MenuTitle = async function (req, res) {
@@ -148,7 +142,7 @@ module.exports.MenuTitle = async function (req, res) {
     }));
     res.json(jsonResult);
   } catch (error) {
-    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    writeLogError(error.message);
   }
 };
 
@@ -185,6 +179,6 @@ module.exports.MenuHome = async function (req, res) {
     }));
     res.json(jsonResult);
   } catch (error) {
-    console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+    writeLogError(error.message);
   }
 };

@@ -24,7 +24,6 @@ const ConnectPG_DB = async () => {
 
 const DisconnectPG_DB = async (client) => {
   await client.end();
-  // console.log("Disconnected from PostgreSQL");
 };
 
 const ConnectOracleDB = async (ConnType) => {
@@ -44,11 +43,6 @@ const ConnectOracleDB = async (ConnType) => {
       password: process.env.SMT_PASSWORD,
       connectString: process.env.SMT_CONNECTION_STRING,
     };
-    console.log(
-      process.env.SMT_USER,
-      process.env.SMT_PASSWORD,
-      process.env.SMT_CONNECTION_STRING
-    );
     const connection = await oracledb.getConnection(SMT);
     return connection;
   } else if (ConnType === "PCTTTEST") {
@@ -75,7 +69,6 @@ async function executeQueryPostgres(query) {
     resultresponse = result.rows[0];
     await DisconnectPG_DB(client);
   } catch (error) {
-    console.error("An error occurred:", error);
     writeLogError(error);
     await DisconnectPG_DB(client);
   }
@@ -89,7 +82,6 @@ async function insertIntoPostgres(query) {
     await DisconnectPG_DB(client);
     return result;
   } catch (error) {
-    console.error("An error occurred:", error);
     writeLogError(error);
     await DisconnectPG_DB(client);
   }
@@ -104,7 +96,6 @@ async function executeOracleQuery(query) {
     resultresponse = result.rows;
     await connection.close();
   } catch (error) {
-    console.error("An error occurred:", error);
     writeLogError(error);
     await connection.close();
   }
@@ -120,7 +111,6 @@ async function deleteFromOracle(query, params) {
     await connection.close();
     return result;
   } catch (error) {
-    console.error("An error occurred:", error);
     writeLogError(error);
     await connection.close();
   }

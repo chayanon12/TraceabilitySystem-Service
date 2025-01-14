@@ -16,12 +16,12 @@ module.exports.CallSMTBakingRecordTimeResult = async function (req, res) {
       const {dataList} = req.body;
       const client = await ConnectPG_DB();
       const json_convertdata = JSON.stringify(dataList);
-      console.log(json_convertdata)
+
       query = `CALL "Traceability".trc_006_common_CallSMTBakingRecordTimeResult('[${json_convertdata}]','')`;
     const result  = await client.query(query);
       if (result.rows.length > 0) {
         res.status(200).json(result.rows[0]);
-        console.log(result.rows[0])
+
         await DisconnectPG_DB(client);
         return;
       } else {
@@ -30,7 +30,7 @@ module.exports.CallSMTBakingRecordTimeResult = async function (req, res) {
     } catch (error) {
       query += `${json_convertdata}`;
       writeLogError(error.message, query);
-      console.log(error, "error");
+
       res.status(500).json({ message: error.message });
     }
   };
@@ -41,11 +41,11 @@ module.exports.CallSMTBakingRecordTimeResult = async function (req, res) {
     let json_convertdata = "";
     try {
       const {dataList} = req.body;
-      console.log("DeleteBakingRecordTimeData",dataList)
+
       const client = await ConnectPG_DB();
       const json_convertdata = JSON.stringify(dataList);
       query = `CALL "Traceability".trc_006_common_DeleteBakingRecordTimeData('[${json_convertdata}]','')`;
-      console.log(query)
+   
     const result  = await client.query(query);
       if (result.rows.length > 0) {
         res.status(200).json(result.rows[0]);
@@ -57,7 +57,6 @@ module.exports.CallSMTBakingRecordTimeResult = async function (req, res) {
     } catch (error) {
       query += `${json_convertdata}`;
       writeLogError(error.message, query);
-      console.log(error, "error");
       res.status(500).json({ message: error.message });
     }
   };

@@ -9,8 +9,7 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
 module.exports.getProductShtInspect = async function (req, res) {
     let query = "";
     try {
-        const p_data = JSON.stringify(req.body);
-        // console.log('ProductShtIn:', p_data);
+
         query = ` SELECT * FROM "Traceability".trc_003_scansheetinspect_getproductshtinspect('${p_data}'); `;
 
         const client = await ConnectPG_DB();
@@ -27,7 +26,7 @@ module.exports.SetLotSheetIns = async function (req, res) {
     let query = "";
     try {
         const p_data = JSON.stringify(req.body);
-        // console.log('SetLotSheetIns:', p_data);
+
         query = ` CALL "Traceability".trc_003_scansheetinspect_setlotsheetins('${p_data}', ''); `;
 
         const client = await ConnectPG_DB();

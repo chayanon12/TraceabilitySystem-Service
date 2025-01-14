@@ -14,7 +14,7 @@ const {
     try {
       const client = await ConnectPG_DB();
       const { Plant_Code,strOldSerial } = req.body;
-      console.log(Plant_Code,strOldSerial)
+
       query += ` SELECT * from "Traceability".trc_027_changpartialno_getfgh_inspect_count('${Plant_Code}','${strOldSerial}')`;
       const result = await client.query(query);
     //   if (result.rows.length > 0) {

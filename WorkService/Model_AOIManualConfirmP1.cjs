@@ -9,14 +9,13 @@ const {
   
   module.exports.Update_aoiandspi_rslt = async function (req, res) {
     const { dataList } = req.body;
-    console.log("Update_aoiandspi_rslt",dataList)
+
     const json_convertdata = JSON.stringify(dataList);
     var query = "";
     try {
       const client = await ConnectPG_DB();
       query += `CALL "Traceability".trc_057_update_aoiandspi_rslt('[${json_convertdata}]','')`;
       const result = await client.query(query);
-      console.log("DATA SHOW trc_057_update_aoiandspi_rslt : ",result.rows)
         res.status(200).json(result.rows);
         DisconnectPG_DB(client);
     } catch (error) {
@@ -31,12 +30,12 @@ const {
     try {
       const { dataList } = req.body;
       const json_convertdata = JSON.stringify(dataList);
-      console.log("Search_aoiandspi_rslt",dataList);
+
       const client = await ConnectPG_DB();
       query += `SELECT * FROM "Traceability".trc_057_search_aoiandspi_rslt('[${json_convertdata}]')`;
       const result = await client.query(query);
       const filteredResult = result.rows.map(row => row.response);
-      console.log("DATA SHOW trc_057_search_aoiandspi_rslt : ",filteredResult)
+
       res.status(200).json(filteredResult);
     } catch (error) {
       writeLogError(error.message, query);

@@ -8,7 +8,7 @@ const oracledb = require("oracledb");
 const { writeLogError } = require("../Common/LogFuction.cjs");
   
   module.exports.GetProductNameByLot = async function (req, res) {
-    console.log('g-hkkkk')
+
     try {
       const { LotNo } = req.body;
       const connect = await ConnectOracleDB("FPC");
@@ -17,22 +17,22 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
       query += `FROM  FPC.FPC_LOT L `;
       query += `WHERE L.LOT =  '${LotNo}' `;
       const result = await connect.execute(query);
-      console.log(result)
+
       await DisconnectOracleDB(connect);
       res.json(result.rows);
     } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+      
       res.status(500).send("ข้อผิดพลาดในการค้นหาข้อมูล");
     }
   };
 
   module.exports.CallFPCSheetLeadTimeResult = async function (req, res) {
-    console.log('mayuuuuu')
+
     let strReturn=""
     let query =""
     try {
       const { LotNo, PROC_ID,SHT_NO,MACHINE_NO,PROGRAM,CB_NO,SUS_NO,strStatus} = req.body;
-      console.log('txtLotNo, PROC_ID ',LotNo, PROC_ID )
+
       const connection = await ConnectOracleDB("PCTTTEST");
   
       // Bind variables for the procedure call
@@ -74,16 +74,16 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
         P_CB_NO :CB_NO||'',
         P_SUS_NO:SUS_NO||'',
       };
-     console.log(data,'data1111')
+
      let insert = await InsertCallFPCSheetLeadTimeResult(data)
   
       if(data.P_ERROR!=null&&data.P_ERROR!=' '){
-        console.log(data.P_ERROR,"pppp")
+
         strReturn=data.P_ERROR
       }
 
       if(insert!=' '&&insert!=null){
-        console.log(insert,"BBBB")
+    
         strReturn=insert
         
       }
@@ -91,7 +91,7 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
   
   
     } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+
       writeLogError(error.message, query);
       res.status(500).json(error.message);
     } 
@@ -102,25 +102,25 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
     let query = "";
     let _intRowCount=0
     try {
-      console.log('เข้าาา1')
+
       const { dataList } = req.body;
       // let data={
       //   strSheetNo:SheetNo,
       //   strProcId:'1840',
       //   strPlantCode:'5'
       // }
-      console.log(dataList,'GetMOT')
+
       const json_convertdata = JSON.stringify(dataList);
       const client = await ConnectPG_DB();
       query += `SELECT * from "Traceability".trc_000_common_getmotrecordtimedata('[${json_convertdata}]')`;
-      console.log(query)
+
       const result = await client.query(query);
     
       _intRowCount=result.rows[0].row_count
       await DisconnectPG_DB(client);
       res.status(200).json(_intRowCount);
     } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+
       writeLogError(error.message, query);
       res.status(500).json({ message: error.message });
     }
@@ -130,14 +130,14 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
     let query = "";
  
     try {
-      console.log("InsertCallFPCSheetLeadTimeResult2222", data);
+
       const json_convertdata = JSON.stringify(data);
       const client = await ConnectPG_DB();
       query = `call "Traceability".trc_000_common_insertcallfpcsheetleadtimeresult('[${json_convertdata}]','');`;
      
       const result = await client.query(query);
       await DisconnectPG_DB(client);
-  console.log(result.rows,result.rows.length,'insert')
+
 
       return result.rows[0]._strerror; 
     } catch (error) {
@@ -151,16 +151,16 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
     try {
     
       const { data } = req.body;
-      console.log('เข้าาา1',data)
+
       const json_convertdata = JSON.stringify(data);
       const client = await ConnectPG_DB();
       query = `call "Traceability".trc_000_common_DeleteMOTRecordTimeData('[${json_convertdata}]','');`;
       const result = await client.query(query);
-      console.log(result.rows,'Delete')
+ 
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
     } catch (error) {
-      console.error("ข้อผิดพลาดในการค้นหาข้อมูล:", error.message);
+
       writeLogError(error.message, query);
       res.status(500).json({ message: error.message });
     }

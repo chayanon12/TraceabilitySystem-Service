@@ -14,13 +14,13 @@ const {
       const client = await ConnectPG_DB();
       const { dataList  } = req.body;
       const json_convertdata = JSON.stringify(dataList);
-      console.log(json_convertdata,"json_convertdata")
+
       query += `select * from "Traceability".trc_025_packing_confirm_sheet('[${json_convertdata}]');`;
       const result = await client.query(query);
 
   
         res.status(200).json(result.rows);
-        console.log(result.rows,"result.rows555")
+
         await DisconnectPG_DB(client);
      
     } catch (error) {
@@ -38,11 +38,11 @@ const {
       const { dataList } = req.body;
       const json_convertdata = JSON.stringify(dataList);
       const query = `CALL "Traceability".trc_025_packingconfirm_setConfirmPackingSheet('[${json_convertdata}]', '')`;
-      console.log(query,"query")
+
       const result = await client.query(query);
         res.status(200).json(result.rows);
         
-        console.log('result.rows',result.rows)
+
         await DisconnectPG_DB(client);
     
     } catch (error) {

@@ -10,8 +10,8 @@ const oracledb = require("oracledb");
 module.exports.SetConfirmConnectRollLeaf = async function (req, res) {
   const { dataList } = req.body;
   const json_convertdata = JSON.stringify(dataList);
-  console.log(dataList,"dataList")
-  console.log(json_convertdata,"json_convertdata")
+
+
   var query = "";
   try {
     const client = await ConnectPG_DB();
@@ -63,7 +63,7 @@ module.exports.CallFPCFlowConfirmConnectRollLeaf = async function (req, res) {
     }
     res.status(200).json(strReturn);
   } catch (error) {
-    console.error("Error executing procedure:", error.message);
+    writeLogError(error.message, strSQL);
     res.status(500).send("Error executing procedure");
   } 
 };

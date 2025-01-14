@@ -178,7 +178,7 @@ module.exports.getconnectshtplasmatime = async function (req, res) {
     }
     res.status(200).json(_strError);
   } catch (error) {
-    console.error("error", error);
+    writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
@@ -837,7 +837,7 @@ module.exports.SetSerialRecordTimeTrayTableTest = async function (req, res) {
   } catch (error) {
     query += `${json_convertdata}`;
     writeLogError(error.message, query);
-    console.error(error, "error");
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -875,7 +875,7 @@ module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
 
   res.status(200).json(dtSerial);
   } catch (err) {
-    console.error(err);
+
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
   }
@@ -1475,7 +1475,7 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
-    console.error(err.message);
+
     res.status(500).json({ message: err.message });
   }
 };
@@ -1707,7 +1707,7 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
-    console.error(err.message);
+
     res.status(500).json({ message: err.message });
   }
 };
@@ -2052,7 +2052,7 @@ module.exports.MaterialDataSearch = async function (req, res) {
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { Venderlot ,Invoice} = req.body;
-    console.log(Venderlot,Invoice);
+
     // query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_MaterialDataSearch( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
     query = `	SELECT DISTINCT VL.VDL_ITEM_CODE AS MAT_CODE  
 		                   , VL.VDL_DESC1 AS MAT_NAME
@@ -2169,9 +2169,9 @@ module.exports.MaterialDataSearch = async function (req, res) {
 		          ORDER BY 9
 		                  ,1 ASC
 		                  ,4 ASC`;
-    console.log(query);
+
     const result = await Conn.execute(query);
-    console.log(result.rows[0],'mamam');
+
     let data = [];
     if (result.rows.length > 0) {
       for (let dt = 0; dt < result.rows.length; dt++) {
@@ -2394,10 +2394,9 @@ module.exports.GetMeterial = async function (req, res) {
    				 AND (V.VDL_INVOICE_NO =  '${Invoice}' OR '${Invoice}' IS NULL OR '${Invoice}' = '')
 			    AND LENGTH(M.VDM_MOS_ID) = 9
 			ORDER BY LOT `
-    console.log(query,'query')
-    // console.log(Conn,'Conn')
+
     const result = await Conn.execute(query);
-    console.log( result.rows,'result.rows[0][0]')
+
     let data = [];
 
     if (result.rows.length > 0) {
@@ -2423,10 +2422,9 @@ module.exports.GetMeterial1 = async function (req, res) {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { txtLotNo } = req.body;
     query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial1( '${txtLotNo}') AS DATA1 FROM DUAL`;
-    console.log(query,'query')
-    console.log(Conn,'Conn')
+
     const result = await Conn.execute(query);
-    console.log( result.rows,'result.rows[0][0]')
+
     let data = [];
 
     if (result.rows[0][0].length > 0) {
@@ -2604,7 +2602,6 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
     res.status(200).json(dtSerial);
   } catch (err) {
     writeLogError(err.message, query);
-    console.error(err.message,'resError');
     res.status(500).json({ message: err.message });
   }
 };

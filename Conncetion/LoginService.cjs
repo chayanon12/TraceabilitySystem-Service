@@ -51,7 +51,6 @@ module.exports.login = async (req, res) => {
   } catch (err) {
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
-    console.log(err);
   }
 };
 module.exports.VerifyToken = (req, res) => {

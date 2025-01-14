@@ -32,7 +32,7 @@ module.exports.GetSearchBySerial = async function (req, res) {
   try {
     const { strSerialNo } = req.body;
     const client = await ConnectPG_DB();
-    console.log(strSerialNo, "strSerialNo", strPlantCode, "strPlantCode");
+
     query += ` select * from "Traceability".trc_008_rejcet_getSearchbySerial('${strPlantCode}','${strSerialNo}'); `; //THA9366000SJFGJ6K
 
     const result = await client.query(query);
@@ -77,7 +77,7 @@ module.exports.SetSubmitData = async function (req, res) {
     const client = await ConnectPG_DB();
     let { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-    console.log(json_convertdata, "json_convertdata");
+
     query = `CALL "Traceability".trc_008_reject_setsubmitdata('[${json_convertdata}]','');`;
     const result = await client.query(query);
     if (result.rows[0].p_error == "") {

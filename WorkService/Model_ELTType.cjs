@@ -52,7 +52,7 @@ const {
       const client = await ConnectPG_DB();
       let { dataList } = req.body;
       const json_convertdata = JSON.stringify(dataList);
-      console.log(json_convertdata)
+
       query += ` select * from "Traceability".trc_016_ELTType_GetELTTypeByProduct('${json_convertdata}') `;
   
       const result = await client.query(query);
@@ -74,7 +74,7 @@ const {
       const client = await ConnectPG_DB();
       let { dataList } = req.body;
       const json_convertdata = JSON.stringify(dataList);
-      console.log(json_convertdata,'INsert')
+
       query += ` call "Traceability".trc_016_ELTType_deletedata('[${json_convertdata}]','') `;
   
       const result = await client.query(query);

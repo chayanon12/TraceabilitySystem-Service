@@ -9,7 +9,6 @@ const {
 
   module.exports.fnSheetSPIAOITimeData = async function (req, res) {
     const { dataList } = req.body;
-    console.log("dataList:dataList", dataList)
     const json_convertdata = JSON.stringify(dataList);
     var query = "";
     try {
@@ -17,7 +16,6 @@ const {
       query += ` SELECT * FROM "Traceability".trc_045_fnsheetspiaoitimedata('[${json_convertdata}]')`;
       const result = await client.query(query);
       const filteredResult = result.rows.map(row => row.response);
-      console.log("DATA SHOW trc_045_fnsheetspiaoitimedata : ",filteredResult)
       res.status(200).json(filteredResult);
         DisconnectPG_DB(client);
     } catch (error) {

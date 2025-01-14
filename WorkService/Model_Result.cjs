@@ -215,7 +215,7 @@ module.exports.XrayResult = async function (req, res) {
 // AOI DATA 
 module.exports.getAOI_RESULT = async function (req, res) {
   var query = "";
-  console.log("OKจ้า")
+
   try {
     const { dataList } = req.body;
     // ('{"strplantcode":"5","strsheetno":"A903104669RGP4630077","strprdname":"RGOZ-517MW","panelno":21}')

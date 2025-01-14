@@ -13,7 +13,7 @@ function writeLogError(err, query) {
   }
   fs.appendFile(logFilePath, timeStampedMessage, (err) => {
     if (err) {
-      console.error("Error writing log file:", err);
+      writeLogError("Error writing log file:", err);
     }
   });
 }

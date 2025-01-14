@@ -11,7 +11,6 @@ const {
     try {
       const client = await ConnectPG_DB();
       const { Plant_Code,strSheetNo } = req.body;
-      console.log(Plant_Code,strSheetNo)
       query += ` SELECT * from "Traceability".trc_029_aoiconfirmresult_getsheetaoixrayresult('${Plant_Code}','${strSheetNo}')`;
       const result = await client.query(query);
     //   if (result.rows.length > 0) {

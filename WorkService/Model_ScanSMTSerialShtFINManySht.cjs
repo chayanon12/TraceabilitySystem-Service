@@ -31,7 +31,7 @@ module.exports.GetProductDataByLot = async function (req, res) {
     }
     DisconnectOracleDB(Conn);
   } catch (error) {
-    console.log(error);
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -44,7 +44,7 @@ module.exports.GetWeekCodebyLot = async function (req, res) {
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetWeekCodebyLot('${strLot}','${strProc}') as PRN_DATE  FROM DUAL`;
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
-      console.log(result.rows[0][0]);
+
       if (result.rows[0][0] == null) {
         res.status(200).json({ strReturn: "" });
       } else if (
@@ -188,7 +188,7 @@ module.exports.GetRollLeafScrapRBMP = async function (req, res) {
     const Conn = await ConnectOracleDB("PCTTTEST");
     const { strRollNo } = req.body;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETROLLLEAFSCRAP('${strRollNo}') AS SCRAP_FLG  FROM dual`;
-    console.log(query)
+ 
     const result = await Conn.execute(query);
     if (result.rows.length > 0) {
       res.status(200).json({ SCRAP_FLG: result.rows[0][0] });
@@ -196,7 +196,7 @@ module.exports.GetRollLeafScrapRBMP = async function (req, res) {
     }
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
+    
     res.status(500).json({ message: error.message });
   }
 };
@@ -228,7 +228,7 @@ module.exports.GetLotSerialCountData = async function (req, res) {
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
     const client = await ConnectPG_DB();
-    console.log(json_convertdata);
+  
     query += `SELECT * from "Traceability".trc_000_common_getlotserialcountdata('[${json_convertdata}]')`;
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
@@ -273,7 +273,7 @@ module.exports.SetRollLeafTrayTable = async function (req, res) {
       strPlantCode: "5",
     };
     const json_convertdata = JSON.stringify(jsondata);
-    console.log(json_convertdata);
+  
     query += `CALL "Traceability".trc_000_common_setrollleaftraytable('[${json_convertdata}]','');`;
     const result = await client.query(query);
 
@@ -313,7 +313,6 @@ module.exports.GetConnectShtMasterCheckResult = async function (req, res) {
       await DisconnectPG_DB(client);
     } catch (error) {
       writeLogError(error.message, query);
-      console.log(error);
       res.status(500).json({ message: error.message });
     }
   } else {
@@ -334,7 +333,7 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const client = await ConnectPG_DB();
     let datax = [];
     datax = Object.entries(_dtRollLeaf);
-    console.log(datax.length);
+
 
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
@@ -367,7 +366,7 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
       strSheetnoB: strSheetnoB,
       strPlantCode: "5",
     };
-    console.log(jsondata,strSheetType,'Type');
+
     if (strSheetType == "D") {
       const json_convertdata = JSON.stringify(jsondata);
       query += `SELECT * FROM "Traceability".trc_000_common_getsheetduplicateconnectshttyped('[${json_convertdata}]');`;
@@ -387,7 +386,6 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
     }
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -408,9 +406,7 @@ module.exports.GetConnectShtPlasmaTime = async function (req, res) {
     const result = await client.query(query);
     if (result.rows.length > 0) {
       data = result.rows[0];
-      console.log(data);
       if (data.lot_no !== "") {
-        console.log(parseFloat(data.plasma_time));
         if (lot_no !== data.lot_no) {
           _strError = "Sheet mix lot";
         } else if (parseFloat(data.plasma_time) > dblPlasmaTime) {
@@ -428,7 +424,6 @@ module.exports.GetConnectShtPlasmaTime = async function (req, res) {
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -473,7 +468,6 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   } catch (error) {
     query += `${json_convertdata}`;
     writeLogError(error.message, query);
-    console.log(error, "error");
     res.status(500).json({ message: error.message });
   }
 };
@@ -495,7 +489,6 @@ module.exports.SetSerialLotShtTable = async function (req, res) {
   } catch (error) {
     query += `${json_convertdata}`;
     writeLogError(error.message, query);
-    console.log(error, "error");
     res.status(500).json({ message: error.message });
   }
 };

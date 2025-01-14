@@ -554,7 +554,7 @@ module.exports.GetSerialAOMEFPCResult = async function (req, res) {
                 _strSheetNo
             );
 
-            console.log(_strSheetNo)
+
             const Conn = await ConnectOracleDB("PCTTTEST");
             query = `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAOMEFPCRST('${_strPlantCode}', '${_strSheetNo}', ${_intPcsNo},'${_strPrdName}','${_strSMPJCavityFlg}','${roll_leaf}') AS  FROM DUAL`;
             const result = await Conn.execute(query);
@@ -624,20 +624,20 @@ module.exports.GetSerialAVIBadmarkResult = async function (req, res) {
     var query = "";
     try {
         const { strSheetNo, intPCSNo, strSMPJCavityFlg } = req.body;
-        console.log(strSheetNo, intPCSNo, strSMPJCavityFlg, "เข้า")
+
         let _strShippingNo = await GetSMTConnectShtPcsShippingNO(strSheetNo);
         if (_strShippingNo === "") {
             _strShippingNo = strSheetNo;
         }
-        console.log(strSheetNo, "strSheetNo")
+
         const client = await ConnectOracleDB("PCTTTEST");
         query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetSerialAVIBadmark( ${intPCSNo},'${strSMPJCavityFlg}','${_strShippingNo}') AS DATA1 FROM DUAL`;
         const result = await client.execute(query);
-        console.log(result.rows[0][0][0], "ROW")
+
         if (result.rows.length > 0) {
 
             let data = [];
-            console.log("data", data)
+
             for (let i = 0; i < result.rows[0][0].length; i++) {
                 data.push({
                     PCS_NO: result.rows[0][0][i][0],
@@ -696,7 +696,7 @@ async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
     try {
         const client = await ConnectPG_DB();
         query = `SELECT * FROM "Traceability".GetRollLeafBySheetNo('[{"strPlantCode": "${FacA1}", "strSheetNo": "${strSheetNo}"}]')`;
-        console.log(query, "query123")
+
         // Execute the query
         const result = await client.query(query);
         await DisconnectPG_DB(client);
@@ -747,7 +747,6 @@ module.exports.getaoiresult = async function (req, res) {
 
     try {
         const p_data = JSON.stringify(req.body);
-        console.log(p_data, "p_data")
         query = `SELECT * FROM "Traceability".trc_043_aoiresult_getaoiresult('${p_data}'); `;
         const client = await ConnectPG_DB();
         const result = await client.query(query);
