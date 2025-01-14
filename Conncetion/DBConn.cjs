@@ -64,7 +64,6 @@ const ConnectOracleDB = async (ConnType) => {
 
 const DisconnectOracleDB = async (connection) => {
   await connection.close();
-  // console.log("Disconnected from Oracle");
 };
 
 async function executeQueryPostgres(query) {
