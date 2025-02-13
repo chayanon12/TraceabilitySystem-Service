@@ -18,7 +18,6 @@ const ConnectPG_DB = async () => {
   const client = new Client(Pg_FETL_A1_Service);
   await client.connect();
   await client.query("SET timezone = 'Asia/Bangkok'");
-
   return client;
 };
 

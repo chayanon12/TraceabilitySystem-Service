@@ -227,6 +227,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
     await DisconnectOracleDB(connect);
     if (result.rows[0][0] != null) {
       _strDate = result.rows[0][0];
+      
       const [day, month, year] = _strDate.split("/");
       const dtToday = new Date(Date.UTC(year, month - 1, day));
       const [startDay, startMonth, startYear] =
@@ -274,7 +275,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           if (_strWeekType === "Y") {
             const strFirst = strYear[0];
 
-            const TempStr = await ConvertBase34(
+            const TempStr = await convertBase34_test(
               year - parseInt(strFirst + "000")
             );
             txtYear = TempStr[TempStr.length - 1];
@@ -294,7 +295,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
             txtLot = LOT_NO;
             txtLot2 = LOT_NO.slice(-2);
           }
-          txtWeek = await ConvertBase34(
+          txtWeek = await convertBase34_test(
             parseInt(strYear[strYear.length - 1] + WeekCnt)
           );
           txtWeek = txtWeek.padStart(2, "0");
@@ -304,7 +305,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
         case "J":
           txtDay = await ChangeBase34(dtToday.getUTCDate());
           txtMonth = await ChangeBase34(dtToday.getUTCMonth() + 1);
-          txtWeek = await ConvertBase34(
+          txtWeek = await convertBase34_test(
             parseInt(strYear[strYear.length - 1] + WeekCnt)
           );
           txtYear = strYear;
@@ -315,7 +316,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           const intDayDiff = Math.floor(
             (dtToday - dtStartDate) / (1000 * 60 * 60 * 24)
           );
-          const strDayCode = await Convert000(ConvertBase34(intDayDiff));
+          const strDayCode = await Convert000(convertBase34_test(intDayDiff));
           txtMonth = strDayCode;
           txtWeek = strDayCode[1];
           txtYear = strDayCode[0];
@@ -335,7 +336,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
             .slice(2, 10)
             .replace(/-/g, ""); // yyMMdd
           _strReturn = await Convert0000(
-            ConvertBase34(parseInt(formattedDate))
+            convertBase34_test(parseInt(formattedDate))
           );
           break;
 
@@ -355,6 +356,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
       }
     }
+    console.log(_strReturn);
     res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -362,8 +364,12 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   }
 };
 
+// const Convert0000 = async (strText) => {
+//   return ("0000" + strText).slice(-4);
+// };
 const Convert0000 = async (strText) => {
-  return ("0000" + strText).slice(-4);
+  let paddedText = "0000" + strText;
+  return paddedText.substring(paddedText.length - 4);
 };
 
 const Convert000 = async (strText) => {
@@ -765,7 +771,7 @@ module.exports.getLotSerialRecordTimeData = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
- 
+
 module.exports.getleafduplicateconnectroll = async function (req, res) {
   var query = "";
   intCount = 0;
@@ -804,7 +810,7 @@ module.exports.SetSerialRecordTimeTrayTable = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-   
+
     json_convertdata = JSON.stringify(dataList);
     query = `call "Traceability".trc_000_common_setserialrecordtimetraytable($1::jsonb,'');`;
     const result = await client.query(query, [json_convertdata]);
@@ -851,36 +857,30 @@ module.exports.getSerialRecordTimeTrayTable = async function (req, res) {
     const allResults = [];
     for (let i = 0; i < dtSerial.length; i++) {
       dtSerial[i].strPlantCode = strPlantCode;
-  
 
       const json_convertdata = JSON.stringify(dtSerial[i]);
-  
+
       query = `SELECT * FROM "Traceability".trc_000_common_getserialrecordtimetraytable('${json_convertdata}');`;
 
-  
       const result = await client.query(query);
 
-  
       allResults.push(...result.rows);
     }
-   
+
     for (let i = 0; i < allResults.length; i++) {
-      if(allResults[i].row_count>0){
-        dtSerial[i].UPDATE_FLG = 'Y';
-      }
-      else{
-        dtSerial[i].UPDATE_FLG = 'N';
+      if (allResults[i].row_count > 0) {
+        dtSerial[i].UPDATE_FLG = "Y";
+      } else {
+        dtSerial[i].UPDATE_FLG = "N";
       }
     }
 
-  res.status(200).json(dtSerial);
+    res.status(200).json(dtSerial);
   } catch (err) {
-
     writeLogError(err.message, query);
     res.status(500).json({ message: err.message });
   }
 };
-
 
 module.exports.SetSerialLotShtELTTable = async function (req, res) {
   var query = "";
@@ -893,7 +893,7 @@ module.exports.SetSerialLotShtELTTable = async function (req, res) {
 
     const result = await client.query(query);
     if (result.rows != "") {
-      res.status(200).json({p_error:result.rows[0].p_error});
+      res.status(200).json({ p_error: result.rows[0].p_error });
       await DisconnectPG_DB(client);
     }
   } catch (error) {
@@ -940,11 +940,11 @@ module.exports.get_spi_aoi_result = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-   
+
     const json_convertdata = JSON.stringify(dataList);
 
     query += `CALL "Traceability".trc_006_common_get_spi_aoi_result('[${json_convertdata}]','','')`;
-   
+
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
@@ -1173,18 +1173,40 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
   if (_strAOIFlg == "Y") {
     var dtDataAOI;
     var strAOIResult = "";
-    dtDataAOI = await GetSerialAOIEFPCResult(_strPlantCode,_strFrontSheetNo,_intPcsNo,_strProduct,"N");
+    dtDataAOI = await GetSerialAOIEFPCResult(
+      _strPlantCode,
+      _strFrontSheetNo,
+      _intPcsNo,
+      _strProduct,
+      "N"
+    );
     if (dtDataAOI.length > 0) {
-      strAOIResult = dtDataAOI[0][3]; 
-      if (strAOIResult != "" &&strAOIResult != "OK" &&strAOIResult != "PASS" &&strAOIResult != "GOOD") {
+      strAOIResult = dtDataAOI[0][3];
+      if (
+        strAOIResult != "" &&
+        strAOIResult != "OK" &&
+        strAOIResult != "PASS" &&
+        strAOIResult != "GOOD"
+      ) {
         result_ = "NG";
         _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
       }
-    } else {      
-      dtDataAOI = await GetSerialAOIEFPCResult(_strPlantCode,_strBackSheetNo,_intPcsNo,_strProduct,"N");
+    } else {
+      dtDataAOI = await GetSerialAOIEFPCResult(
+        _strPlantCode,
+        _strBackSheetNo,
+        _intPcsNo,
+        _strProduct,
+        "N"
+      );
       if (dtDataAOI.length > 0) {
-        strAOIResult = dtDataAOI[0]["AOI_RESULT"]; 
-        if (strAOIResult != "" &&strAOIResult != "OK" &&strAOIResult != "PASS" &&strAOIResult != "GOOD") {
+        strAOIResult = dtDataAOI[0]["AOI_RESULT"];
+        if (
+          strAOIResult != "" &&
+          strAOIResult != "OK" &&
+          strAOIResult != "PASS" &&
+          strAOIResult != "GOOD"
+        ) {
           result_ = "NG";
           _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
         }
@@ -1194,18 +1216,32 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
   if (_strOSTFlg == "Y") {
     var dtOSTData;
     var strOSTResult = "";
-    dtOSTData = await GetSerialOSTResult(_strFrontSheetNo,parseInt(_intPcsNo),"N");
+    dtOSTData = await GetSerialOSTResult(
+      _strFrontSheetNo,
+      parseInt(_intPcsNo),
+      "N"
+    );
     if (dtOSTData.length > 0) {
       strOSTResult = dtOSTData[0][2];
-      if (strOSTResult != "" &&strOSTResult != "OK" &&strOSTResult != "PASS" &&strOSTResult != "GOOD") {
+      if (
+        strOSTResult != "" &&
+        strOSTResult != "OK" &&
+        strOSTResult != "PASS" &&
+        strOSTResult != "GOOD"
+      ) {
         result_ = "NG";
         _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
       }
     } else {
-      dtOSTData = await GetSerialOSTResult(_strBackSheetNo,_intPcsNo,"N");
+      dtOSTData = await GetSerialOSTResult(_strBackSheetNo, _intPcsNo, "N");
       if (dtOSTData.length > 0) {
         strOSTResult = dtOSTData[0][2];
-        if (strOSTResult != "" &&strOSTResult != "OK" &&strOSTResult != "PASS" &&strOSTResult != "GOOD") {
+        if (
+          strOSTResult != "" &&
+          strOSTResult != "OK" &&
+          strOSTResult != "PASS" &&
+          strOSTResult != "GOOD"
+        ) {
           result_ = "NG";
           _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
         }
@@ -1218,7 +1254,12 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
     dtAVIData = await GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N");
     if (dtAVIData.length > 0) {
       strAVIResult = dtAVIData[0][0];
-      if (strAVIResult != "" &&strAVIResult != "OK" &&strAVIResult != "PASS" &&strAVIResult != "GOOD") {
+      if (
+        strAVIResult != "" &&
+        strAVIResult != "OK" &&
+        strAVIResult != "PASS" &&
+        strAVIResult != "GOOD"
+      ) {
         result_ = "NG";
         _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
       }
@@ -1226,16 +1267,21 @@ module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
       dtAVIData = await GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N");
       if (dtAVIData.length > 0) {
         strAVIResult = dtAVIData[0][2];
-        if (strAVIResult != "" &&strAVIResult != "OK" &&strAVIResult != "PASS" &&strAVIResult != "GOOD") {
+        if (
+          strAVIResult != "" &&
+          strAVIResult != "OK" &&
+          strAVIResult != "PASS" &&
+          strAVIResult != "GOOD"
+        ) {
           result_ = "NG";
           _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
         }
       }
     }
   }
-  res.status(200).json({remark:_strRemark,result:result_});
+  res.status(200).json({ remark: _strRemark, result: result_ });
 };
- 
+
 async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
   let query = "";
   try {
@@ -1250,7 +1296,13 @@ async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
   }
 }
 
-async function GetSerialAOIEFPCResult(_strPlantCode,_strFrontSheetNo,_intPcsNo,_strProduct,_strSMPJCavityFlg) {
+async function GetSerialAOIEFPCResult(
+  _strPlantCode,
+  _strFrontSheetNo,
+  _intPcsNo,
+  _strProduct,
+  _strSMPJCavityFlg
+) {
   let query = "";
   try {
     let roll_leaf = await GetRollLeafBySheetNo(_strPlantCode, _strFrontSheetNo);
@@ -1296,7 +1348,7 @@ async function GetRollLeafBySheetNo(strPlantCode, strSheetNo) {
     // Execute the query
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    if(result.rowCount > 0){
+    if (result.rowCount > 0) {
       roll_leaf = result.rows[0].roll_leaf;
     }
     return roll_leaf;
@@ -1333,10 +1385,12 @@ module.exports.Getsheetnobyserialno = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query, [datalist]);
     await DisconnectPG_DB(client);
-    if(result.rows[0]!=undefined){
+    if (result.rows[0] != undefined) {
       res.status(200).json(result.rows[0]);
     } else {
-      res.status(200).json({ _strsheet: "" ,sheet_no_back: "",pcs_no: "",lot_no: ""});
+      res
+        .status(200)
+        .json({ _strsheet: "", sheet_no_back: "", pcs_no: "", lot_no: "" });
     }
   } catch (err) {
     writeLogError(err.message, query);
@@ -1424,27 +1478,29 @@ module.exports.GetSerialBoxProductByProduct = async function (req, res) {
 
 module.exports.GetSerialTestResultManyTable = async function (req, res) {
   let data = [{}];
-  let query=''
+  let query = "";
   try {
     let { dataList, dtSerial } = req.body;
     const queries = [];
     for (let i = 0; i < dtSerial.length; i++) {
-      let strSerial = dtSerial[i].SERIAL || ''; 
-      if (dataList[0] && strSerial !== '') {
+      let strSerial = dtSerial[i].SERIAL || "";
+      if (dataList[0] && strSerial !== "") {
         dataList[0].strSerial = strSerial;
       } else if (dataList[0] && strSerial === "") {
         dataList[0].strSerial = "";
       }
       const json_convertdata = JSON.stringify(dataList);
 
-       query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
+      query = `CALL "Traceability".trc_000_common_getserialtestresultmanytable2('${json_convertdata}','','{}')`;
 
       queries.push(query);
     }
     const client = await ConnectPG_DB();
-    const result = await Promise.all(queries.map(query => client.query(query))); 
+    const result = await Promise.all(
+      queries.map((query) => client.query(query))
+    );
     await DisconnectPG_DB(client);
-   
+
     result.forEach((res, index) => {
       const response = res.rows[0].response;
 
@@ -1458,8 +1514,9 @@ module.exports.GetSerialTestResultManyTable = async function (req, res) {
         if (response.REJECT) updatedSerial.REJECT = response.REJECT;
         if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
         if (response.REJECT2) updatedSerial.REJECT2 = response.REJECT2;
-        if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
-       if (response.REMARK) updatedSerial.REMARK = response.REMARK;
+        if (response.REJECT_CODE)
+          updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REMARK) updatedSerial.REMARK = response.REMARK;
         if (response.UPDATE_FLG) updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
         if (response.FRONT_SHEET_NO)
           updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
@@ -1485,7 +1542,7 @@ module.exports.SetSerialLotTrayTableGood2 = async function (req, res) {
 
   try {
     const client = await ConnectPG_DB();
-    const { dataList,data } = req.body;
+    const { dataList, data } = req.body;
     const json_convertdata = JSON.stringify(dataList);
 
     const query = `CALL "Traceability".trc_022_packing_gate_onlygood_setseriallottraytablegood2('[${json_convertdata}]', '')`;
@@ -1506,7 +1563,7 @@ module.exports.SetSerialLotTrayTableGood = async function (req, res) {
   try {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
-    
+
     const json_convertdata = JSON.stringify(dataList);
 
     const query = `CALL "Traceability".trc_022_packing_gate_onlygood_setseriallottraytablegood($1, '')`;
@@ -1652,7 +1709,10 @@ const ConvertBase34to10 = (strText) => {
   return parseInt(result);
 };
 
-module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res) {
+module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (
+  req,
+  res
+) {
   var query = "";
   try {
     let { dataList, dtSerial } = req.body;
@@ -1687,20 +1747,26 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res
 
       if (response) {
         const updatedSerial = dtSerial[index];
-        if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
-        if (response.TYPE_TEST_RESULT)updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
-        if (response.PLASMA_TIME) updatedSerial.PLASMA_TIME = response.PLASMA_TIME;
+        if (response.TEST_RESULT)
+          updatedSerial.TEST_RESULT = response.TEST_RESULT;
+        if (response.TYPE_TEST_RESULT)
+          updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+        if (response.PLASMA_TIME)
+          updatedSerial.PLASMA_TIME = response.PLASMA_TIME;
         if (response.REJECT) updatedSerial.REJECT = response.REJECT;
         if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
-        if (response.REJECT2)updatedSerial.REJECT2 = response.REJECT2;
-        if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REJECT2) updatedSerial.REJECT2 = response.REJECT2;
+        if (response.REJECT_CODE)
+          updatedSerial.REJECT_CODE = response.REJECT_CODE;
         if (response.REMARK) updatedSerial.REMARK = response.REMARK;
-        if (response.UPDATE_FLG)updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
+        if (response.UPDATE_FLG) updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
         if (response.ROW_COUNT) updatedSerial.ROW_COUNT = response.ROW_COUNT;
-        if (response.FRONT_SHEET_NO)updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
-        if (response.BACK_SHEET_NO)updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
-        if (response.SHEET_PCS_NO)updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
-       
+        if (response.FRONT_SHEET_NO)
+          updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+        if (response.BACK_SHEET_NO)
+          updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+        if (response.SHEET_PCS_NO)
+          updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
       }
     });
 
@@ -1711,8 +1777,6 @@ module.exports.GetSerialBoxTestResultManyTableOnlyGood = async function (req,res
     res.status(500).json({ message: err.message });
   }
 };
-
-
 
 module.exports.SetBoxPackingSerialTray = async function (req, res) {
   let Conn;
@@ -1755,7 +1819,7 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
 
       _strErrorAll = result.outBinds.P_ERROR;
     }
-    res.status(200).json({p_error:_strErrorAll});
+    res.status(200).json({ p_error: _strErrorAll });
   } catch (error) {
     writeLogError(error.message, "");
     res
@@ -1771,12 +1835,12 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
 };
 module.exports.SetSerialLotShtTable = async function (req, res) {
   var query = "";
-
+  console.log(req.body);
   try {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(req.body);
     query += `call "Traceability".trc_000_common_setseriallotshttable('[${json_convertdata}]','')`;
-
+    console.log(query);
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
@@ -1818,21 +1882,55 @@ module.exports.GetSheetDuplicateConnectSht = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+async function convertBase34_test(lngNumber2) {
+  let shou;
+  let amari = [];
+  let i = 0;
+  let strTemp = "";
+  let lngNumber = lngNumber2;
+
+  do {
+    amari[i] = lngNumber % 34;
+    shou = Math.trunc(lngNumber / 34);
+    if (shou === 0) {
+      break;
+    }
+    i++;
+    if (shou < 34) {
+      amari[i] = shou;
+      break;
+    }
+    lngNumber = shou;
+  } while (true);
+
+  for (let j = i; j >= 0; j--) {
+    strTemp += changeBase34_test(amari[j]);
+  }
+
+  return strTemp;
+}
+function changeBase34_test(value) {
+  const base34Chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // ไม่มี I และ O
+  return base34Chars[value] || "";
+}
 module.exports.GetShippingSerialNo = async function (req, res) {
   try {
     const { strLotNo, dtSerial, strWeekType } = req.body;
+    console.log(req.body);
     let _strReturn = "";
     let _intSeq = 1;
     let _strShetSeq = "";
 
-    const _strLotBase34_1 = ConvertBase34(parseInt(strLotNo.substring(0, 1)) +
+    const _strLotBase34_1 = await ConvertBase34(
+      parseInt(strLotNo.substring(0, 1)) +
         parseInt(strLotNo.substring(1, 2)) +
         parseInt(strLotNo.substring(2, 3))
     );
-    const _strLotBase34_4 = Convert0000(
-      ConvertBase34(parseInt(strLotNo.substring(3, 9)))
+    const _strLotBase34_4 = await Convert0000(
+      convertBase34_test(parseInt(strLotNo.substring(3, 9)))
     );
-
+    console.log(_strLotBase34_1, "_strLotBase34_1");
+    console.log(_strLotBase34_4, "_strLotBase34_4");
     dtSerial.forEach((drRow) => {
       let _strResult = "OK";
       let _strRemark = "";
@@ -1865,7 +1963,6 @@ module.exports.GetShippingSerialNo = async function (req, res) {
 
       _intSeq += 1;
     });
-
     res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message);
@@ -1936,12 +2033,12 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const { dataList, _dtRollLeaf } = req.body;
     const json_data = JSON.stringify(dataList);
     const client = await ConnectPG_DB();
-
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
 
-    datax = Object.entries(_dtRollLeaf);
     if (result.rows.length > 0 && datax.length > 0) {
+      datax = Object.entries(_dtRollLeaf);
+
       if (result.rows.length > 0 != _dtRollLeaf.length) {
         intCount = 1;
       } else {
@@ -1951,8 +2048,12 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
           }
         }
       }
+    } else {
+      intCount = 0;
     }
+
     res.status(200).json({ intCount: intCount });
+
     await DisconnectPG_DB(client);
   } catch (error) {
     writeLogError(error.message, query);
@@ -2046,12 +2147,11 @@ module.exports.fnGetMaterialData = async function (req, res) {
   }
 };
 
-
 module.exports.MaterialDataSearch = async function (req, res) {
   var query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    const { Venderlot ,Invoice} = req.body;
+    const { Venderlot, Invoice } = req.body;
 
     // query += ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_MaterialDataSearch( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
     query = `	SELECT DISTINCT VL.VDL_ITEM_CODE AS MAT_CODE  
@@ -2367,7 +2467,7 @@ module.exports.GetMeterial = async function (req, res) {
   var query = "";
   try {
     const Conn = await ConnectOracleDB("PCTTTEST");
-    const { Venderlot,Invoice } = req.body;
+    const { Venderlot, Invoice } = req.body;
     // query = ` SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetMeterial( '${Venderlot}','${Invoice}') AS DATA1 FROM DUAL`;
     query = `	SELECT DISTINCT
 			    L.VDL_VENDER_LOT AS VENDER_LOT,
@@ -2393,7 +2493,7 @@ module.exports.GetMeterial = async function (req, res) {
 				(V.VDL_VENDER_LOT =  '${Venderlot}' OR  '${Venderlot}' IS NULL OR  '${Venderlot}' = '')
    				 AND (V.VDL_INVOICE_NO =  '${Invoice}' OR '${Invoice}' IS NULL OR '${Invoice}' = '')
 			    AND LENGTH(M.VDM_MOS_ID) = 9
-			ORDER BY LOT `
+			ORDER BY LOT `;
 
     const result = await Conn.execute(query);
 
@@ -2406,7 +2506,6 @@ module.exports.GetMeterial = async function (req, res) {
           LOT: result.rows[dt][1],
         });
       }
-     
     }
     res.status(200).json(data);
     DisconnectOracleDB(Conn);
@@ -2436,7 +2535,7 @@ module.exports.GetMeterial1 = async function (req, res) {
       }
       res.status(200).json(data);
     }
-    
+
     DisconnectOracleDB(Conn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -2479,7 +2578,6 @@ module.exports.GetCavitySerialBarcodeGrade = async function (req, res) {
 module.exports.GetSerialBoxTestResultManyTable222 = async function (req, res) {
   var query = "";
   try {
-    
     let { dataList, dtSerial } = req.body;
 
     if (!dataList || !dtSerial || dtSerial.length === 0) {
@@ -2498,9 +2596,8 @@ module.exports.GetSerialBoxTestResultManyTable222 = async function (req, res) {
       const json_convertdata = JSON.stringify(dataList);
       const query = `CALL "Traceability".trc_000_common_getserialboxtestresultmanytable('${json_convertdata}','','{}')`;
       queries.push(query);
-    
     }
-     
+
     const client = await ConnectPG_DB();
     const result = await Promise.all(
       queries.map((query) => client.query(query))
@@ -2513,34 +2610,38 @@ module.exports.GetSerialBoxTestResultManyTable222 = async function (req, res) {
       if (response) {
         const updatedSerial = dtSerial[index];
         if (response.SERIAL) updatedSerial.SERIAL = response.SERIAL;
-        if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
-        if (response.TYPE_TEST_RESULT)  updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+        if (response.TEST_RESULT)
+          updatedSerial.TEST_RESULT = response.TEST_RESULT;
+        if (response.TYPE_TEST_RESULT)
+          updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
         if (response.REJECT) updatedSerial.REJECT = response.REJECT;
         if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
         if (response.REJECT2) updatedSerial.REJECT2 = response.REJECT2;
-        if (response.REJECT_CODE)  updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REJECT_CODE)
+          updatedSerial.REJECT_CODE = response.REJECT_CODE;
         if (response.REMARK) updatedSerial.REMARK = response.REMARK;
         if (response.UPDATE_FLG) updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
-        if (response.FRONT_SHEET_NO)  updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
-        if (response.BACK_SHEET_NO) updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
-        if (response.SHEET_PCS_NO) updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
-        if (response.ROLL_LEAF_NO)  updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
+        if (response.FRONT_SHEET_NO)
+          updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+        if (response.BACK_SHEET_NO)
+          updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+        if (response.SHEET_PCS_NO)
+          updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+        if (response.ROLL_LEAF_NO)
+          updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
     res.status(200).json(dtSerial);
-
-    
   } catch (error) {
     writeLogError(error.message, query);
     res.status(500).json({ message: error.message });
   }
 };
 
-
 module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
   let data = [{}];
   let queries = [];
-  let query =''
+  let query = "";
   try {
     let { dataList, dtSerial } = req.body;
 
@@ -2548,7 +2649,6 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
       return res.status(400).json({ message: "Missing necessary data." });
     }
 
-    
     for (let i = 0; i < dtSerial.length; i++) {
       let strSerial = dtSerial[i].SERIAL || "";
 
@@ -2574,29 +2674,28 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
 
       if (response) {
         const updatedSerial = dtSerial[index];
-        if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
+        if (response.TEST_RESULT)
+          updatedSerial.TEST_RESULT = response.TEST_RESULT;
         if (response.TEST_RESULT)
           updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
         if (response.TYPE_TEST_RESULT)
           updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
-        if (response.PLASMA_TIME) updatedSerial.PLASMA_TIME = response.PLASMA_TIME;
+        if (response.PLASMA_TIME)
+          updatedSerial.PLASMA_TIME = response.PLASMA_TIME;
         if (response.REJECT) updatedSerial.REJECT = response.REJECT;
         if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
-        if (response.REJECT2)
-          updatedSerial.REJECT2 = response.REJECT2;
-        if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REJECT2) updatedSerial.REJECT2 = response.REJECT2;
+        if (response.REJECT_CODE)
+          updatedSerial.REJECT_CODE = response.REJECT_CODE;
         if (response.REMARK) updatedSerial.REMARK = response.REMARK;
-        if (response.UPDATE_FLG)
-          updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
-        if (response.ROW_COUNT)
-          updatedSerial.ROW_COUNT = response.ROW_COUNT;
+        if (response.UPDATE_FLG) updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
+        if (response.ROW_COUNT) updatedSerial.ROW_COUNT = response.ROW_COUNT;
         if (response.FRONT_SHEET_NO)
           updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
         if (response.BACK_SHEET_NO)
           updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
         if (response.SHEET_PCS_NO)
           updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
-       
       }
     });
     res.status(200).json(dtSerial);
@@ -2606,7 +2705,7 @@ module.exports.GetSerialBoxTestResultManyTable = async function (req, res) {
   }
 };
 
-module.exports.GetSerialTestResultManyOnlyGood = async function (req,res) {
+module.exports.GetSerialTestResultManyOnlyGood = async function (req, res) {
   var query = "";
   try {
     let { dataList, dtSerial } = req.body;
@@ -2647,18 +2746,25 @@ module.exports.GetSerialTestResultManyOnlyGood = async function (req,res) {
       const response = res.rows[0].response;
       if (response) {
         const updatedSerial = dtSerial[index];
-        if (response.TEST_RESULT) updatedSerial.TEST_RESULT = response.TEST_RESULT;
-        if (response.TYPE_TEST_RESULT)updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
+        if (response.TEST_RESULT)
+          updatedSerial.TEST_RESULT = response.TEST_RESULT;
+        if (response.TYPE_TEST_RESULT)
+          updatedSerial.TYPE_TEST_RESULT = response.TYPE_TEST_RESULT;
         if (response.REJECT) updatedSerial.REJECT = response.REJECT;
         if (response.TOUCH_UP) updatedSerial.TOUCH_UP = response.TOUCH_UP;
-        if (response.REJECT2)updatedSerial.REJECT2 = response.REJECT2;
-        if (response.REJECT_CODE) updatedSerial.REJECT_CODE = response.REJECT_CODE;
+        if (response.REJECT2) updatedSerial.REJECT2 = response.REJECT2;
+        if (response.REJECT_CODE)
+          updatedSerial.REJECT_CODE = response.REJECT_CODE;
         if (response.REMARK) updatedSerial.REMARK = response.REMARK;
-        if (response.UPDATE_FLG)updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
-        if (response.FRONT_SHEET_NO)updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
-        if (response.BACK_SHEET_NO)updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
-        if (response.SHEET_PCS_NO)updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
-        if (response.ROLL_LEAF_NO)updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
+        if (response.UPDATE_FLG) updatedSerial.UPDATE_FLG = response.UPDATE_FLG;
+        if (response.FRONT_SHEET_NO)
+          updatedSerial.FRONT_SHEET_NO = response.FRONT_SHEET_NO;
+        if (response.BACK_SHEET_NO)
+          updatedSerial.BACK_SHEET_NO = response.BACK_SHEET_NO;
+        if (response.SHEET_PCS_NO)
+          updatedSerial.SHEET_PCS_NO = response.SHEET_PCS_NO;
+        if (response.ROLL_LEAF_NO)
+          updatedSerial.ROLL_LEAF_NO = response.ROLL_LEAF_NO;
       }
     });
 
@@ -2668,7 +2774,6 @@ module.exports.GetSerialTestResultManyOnlyGood = async function (req,res) {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 module.exports.GetDataConfig = async function (req, res) {
   var query = "";

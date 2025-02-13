@@ -12,8 +12,9 @@ const { writeLogError } = require("../Common/LogFuction.cjs");
 module.exports.GetProductDataByLot = async function (req, res) {
   let query = "";
   try {
-    const Conn = await ConnectOracleDB("PCTTTEST");
+    const Conn = await ConnectOracleDB("FPC");
     const { strLot } = req.body;
+    console.log(strLot);
     var FINAL_GATE_LOT_PRIORITY_SKIP = process.env.FINAL_GATE_LOT_PRIORITY_SKIP;
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GetProductDataByLot('${strLot}','${FINAL_GATE_LOT_PRIORITY_SKIP}') AS x FROM dual`;
     const result = await Conn.execute(query);
