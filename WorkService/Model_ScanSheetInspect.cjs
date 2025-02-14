@@ -10,6 +10,7 @@ module.exports.getProductShtInspect = async function (req, res) {
     let query = "";
     try {
 
+        const p_data = JSON.stringify(req.body);
         query = ` SELECT * FROM "Traceability".trc_003_scansheetinspect_getproductshtinspect('${p_data}'); `;
 
         const client = await ConnectPG_DB();
