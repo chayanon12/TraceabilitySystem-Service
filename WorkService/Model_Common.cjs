@@ -222,23 +222,18 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const { _strLot, _strProc, _strWeekType, _strSerialInfo } = req.body;
+    console.log(req.body);
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
     if (result.rows[0][0] != null) {
       _strDate = result.rows[0][0];
-      
       const [day, month, year] = _strDate.split("/");
       const dtToday = new Date(Date.UTC(year, month - 1, day));
-      const [startDay, startMonth, startYear] =
-        SERIAL_DATE_START_WEEK_CODE.split("/");
-      const dtStartDate = new Date(
-        Date.UTC(startYear, startMonth - 1, startDay)
-      );
+      const [startDay, startMonth, startYear] =SERIAL_DATE_START_WEEK_CODE.split("/");
+      const dtStartDate = new Date(Date.UTC(startYear, startMonth - 1, startDay));
       const dtNextSaturday = new Date(dtToday);
-      dtNextSaturday.setUTCDate(
-        dtToday.getUTCDate() + (6 - dtToday.getUTCDay())
-      );
+      dtNextSaturday.setUTCDate(dtToday.getUTCDate() + (6 - dtToday.getUTCDay()));
       const weekNumber = (date) => {
         const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
         const dayOfYear = (date - start) / 86400000 + 1;
@@ -274,7 +269,6 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           txtWeek = WeekCnt;
           if (_strWeekType === "Y") {
             const strFirst = strYear[0];
-
             const TempStr = await convertBase34_test(
               year - parseInt(strFirst + "000")
             );
@@ -305,9 +299,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
         case "J":
           txtDay = await ChangeBase34(dtToday.getUTCDate());
           txtMonth = await ChangeBase34(dtToday.getUTCMonth() + 1);
-          txtWeek = await convertBase34_test(
-            parseInt(strYear[strYear.length - 1] + WeekCnt)
-          );
+          txtWeek = await convertBase34_test(parseInt(strYear[strYear.length - 1] + WeekCnt));
           txtYear = strYear;
           _strReturn = `${txtMonth}${txtDay}`;
           break;
@@ -331,13 +323,10 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
 
         case "S":
-          const formattedDate = dtToday
-            .toISOString()
-            .slice(2, 10)
-            .replace(/-/g, ""); // yyMMdd
-          _strReturn = await Convert0000(
-            convertBase34_test(parseInt(formattedDate))
-          );
+          const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ""); 
+
+          _strReturn = await Convert0000(await convertBase34_test(parseInt(formattedDate)));
+          console.log(_strReturn,'_strReturn');
           break;
 
         case "D":
@@ -1654,7 +1643,7 @@ module.exports.GetCheckSumSerial = async function (req, res) {
         SixNumber = FivNumber * 34;
         SevNumber = SixNumber - FouNumber;
 
-        if ((await ConvertBase34(SevNumber)) !== strSerialCheckSum) {
+        if ((await convertBase34_test(SevNumber)) !== strSerialCheckSum) {
           boolResult = false;
         }
       } else {
@@ -1910,24 +1899,20 @@ async function convertBase34_test(lngNumber2) {
   return strTemp;
 }
 function changeBase34_test(value) {
-  const base34Chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // ไม่มี I และ O
+  const base34Chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; 
   return base34Chars[value] || "";
 }
 module.exports.GetShippingSerialNo = async function (req, res) {
   try {
     const { strLotNo, dtSerial, strWeekType } = req.body;
-    console.log(req.body);
+    console.log(strWeekType);
     let _strReturn = "";
     let _intSeq = 1;
     let _strShetSeq = "";
 
-    const _strLotBase34_1 = await ConvertBase34(
-      parseInt(strLotNo.substring(0, 1)) +
-        parseInt(strLotNo.substring(1, 2)) +
-        parseInt(strLotNo.substring(2, 3))
-    );
+    const _strLotBase34_1 = await convertBase34_test(parseInt(strLotNo.substring(0, 1)) +parseInt(strLotNo.substring(1, 2)) +parseInt(strLotNo.substring(2, 3)));
     const _strLotBase34_4 = await Convert0000(
-      convertBase34_test(parseInt(strLotNo.substring(3, 9)))
+      await convertBase34_test(parseInt(strLotNo.substring(3, 9)))
     );
     console.log(_strLotBase34_1, "_strLotBase34_1");
     console.log(_strLotBase34_4, "_strLotBase34_4");
