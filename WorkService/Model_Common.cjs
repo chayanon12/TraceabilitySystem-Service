@@ -222,7 +222,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const { _strLot, _strProc, _strWeekType, _strSerialInfo } = req.body;
-    console.log(req.body);
+    
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -326,7 +326,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ""); 
 
           _strReturn = await Convert0000(await convertBase34_test(parseInt(formattedDate)));
-          console.log(_strReturn,'_strReturn');
+          
           break;
 
         case "D":
@@ -345,7 +345,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
       }
     }
-    console.log(_strReturn);
+    
     res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -1825,12 +1825,10 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
 };
 module.exports.SetSerialLotShtTable = async function (req, res) {
   var query = "";
-  console.log(req.body);
   try {
     const client = await ConnectPG_DB();
     const json_convertdata = JSON.stringify(req.body);
     query += `call "Traceability".trc_000_common_setseriallotshttable('[${json_convertdata}]','')`;
-    console.log(query);
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
     await DisconnectPG_DB(client);
@@ -1906,7 +1904,6 @@ function changeBase34_test(value) {
 module.exports.GetShippingSerialNo = async function (req, res) {
   try {
     const { strLotNo, dtSerial, strWeekType } = req.body;
-    console.log(strWeekType);
     let _strReturn = "";
     let _intSeq = 1;
     let _strShetSeq = "";
@@ -1915,8 +1912,6 @@ module.exports.GetShippingSerialNo = async function (req, res) {
     const _strLotBase34_4 = await Convert0000(
       await convertBase34_test(parseInt(strLotNo.substring(3, 9)))
     );
-    console.log(_strLotBase34_1, "_strLotBase34_1");
-    console.log(_strLotBase34_4, "_strLotBase34_4");
     dtSerial.forEach((drRow) => {
       let _strResult = "OK";
       let _strRemark = "";
@@ -2022,26 +2017,20 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
     datax = Object.entries(_dtRollLeaf);
-    console.log(_dtRollLeaf,result.rows,datax,"มาแล้วจ้าน้องเมย์ขี้บ่น0");
     if (result.rows.length > 0 && _dtRollLeaf.length > 0) {
-      console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น1");
 
       if (result.rows.length  != _dtRollLeaf.length) {
         intCount = 1;
-        console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น2");
       } else {
-        console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น5");
         for (let i = 0; i < result.rows.length; i++) {
           
           if (result.rows[i].sheet_no != _dtRollLeaf[i].SHT_NO) {
             intCount = 1;
-            console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น3");
           }
         }
       }
     } else {
       intCount = 0;
-      console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น4");
     }
 
     res.status(200).json({ intCount: intCount });
