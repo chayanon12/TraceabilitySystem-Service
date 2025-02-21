@@ -774,6 +774,7 @@ module.exports.getleafduplicateconnectroll = async function (req, res) {
     query = `select * from "Traceability".trc_000_common_getleafduplicateconnectroll('[${json_convertdata}]');`;
     const result = await client.query(query);
     if (result.rows.length > 0) {
+      strLeafDup = result.rows[0].sheet_no;
       if (
         dataList._strRollLeaf == result.rows[0].roll_leaf &&
         dataList._strRollNo == result.rows[0].roll_no &&
@@ -785,8 +786,8 @@ module.exports.getleafduplicateconnectroll = async function (req, res) {
         intCount = 1;
       }
     }
-    _strLeafDup = "";
-    res.status(200).json(intCount);
+    
+    res.status(200).json({ intCount: intCount, strLeafDup : strLeafDup });
     await DisconnectPG_DB(client);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -2020,21 +2021,27 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const client = await ConnectPG_DB();
     query += `SELECT * FROM "Traceability".trc_000_common_getrollleafduplicate('[${json_data}]')`;
     const result = await client.query(query);
+    datax = Object.entries(_dtRollLeaf);
+    console.log(_dtRollLeaf,result.rows,datax,"มาแล้วจ้าน้องเมย์ขี้บ่น0");
+    if (result.rows.length > 0 && _dtRollLeaf.length > 0) {
+      console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น1");
 
-    if (result.rows.length > 0 && datax.length > 0) {
-      datax = Object.entries(_dtRollLeaf);
-
-      if (result.rows.length > 0 != _dtRollLeaf.length) {
+      if (result.rows.length  != _dtRollLeaf.length) {
         intCount = 1;
+        console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น2");
       } else {
+        console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น5");
         for (let i = 0; i < result.rows.length; i++) {
+          
           if (result.rows[i].sheet_no != _dtRollLeaf[i].SHT_NO) {
             intCount = 1;
+            console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น3");
           }
         }
       }
     } else {
       intCount = 0;
+      console.log(result.rows.length, datax.length,"มาแล้วจ้าน้องเมย์ขี้บ่น4");
     }
 
     res.status(200).json({ intCount: intCount });
