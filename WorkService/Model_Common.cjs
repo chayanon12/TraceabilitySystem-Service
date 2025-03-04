@@ -1596,7 +1596,7 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    if (result.rows[0].plasma_time > 0) {
+    if (result.rows[0].plasma_time > 0 || result.rows[0].plasma_time !== undefined) {
       response = result.rows[0].plasma_time;
       if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
         response = 0;
