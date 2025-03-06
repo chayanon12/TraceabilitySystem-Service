@@ -1592,16 +1592,18 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
     const json_convertdata = JSON.stringify(dataList);
     // select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[{"strSerial":"THA9276167M21387Y","strPlantCode":"5","strPacking":"","strMasterCode":"T999999999","strPrdname":"RGOZ-960ML-2D"}]')
     query = ` select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[${json_convertdata}]'); `;
-
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    if (result.rows[0].plasma_time > 0 || result.rows[0].plasma_time !== undefined) {
-      response = result.rows[0].plasma_time;
-      if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
-        response = 0;
+    if(result.rows>0){
+      if (result.rows[0].plasma_time > 0 || result.rows[0].plasma_time !== undefined) {
+        response = result.rows[0].plasma_time;
+        if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
+          response = 0;
+        }
       }
     }
+
     res.status(200).json({ plasma_time: response });
   } catch (err) {
     writeLogError(err.message, query);
