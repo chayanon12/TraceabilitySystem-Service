@@ -117,10 +117,10 @@ module.exports.Menuname = async function (req, res) {
       active_flag: row[4],
       visible_flag: row[5],
       parent_id: row[6],
-      count_work: row[7],
-      count_maintain: row[8],
-      count_viewdata: row[9],
-      page_title: row[10],
+      count_work: row[8],
+      count_maintain: row[9],
+      count_viewdata: row[10],
+      page_title: row[7],
     }));
     res.json(jsonResult);
   } catch (error) {
