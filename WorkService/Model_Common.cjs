@@ -222,7 +222,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const { _strLot, _strProc, _strWeekType, _strSerialInfo } = req.body;
-    
+
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -230,10 +230,15 @@ module.exports.getWeekCodebyLot = async function (req, res) {
       _strDate = result.rows[0][0];
       const [day, month, year] = _strDate.split("/");
       const dtToday = new Date(Date.UTC(year, month - 1, day));
-      const [startDay, startMonth, startYear] =SERIAL_DATE_START_WEEK_CODE.split("/");
-      const dtStartDate = new Date(Date.UTC(startYear, startMonth - 1, startDay));
+      const [startDay, startMonth, startYear] =
+        SERIAL_DATE_START_WEEK_CODE.split("/");
+      const dtStartDate = new Date(
+        Date.UTC(startYear, startMonth - 1, startDay)
+      );
       const dtNextSaturday = new Date(dtToday);
-      dtNextSaturday.setUTCDate(dtToday.getUTCDate() + (6 - dtToday.getUTCDay()));
+      dtNextSaturday.setUTCDate(
+        dtToday.getUTCDate() + (6 - dtToday.getUTCDay())
+      );
       const weekNumber = (date) => {
         const start = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
         const dayOfYear = (date - start) / 86400000 + 1;
@@ -299,7 +304,9 @@ module.exports.getWeekCodebyLot = async function (req, res) {
         case "J":
           txtDay = await ChangeBase34(dtToday.getUTCDate());
           txtMonth = await ChangeBase34(dtToday.getUTCMonth() + 1);
-          txtWeek = await convertBase34_test(parseInt(strYear[strYear.length - 1] + WeekCnt));
+          txtWeek = await convertBase34_test(
+            parseInt(strYear[strYear.length - 1] + WeekCnt)
+          );
           txtYear = strYear;
           _strReturn = `${txtMonth}${txtDay}`;
           break;
@@ -323,10 +330,15 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
 
         case "S":
-          const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, ""); 
+          const formattedDate = dtToday
+            .toISOString()
+            .slice(2, 10)
+            .replace(/-/g, "");
 
-          _strReturn = await Convert0000(await convertBase34_test(parseInt(formattedDate)));
-          
+          _strReturn = await Convert0000(
+            await convertBase34_test(parseInt(formattedDate))
+          );
+
           break;
 
         case "D":
@@ -345,7 +357,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
       }
     }
-    
+
     res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -786,8 +798,8 @@ module.exports.getleafduplicateconnectroll = async function (req, res) {
         intCount = 1;
       }
     }
-    
-    res.status(200).json({ intCount: intCount, strLeafDup : strLeafDup });
+
+    res.status(200).json({ intCount: intCount, strLeafDup: strLeafDup });
     await DisconnectPG_DB(client);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -1596,7 +1608,10 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    if (result.rows[0].plasma_time > 0 || result.rows[0].plasma_time !== undefined) {
+    if (
+      result.rows[0].plasma_time > 0 ||
+      result.rows[0].plasma_time !== undefined
+    ) {
       response = result.rows[0].plasma_time;
       if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
         response = 0;
@@ -1898,7 +1913,7 @@ async function convertBase34_test(lngNumber2) {
   return strTemp;
 }
 function changeBase34_test(value) {
-  const base34Chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ"; 
+  const base34Chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
   return base34Chars[value] || "";
 }
 module.exports.GetShippingSerialNo = async function (req, res) {
@@ -1908,7 +1923,11 @@ module.exports.GetShippingSerialNo = async function (req, res) {
     let _intSeq = 1;
     let _strShetSeq = "";
 
-    const _strLotBase34_1 = await convertBase34_test(parseInt(strLotNo.substring(0, 1)) +parseInt(strLotNo.substring(1, 2)) +parseInt(strLotNo.substring(2, 3)));
+    const _strLotBase34_1 = await convertBase34_test(
+      parseInt(strLotNo.substring(0, 1)) +
+        parseInt(strLotNo.substring(1, 2)) +
+        parseInt(strLotNo.substring(2, 3))
+    );
     const _strLotBase34_4 = await Convert0000(
       await convertBase34_test(parseInt(strLotNo.substring(3, 9)))
     );
@@ -2018,12 +2037,10 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const result = await client.query(query);
     datax = Object.entries(_dtRollLeaf);
     if (result.rows.length > 0 && _dtRollLeaf.length > 0) {
-
-      if (result.rows.length  != _dtRollLeaf.length) {
+      if (result.rows.length != _dtRollLeaf.length) {
         intCount = 1;
       } else {
         for (let i = 0; i < result.rows.length; i++) {
-          
           if (result.rows[i].sheet_no != _dtRollLeaf[i].SHT_NO) {
             intCount = 1;
           }

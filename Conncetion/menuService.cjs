@@ -69,30 +69,43 @@ module.exports.Menuname = async function (req, res) {
     const { login_id } = req.body;
     const connect = await ConnectOracleDB("FPC");
     const query = `
-      SELECT
-         NM.MENU_ID,
-         NM.MENU_NAME ,
-         NM.URL ,
-         NM.SEQ ,
-         NM.ACTIVE_FLAG ,
-         NM.VISIBLE_FLAG ,
-         NM.PARENT_ID,
-        COUNT(DECODE(NM.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work,
-    	  COUNT(DECODE(NM.PARENT_ID, '0929', 1, NULL)) OVER () AS count_maintain,
-    	  COUNT(DECODE(NM.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata,
-        NM.PAGE_TITLE
-      FROM
-         NAP_MAP_ROLE_USER NMRU
-      INNER JOIN NAP_MAP_ROLE_MENU NMRM ON
-         NMRM.ROLE_ID = NMRU.ROLE_ID
-      INNER JOIN NAP_MENU NM ON
-         NM.MENU_ID = NMRM.MENU_ID
-      WHERE
-         NMRU.LOGIN_ID = '${login_id}'
-        AND NM.APP_ID = '16'
-        AND NM.PARENT_ID IS NOT NULL
-        AND NM.ACTIVE_FLAG <> 'N'
-      ORDER BY NM.SEQ `;
+     SELECT A.*
+    	,COUNT(DECODE(A.PARENT_ID, '0928', 1, NULL)) OVER () AS count_work
+  		,COUNT(DECODE(A.PARENT_ID, '0929', 1, NULL)) OVER () AS count_maintain
+  		,COUNT(DECODE(A.PARENT_ID, '0930', 1, NULL)) OVER () AS count_viewdata
+  FROM
+  (
+	  SELECT
+	     	NM.MENU_ID,
+	     	NM.MENU_NAME ,
+	     	NM.URL ,
+	     	NM.SEQ ,
+	     	NM.ACTIVE_FLAG ,
+	     	NM.VISIBLE_FLAG ,
+	     	NM.PARENT_ID,
+	    	NM.PAGE_TITLE
+	  FROM NAP_MAP_ROLE_USER NMRU 	INNER JOIN NAP_MAP_ROLE_MENU NMRM ON NMRM.ROLE_ID = NMRU.ROLE_ID
+	  								INNER JOIN NAP_MENU NM ON NM.MENU_ID = NMRM.MENU_ID
+	  WHERE NMRU.LOGIN_ID = '${login_id}'
+	    	AND NM.APP_ID = '16'
+			AND NM.PARENT_ID IS NOT NULL
+			AND NM.ACTIVE_FLAG <> 'N'
+	  UNION
+	  SELECT
+	     	NM.MENU_ID,
+	     	NM.MENU_NAME ,
+	     	NM.URL ,
+	     	NM.SEQ ,
+	     	NM.ACTIVE_FLAG ,
+	     	NM.VISIBLE_FLAG ,
+	     	NM.PARENT_ID,
+	    	NM.PAGE_TITLE
+	  FROM NAP_MAP_ROLE_MENU NMRM INNER JOIN NAP_MENU NM ON NM.MENU_ID = NMRM.MENU_ID
+	  WHERE NM.APP_ID = '16'
+			AND NM.ACTIVE_FLAG <> 'N'  
+			AND NMRM.ROLE_ID = '0347'
+  ) A
+  ORDER BY A.SEQ`;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
     //  res.json(result);
