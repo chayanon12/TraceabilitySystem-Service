@@ -223,6 +223,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
     const connect = await ConnectOracleDB("FPC");
     const { _strLot, _strProc, _strWeekType, _strSerialInfo } = req.body;
 
+
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
     await DisconnectOracleDB(connect);
@@ -230,11 +231,8 @@ module.exports.getWeekCodebyLot = async function (req, res) {
       _strDate = result.rows[0][0];
       const [day, month, year] = _strDate.split("/");
       const dtToday = new Date(Date.UTC(year, month - 1, day));
-      const [startDay, startMonth, startYear] =
-        SERIAL_DATE_START_WEEK_CODE.split("/");
-      const dtStartDate = new Date(
-        Date.UTC(startYear, startMonth - 1, startDay)
-      );
+      const [startDay, startMonth, startYear] = SERIAL_DATE_START_WEEK_CODE.split("/");
+      const dtStartDate = new Date(Date.UTC(startYear, startMonth - 1, startDay));
       const dtNextSaturday = new Date(dtToday);
       dtNextSaturday.setUTCDate(
         dtToday.getUTCDate() + (6 - dtToday.getUTCDay())
@@ -330,14 +328,9 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
 
         case "S":
-          const formattedDate = dtToday
-            .toISOString()
-            .slice(2, 10)
-            .replace(/-/g, "");
+          const formattedDate = dtToday.toISOString().slice(2, 10).replace(/-/g, "");
 
-          _strReturn = await Convert0000(
-            await convertBase34_test(parseInt(formattedDate))
-          );
+          _strReturn = await Convert0000(await convertBase34_test(parseInt(formattedDate)));
 
           break;
 
@@ -1155,133 +1148,223 @@ module.exports.GetCountTrayByBoxPacking = async function (req, res) {
   }
 };
 
-module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
-  const {
-    _strPlantCode,
-    _strProduct,
-    _strFrontSheetNo,
-    _strBackSheetNo,
-    _intPcsNo,
-    _strAOMFlg,
-    _strAOIFlg,
-    _strOSTFlg,
-    _strAVIFlg,
-    _strResult,
-  } = req.body;
-  var _strRemark = "";
-  let result_ = _strResult;
-  result_ = "OK";
+// module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
+//   const {
+//     _strPlantCode,
+//     _strProduct,
+//     _strFrontSheetNo,
+//     _strBackSheetNo,
+//     _intPcsNo,
+//     _strAOMFlg,
+//     _strAOIFlg,
+//     _strOSTFlg,
+//     _strAVIFlg,
+//     _strResult,
+//   } = req.query;
+//   var _strRemark = "";
+//   let result_ = _strResult;
+//   result_ = "OK";
 
-  if (_strAOIFlg == "Y") {
-    var dtDataAOI;
-    var strAOIResult = "";
-    dtDataAOI = await GetSerialAOIEFPCResult(
+//   if (_strAOIFlg == "Y") {
+//     var dtDataAOI;
+//     var strAOIResult = "";
+//     dtDataAOI = await GetSerialAOIEFPCResult(
+//       _strPlantCode,
+//       _strFrontSheetNo,
+//       _intPcsNo,
+//       _strProduct,
+//       "N"
+//     );
+//     if (dtDataAOI.length > 0) {
+//       strAOIResult = dtDataAOI[0][3];
+//       if (
+//         strAOIResult != "" &&
+//         strAOIResult != "OK" &&
+//         strAOIResult != "PASS" &&
+//         strAOIResult != "GOOD"
+//       ) {
+//         result_ = "NG";
+//         _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
+//       }
+//     } else {
+//       dtDataAOI = await GetSerialAOIEFPCResult(
+//         _strPlantCode,
+//         _strBackSheetNo,
+//         _intPcsNo,
+//         _strProduct,
+//         "N"
+//       );
+//       if (dtDataAOI.length > 0) {
+//         strAOIResult = dtDataAOI[0]["AOI_RESULT"];
+//         if (
+//           strAOIResult != "" &&
+//           strAOIResult != "OK" &&
+//           strAOIResult != "PASS" &&
+//           strAOIResult != "GOOD"
+//         ) {
+//           result_ = "NG";
+//           _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
+//         }
+//       }
+//     }
+//   }
+//   if (_strOSTFlg == "Y") {
+//     var dtOSTData;
+//     var strOSTResult = "";
+//     dtOSTData = await GetSerialOSTResult(
+//       _strFrontSheetNo,
+//       parseInt(_intPcsNo),
+//       "N"
+//     );
+//     if (dtOSTData.length > 0) {
+//       strOSTResult = dtOSTData[0][2];
+//       if (
+//         strOSTResult != "" &&
+//         strOSTResult != "OK" &&
+//         strOSTResult != "PASS" &&
+//         strOSTResult != "GOOD"
+//       ) {
+//         result_ = "NG";
+//         _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
+//       }
+//     } else {
+//       dtOSTData = await GetSerialOSTResult(_strBackSheetNo, _intPcsNo, "N");
+//       if (dtOSTData.length > 0) {
+//         strOSTResult = dtOSTData[0][2];
+//         if (
+//           strOSTResult != "" &&
+//           strOSTResult != "OK" &&
+//           strOSTResult != "PASS" &&
+//           strOSTResult != "GOOD"
+//         ) {
+//           result_ = "NG";
+//           _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
+//         }
+//       }
+//     }
+//   }
+//   if (_strAVIFlg == "Y") {
+//     var dtAVIData;
+//     var strAVIResult = "";
+//     dtAVIData = await GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N");
+//     if (dtAVIData.length > 0) {
+//       strAVIResult = dtAVIData[0][0];
+//       if (
+//         strAVIResult != "" &&
+//         strAVIResult != "OK" &&
+//         strAVIResult != "PASS" &&
+//         strAVIResult != "GOOD"
+//       ) {
+//         result_ = "NG";
+//         _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
+//       }
+//     } else {
+//       dtAVIData = await GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N");
+//       if (dtAVIData.length > 0) {
+//         strAVIResult = dtAVIData[0][2];
+//         if (
+//           strAVIResult != "" &&
+//           strAVIResult != "OK" &&
+//           strAVIResult != "PASS" &&
+//           strAVIResult != "GOOD"
+//         ) {
+//           result_ = "NG";
+//           _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
+//         }
+//       }
+//     }
+//   }
+//   res.status(200).json({ remark: _strRemark, result: result_ });
+// };
+
+
+module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
+  try {
+    const {
       _strPlantCode,
-      _strFrontSheetNo,
-      _intPcsNo,
       _strProduct,
-      "N"
-    );
-    if (dtDataAOI.length > 0) {
-      strAOIResult = dtDataAOI[0][3];
-      if (
-        strAOIResult != "" &&
-        strAOIResult != "OK" &&
-        strAOIResult != "PASS" &&
-        strAOIResult != "GOOD"
-      ) {
-        result_ = "NG";
-        _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
-      }
-    } else {
-      dtDataAOI = await GetSerialAOIEFPCResult(
-        _strPlantCode,
-        _strBackSheetNo,
-        _intPcsNo,
-        _strProduct,
-        "N"
-      );
-      if (dtDataAOI.length > 0) {
-        strAOIResult = dtDataAOI[0]["AOI_RESULT"];
-        if (
-          strAOIResult != "" &&
-          strAOIResult != "OK" &&
-          strAOIResult != "PASS" &&
-          strAOIResult != "GOOD"
-        ) {
-          result_ = "NG";
-          _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
-        }
-      }
-    }
-  }
-  if (_strOSTFlg == "Y") {
-    var dtOSTData;
-    var strOSTResult = "";
-    dtOSTData = await GetSerialOSTResult(
       _strFrontSheetNo,
-      parseInt(_intPcsNo),
-      "N"
-    );
-    if (dtOSTData.length > 0) {
-      strOSTResult = dtOSTData[0][2];
-      if (
-        strOSTResult != "" &&
-        strOSTResult != "OK" &&
-        strOSTResult != "PASS" &&
-        strOSTResult != "GOOD"
-      ) {
+      _strBackSheetNo,
+      _intPcsNo,
+      _strAOMFlg,
+      _strAOIFlg,
+      _strOSTFlg,
+      _strAVIFlg,
+      _strResult,
+    } = req.query;
+
+    let result_ = _strResult;
+    result_ = "OK";
+    let _strRemark = "";
+
+    const promises = [];
+
+
+    //console.time('EFPCProcessing');
+
+    // 🔹 AOI Processing
+    if (_strAOIFlg === "Y") {
+      //console.time('AOIProcessing');
+      promises.push(
+        GetSerialAOIEFPCResult(_strPlantCode, _strFrontSheetNo, _intPcsNo, _strProduct, "N"),
+        GetSerialAOIEFPCResult(_strPlantCode, _strBackSheetNo, _intPcsNo, _strProduct, "N")
+      );
+    }
+
+    if (_strOSTFlg === "Y") {
+      //console.time('OSTProcessing');
+      promises.push(
+        GetSerialOSTResult(_strFrontSheetNo, parseInt(_intPcsNo), "N"),
+        GetSerialOSTResult(_strBackSheetNo, parseInt(_intPcsNo), "N")
+      );
+    }
+
+
+    if (_strAVIFlg === "Y") {
+      //console.time('AVIProcessing');
+      promises.push(
+        GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N"),
+        GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N")
+      );
+    }
+
+    const results = promises;
+
+    let index = 0;
+
+    if (_strAOIFlg === "Y") {
+      let dtDataAOI = results[index++] || [];
+      let strAOIResult = dtDataAOI[0]?.[3] || dtDataAOI[0]?.AOI_RESULT || "";
+      if (!["", "OK", "PASS", "GOOD"].includes(strAOIResult)) {
         result_ = "NG";
-        _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
-      }
-    } else {
-      dtOSTData = await GetSerialOSTResult(_strBackSheetNo, _intPcsNo, "N");
-      if (dtOSTData.length > 0) {
-        strOSTResult = dtOSTData[0][2];
-        if (
-          strOSTResult != "" &&
-          strOSTResult != "OK" &&
-          strOSTResult != "PASS" &&
-          strOSTResult != "GOOD"
-        ) {
-          result_ = "NG";
-          _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
-        }
+        _strRemark += ` AOI-EFPC: ${strAOIResult}`;
       }
     }
-  }
-  if (_strAVIFlg == "Y") {
-    var dtAVIData;
-    var strAVIResult = "";
-    dtAVIData = await GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N");
-    if (dtAVIData.length > 0) {
-      strAVIResult = dtAVIData[0][0];
-      if (
-        strAVIResult != "" &&
-        strAVIResult != "OK" &&
-        strAVIResult != "PASS" &&
-        strAVIResult != "GOOD"
-      ) {
+
+    if (_strOSTFlg === "Y") {
+      let dtOSTData = results[index++] || [];
+      let strOSTResult = dtOSTData[0]?.[2] || "";
+      if (!["", "OK", "PASS", "GOOD"].includes(strOSTResult)) {
         result_ = "NG";
-        _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
-      }
-    } else {
-      dtAVIData = await GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N");
-      if (dtAVIData.length > 0) {
-        strAVIResult = dtAVIData[0][2];
-        if (
-          strAVIResult != "" &&
-          strAVIResult != "OK" &&
-          strAVIResult != "PASS" &&
-          strAVIResult != "GOOD"
-        ) {
-          result_ = "NG";
-          _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
-        }
+        _strRemark += ` OST-EFPC: ${strOSTResult}`;
       }
     }
+
+    if (_strAVIFlg === "Y") {
+      let dtAVIData = results[index++] || [];
+      let strAVIResult = dtAVIData[0]?.[0] || dtAVIData[0]?.[2] || "";
+      if (!["", "OK", "PASS", "GOOD"].includes(strAVIResult)) {
+        result_ = "NG";
+        _strRemark += ` AVI-EFPC: ${strAVIResult}`;
+      }
+    }
+    
+    res.status(200).json({ remark: _strRemark, result: result_ });
+    
+  } catch (error) {
+    console.error("Error processing request:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-  res.status(200).json({ remark: _strRemark, result: result_ });
 };
 
 async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
@@ -1604,19 +1687,18 @@ module.exports.GetPlasmaTimeBySerialNo = async function (req, res) {
     const json_convertdata = JSON.stringify(dataList);
     // select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[{"strSerial":"THA9276167M21387Y","strPlantCode":"5","strPacking":"","strMasterCode":"T999999999","strPrdname":"RGOZ-960ML-2D"}]')
     query = ` select * from "Traceability".trc_000_common_GetPlasmaTimeBySerialNo('[${json_convertdata}]'); `;
-
     const client = await ConnectPG_DB();
     const result = await client.query(query);
     await DisconnectPG_DB(client);
-    if (
-      result.rows[0].plasma_time > 0 ||
-      result.rows[0].plasma_time !== undefined
-    ) {
-      response = result.rows[0].plasma_time;
-      if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
-        response = 0;
+    if (result.rows > 0) {
+      if (result.rows[0].plasma_time > 0 || result.rows[0].plasma_time !== undefined) {
+        response = result.rows[0].plasma_time;
+        if (result.rows[0].plasma_time == 0 && result.rows[0].plasma_count == 0) {
+          response = 0;
+        }
       }
     }
+
     res.status(200).json({ plasma_time: response });
   } catch (err) {
     writeLogError(err.message, query);
@@ -1834,7 +1916,7 @@ module.exports.SetBoxPackingSerialTray = async function (req, res) {
     if (Conn) {
       try {
         await DisconnectOracleDB(Conn);
-      } catch (closeError) {}
+      } catch (closeError) { }
     }
   }
 };
@@ -1923,11 +2005,7 @@ module.exports.GetShippingSerialNo = async function (req, res) {
     let _intSeq = 1;
     let _strShetSeq = "";
 
-    const _strLotBase34_1 = await convertBase34_test(
-      parseInt(strLotNo.substring(0, 1)) +
-        parseInt(strLotNo.substring(1, 2)) +
-        parseInt(strLotNo.substring(2, 3))
-    );
+    const _strLotBase34_1 = await convertBase34_test(parseInt(strLotNo.substring(0, 1)) + parseInt(strLotNo.substring(1, 2)) + parseInt(strLotNo.substring(2, 3)));
     const _strLotBase34_4 = await Convert0000(
       await convertBase34_test(parseInt(strLotNo.substring(3, 9)))
     );
@@ -2037,10 +2115,12 @@ module.exports.GetRollLeafDuplicate = async function (req, res) {
     const result = await client.query(query);
     datax = Object.entries(_dtRollLeaf);
     if (result.rows.length > 0 && _dtRollLeaf.length > 0) {
+
       if (result.rows.length != _dtRollLeaf.length) {
         intCount = 1;
       } else {
         for (let i = 0; i < result.rows.length; i++) {
+
           if (result.rows[i].sheet_no != _dtRollLeaf[i].SHT_NO) {
             intCount = 1;
           }
