@@ -377,7 +377,9 @@ module.exports.GetSheetDuplicateConnectShtType = async function (req, res) {
       }
     } else {
       const json_convertdata = JSON.stringify(jsondata);
+      console.log(json_convertdata)
       query += `SELECT * FROM "Traceability".trc_000_common_getsheetduplicateconnectshtnotype('[${json_convertdata}]');`;
+      console.log(query)
       const result = await client.query(query);
       if (result.rows.length > 0) {
         res.status(200).json(result.rows[0].sheet_count);

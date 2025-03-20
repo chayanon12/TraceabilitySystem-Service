@@ -222,7 +222,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const { _strLot, _strProc, _strWeekType, _strSerialInfo } = req.body;
-
+    console.log(req.body)
 
     query += `SELECT FPC.TRC_COMMON_TRACEABILITY.TRC_COMMON_GETWEEKCODEBYLOT('${_strLot}', '${_strProc}')AS data1 FROM dual`;
     const result = await connect.execute(query);
@@ -279,7 +279,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           } else {
             txtYear = strYear[3];
           }
-          txtDay = dtToday.getUTCDay();
+          txtDay = dtToday.getDay() + 1;
 
           _strReturn = `${txtYear}${txtWeek}${txtDay}`;
           break;
@@ -350,7 +350,7 @@ module.exports.getWeekCodebyLot = async function (req, res) {
           break;
       }
     }
-
+    console.log("_strReturn : ",_strReturn)
     res.status(200).json(_strReturn);
   } catch (error) {
     writeLogError(error.message, query);
@@ -971,11 +971,12 @@ module.exports.SetSerialLotTrayTable = async function (req, res) {
     const client = await ConnectPG_DB();
     const { dataList } = req.body;
     const json_convertdata = JSON.stringify(dataList);
-
-    const query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
-
-    const result = await client.query(query, [json_convertdata]);
+    // query = `CALL "Traceability".trc_000_common_setseriallottraytable($1, '')`;
+    query = `CALL "Traceability".trc_000_common_setseriallottraytable('[${json_convertdata}]', '')`    
+    const result = await client.query(query);
+    // const result = await client.query(query, [json_convertdata]);
     if (result.rows != "") {
+      console.log(result.rows);
       res.status(200).json(result.rows[0]);
       await DisconnectPG_DB(client);
     }
