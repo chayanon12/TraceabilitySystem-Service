@@ -1149,224 +1149,214 @@ module.exports.GetCountTrayByBoxPacking = async function (req, res) {
   }
 };
 
-// module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
-//   const {
-//     _strPlantCode,
-//     _strProduct,
-//     _strFrontSheetNo,
-//     _strBackSheetNo,
-//     _intPcsNo,
-//     _strAOMFlg,
-//     _strAOIFlg,
-//     _strOSTFlg,
-//     _strAVIFlg,
-//     _strResult,
-//   } = req.query;
-//   var _strRemark = "";
-//   let result_ = _strResult;
-//   result_ = "OK";
-
-//   if (_strAOIFlg == "Y") {
-//     var dtDataAOI;
-//     var strAOIResult = "";
-//     dtDataAOI = await GetSerialAOIEFPCResult(
-//       _strPlantCode,
-//       _strFrontSheetNo,
-//       _intPcsNo,
-//       _strProduct,
-//       "N"
-//     );
-//     if (dtDataAOI.length > 0) {
-//       strAOIResult = dtDataAOI[0][3];
-//       if (
-//         strAOIResult != "" &&
-//         strAOIResult != "OK" &&
-//         strAOIResult != "PASS" &&
-//         strAOIResult != "GOOD"
-//       ) {
-//         result_ = "NG";
-//         _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
-//       }
-//     } else {
-//       dtDataAOI = await GetSerialAOIEFPCResult(
-//         _strPlantCode,
-//         _strBackSheetNo,
-//         _intPcsNo,
-//         _strProduct,
-//         "N"
-//       );
-//       if (dtDataAOI.length > 0) {
-//         strAOIResult = dtDataAOI[0]["AOI_RESULT"];
-//         if (
-//           strAOIResult != "" &&
-//           strAOIResult != "OK" &&
-//           strAOIResult != "PASS" &&
-//           strAOIResult != "GOOD"
-//         ) {
-//           result_ = "NG";
-//           _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
-//         }
-//       }
-//     }
-//   }
-//   if (_strOSTFlg == "Y") {
-//     var dtOSTData;
-//     var strOSTResult = "";
-//     dtOSTData = await GetSerialOSTResult(
-//       _strFrontSheetNo,
-//       parseInt(_intPcsNo),
-//       "N"
-//     );
-//     if (dtOSTData.length > 0) {
-//       strOSTResult = dtOSTData[0][2];
-//       if (
-//         strOSTResult != "" &&
-//         strOSTResult != "OK" &&
-//         strOSTResult != "PASS" &&
-//         strOSTResult != "GOOD"
-//       ) {
-//         result_ = "NG";
-//         _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
-//       }
-//     } else {
-//       dtOSTData = await GetSerialOSTResult(_strBackSheetNo, _intPcsNo, "N");
-//       if (dtOSTData.length > 0) {
-//         strOSTResult = dtOSTData[0][2];
-//         if (
-//           strOSTResult != "" &&
-//           strOSTResult != "OK" &&
-//           strOSTResult != "PASS" &&
-//           strOSTResult != "GOOD"
-//         ) {
-//           result_ = "NG";
-//           _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
-//         }
-//       }
-//     }
-//   }
-//   if (_strAVIFlg == "Y") {
-//     var dtAVIData;
-//     var strAVIResult = "";
-//     dtAVIData = await GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N");
-//     if (dtAVIData.length > 0) {
-//       strAVIResult = dtAVIData[0][0];
-//       if (
-//         strAVIResult != "" &&
-//         strAVIResult != "OK" &&
-//         strAVIResult != "PASS" &&
-//         strAVIResult != "GOOD"
-//       ) {
-//         result_ = "NG";
-//         _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
-//       }
-//     } else {
-//       dtAVIData = await GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N");
-//       if (dtAVIData.length > 0) {
-//         strAVIResult = dtAVIData[0][2];
-//         if (
-//           strAVIResult != "" &&
-//           strAVIResult != "OK" &&
-//           strAVIResult != "PASS" &&
-//           strAVIResult != "GOOD"
-//         ) {
-//           result_ = "NG";
-//           _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
-//         }
-//       }
-//     }
-//   }
-//   res.status(200).json({ remark: _strRemark, result: result_ });
-// };
-
-
 module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
-  try {
-    const {
+  const {_strPlantCode,_strProduct,_strFrontSheetNo,_strBackSheetNo,_intPcsNo,_strAOMFlg,_strAOIFlg,_strOSTFlg,_strAVIFlg,_strResult,} = req.query;
+  var _strRemark = "";
+  let result_ = _strResult;
+  result_ = "OK";
+
+  if (_strAOIFlg == "Y") {
+    var dtDataAOI;
+    var strAOIResult = "";
+    dtDataAOI = await GetSerialAOIEFPCResult(
       _strPlantCode,
-      _strProduct,
       _strFrontSheetNo,
-      _strBackSheetNo,
       _intPcsNo,
-      _strAOMFlg,
-      _strAOIFlg,
-      _strOSTFlg,
-      _strAVIFlg,
-      _strResult,
-    } = req.query;
-
-    let result_ = _strResult;
-    result_ = "OK";
-    let _strRemark = "";
-
-    const promises = [];
-
-
-    //console.time('EFPCProcessing');
-
-    // 🔹 AOI Processing
-    if (_strAOIFlg === "Y") {
-      //console.time('AOIProcessing');
-      promises.push(
-        GetSerialAOIEFPCResult(_strPlantCode, _strFrontSheetNo, _intPcsNo, _strProduct, "N"),
-        GetSerialAOIEFPCResult(_strPlantCode, _strBackSheetNo, _intPcsNo, _strProduct, "N")
-      );
-    }
-
-    if (_strOSTFlg === "Y") {
-      //console.time('OSTProcessing');
-      promises.push(
-        GetSerialOSTResult(_strFrontSheetNo, parseInt(_intPcsNo), "N"),
-        GetSerialOSTResult(_strBackSheetNo, parseInt(_intPcsNo), "N")
-      );
-    }
-
-
-    if (_strAVIFlg === "Y") {
-      //console.time('AVIProcessing');
-      promises.push(
-        GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N"),
-        GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N")
-      );
-    }
-
-    const results = promises;
-
-    let index = 0;
-
-    if (_strAOIFlg === "Y") {
-      let dtDataAOI = results[index++] || [];
-      let strAOIResult = dtDataAOI[0]?.[3] || dtDataAOI[0]?.AOI_RESULT || "";
-      if (!["", "OK", "PASS", "GOOD"].includes(strAOIResult)) {
+      _strProduct,
+      "N"
+    );
+    if (dtDataAOI.length > 0) {
+      strAOIResult = dtDataAOI[0][3];
+      if (
+        strAOIResult != "" &&
+        strAOIResult != "OK" &&
+        strAOIResult != "PASS" &&
+        strAOIResult != "GOOD"
+      ) {
         result_ = "NG";
-        _strRemark += ` AOI-EFPC: ${strAOIResult}`;
+        _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
+      }
+    } else {
+      dtDataAOI = await GetSerialAOIEFPCResult(
+        _strPlantCode,
+        _strBackSheetNo,
+        _intPcsNo,
+        _strProduct,
+        "N"
+      );
+      if (dtDataAOI.length > 0) {
+        strAOIResult = dtDataAOI[0]["AOI_RESULT"];
+        if (
+          strAOIResult != "" &&
+          strAOIResult != "OK" &&
+          strAOIResult != "PASS" &&
+          strAOIResult != "GOOD"
+        ) {
+          result_ = "NG";
+          _strRemark = _strRemark + " AOI-EFPC: " + strAOIResult;
+        }
       }
     }
-
-    if (_strOSTFlg === "Y") {
-      let dtOSTData = results[index++] || [];
-      let strOSTResult = dtOSTData[0]?.[2] || "";
-      if (!["", "OK", "PASS", "GOOD"].includes(strOSTResult)) {
-        result_ = "NG";
-        _strRemark += ` OST-EFPC: ${strOSTResult}`;
-      }
-    }
-
-    if (_strAVIFlg === "Y") {
-      let dtAVIData = results[index++] || [];
-      let strAVIResult = dtAVIData[0]?.[0] || dtAVIData[0]?.[2] || "";
-      if (!["", "OK", "PASS", "GOOD"].includes(strAVIResult)) {
-        result_ = "NG";
-        _strRemark += ` AVI-EFPC: ${strAVIResult}`;
-      }
-    }
-    
-    res.status(200).json({ remark: _strRemark, result: result_ });
-    
-  } catch (error) {
-    console.error("Error processing request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
+  if (_strOSTFlg == "Y") {
+    var dtOSTData;
+    var strOSTResult = "";
+    dtOSTData = await GetSerialOSTResult(
+      _strFrontSheetNo,
+      parseInt(_intPcsNo),
+      "N"
+    );
+    if (dtOSTData.length > 0) {
+      strOSTResult = dtOSTData[0][2];
+      if (
+        strOSTResult != "" &&
+        strOSTResult != "OK" &&
+        strOSTResult != "PASS" &&
+        strOSTResult != "GOOD"
+      ) {
+        result_ = "NG";
+        _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
+      }
+    } else {
+      dtOSTData = await GetSerialOSTResult(_strBackSheetNo, _intPcsNo, "N");
+      if (dtOSTData.length > 0) {
+        strOSTResult = dtOSTData[0][2];
+        if (
+          strOSTResult != "" &&
+          strOSTResult != "OK" &&
+          strOSTResult != "PASS" &&
+          strOSTResult != "GOOD"
+        ) {
+          result_ = "NG";
+          _strRemark = _strRemark + " OST-EFPC: " + strOSTResult;
+        }
+      }
+    }
+  }
+  if (_strAVIFlg == "Y") {
+    var dtAVIData;
+    var strAVIResult = "";
+    dtAVIData = await GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N");
+    if (dtAVIData.length > 0) {
+      strAVIResult = dtAVIData[0][0];
+      if (
+        strAVIResult != "" &&
+        strAVIResult != "OK" &&
+        strAVIResult != "PASS" &&
+        strAVIResult != "GOOD"
+      ) {
+        result_ = "NG";
+        _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
+      }
+    } else {
+      dtAVIData = await GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N");
+      if (dtAVIData.length > 0) {
+        strAVIResult = dtAVIData[0][2];
+        if (
+          strAVIResult != "" &&
+          strAVIResult != "OK" &&
+          strAVIResult != "PASS" &&
+          strAVIResult != "GOOD"
+        ) {
+          result_ = "NG";
+          _strRemark = _strRemark + " OST-EFPC: " + strAVIResult;
+        }
+      }
+    }
+  }
+  console.log(_strRemark,result_,'EFPCE')
+  res.status(200).json({ remark: _strRemark, result: result_ });
 };
+
+
+// module.exports.GetEFPCSheetInspectionResult = async function (req, res) {
+//   try {
+//     const {
+//       _strPlantCode,
+//       _strProduct,
+//       _strFrontSheetNo,
+//       _strBackSheetNo,
+//       _intPcsNo,
+//       _strAOMFlg,
+//       _strAOIFlg,
+//       _strOSTFlg,
+//       _strAVIFlg,
+//       _strResult,
+//     } = req.query;
+//     console.log(req.query)
+//     let result_ = _strResult;
+//     result_ = "OK";
+//     let _strRemark = "";
+
+//     const promises = [];
+
+
+//     //console.time('EFPCProcessing');
+
+//     // 🔹 AOI Processing
+//     if (_strAOIFlg === "Y") {
+//       //console.time('AOIProcessing');
+//       promises.push(
+//         GetSerialAOIEFPCResult(_strPlantCode, _strFrontSheetNo, _intPcsNo, _strProduct, "N"),
+//         GetSerialAOIEFPCResult(_strPlantCode, _strBackSheetNo, _intPcsNo, _strProduct, "N")
+//       );
+//     }
+
+//     if (_strOSTFlg === "Y") {
+//       //console.time('OSTProcessing');
+//       promises.push(
+//         GetSerialOSTResult(_strFrontSheetNo, parseInt(_intPcsNo), "N"),
+//         GetSerialOSTResult(_strBackSheetNo, parseInt(_intPcsNo), "N")
+//       );
+//     }
+
+
+//     if (_strAVIFlg === "Y") {
+//       //console.time('AVIProcessing');
+//       promises.push(
+//         GetSerialAVIResult(_strFrontSheetNo, _intPcsNo, "N"),
+//         GetSerialAVIResult(_strBackSheetNo, _intPcsNo, "N")
+//       );
+//     }
+
+//     const results = promises;
+//     console.log(results)
+//     let index = 0;
+
+//     if (_strAOIFlg === "Y") {
+//       let dtDataAOI = results[index++] || [];
+//       let strAOIResult = dtDataAOI[0]?.[3] || dtDataAOI[0]?.AOI_RESULT || "";
+//       if (!["", "OK", "PASS", "GOOD"].includes(strAOIResult)) {
+//         result_ = "NG";
+//         _strRemark += ` AOI-EFPC: ${strAOIResult}`;
+//       }
+//     }
+
+//     if (_strOSTFlg === "Y") {
+//       let dtOSTData = results[index++] || [];
+//       let strOSTResult = dtOSTData[0]?.[2] || "";
+//       if (!["", "OK", "PASS", "GOOD"].includes(strOSTResult)) {
+//         result_ = "NG";
+//         _strRemark += ` OST-EFPC: ${strOSTResult}`;
+//       }
+//     }
+
+//     if (_strAVIFlg === "Y") {
+//       let dtAVIData = results[index++] || [];
+//       let strAVIResult = dtAVIData[0]?.[0] || dtAVIData[0]?.[2] || "";
+//       if (!["", "OK", "PASS", "GOOD"].includes(strAVIResult)) {
+//         result_ = "NG";
+//         _strRemark += ` AVI-EFPC: ${strAVIResult}`;
+//       }
+//     }
+    
+//     res.status(200).json({ remark: _strRemark, result: result_ });
+    
+//   } catch (error) {
+//     console.error("Error processing request:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 async function GetSerialOSTResult(SerialNo, intPCSNo, strSMPJCavityFlg) {
   let query = "";

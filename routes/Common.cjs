@@ -39,7 +39,7 @@ const Common = require("../WorkService/Model_Common.cjs");
 //  router.post("/GetSerialOSTResult", Common.GetSerialOSTResult);
  router.post("/GetCheckChipDuplicate", Common.GetCheckChipDuplicate);
  router.post("/GetSerialFinInspectResult", Common.GetSerialFinInspectResult);
- router.get("/GetEFPCSheetInspectionResult", Common.GetEFPCSheetInspectionResult);
+ router.post("/GetEFPCSheetInspectionResult", Common.GetEFPCSheetInspectionResult);
  router.post("/GetSerialBoxProductByProduct", Common.GetSerialBoxProductByProduct);
  router.post("/SetSerialLotTrayTableGood", Common.SetSerialLotTrayTableGood);
  router.post("/GetSerialDuplicate", Common.GetSerialDuplicate);
