@@ -163,7 +163,7 @@ module.exports.MenuHome = async function (req, res) {
   try {
     const connect = await ConnectOracleDB("FPC");
     const query = `
-    SELECT
+  SELECT
 	NM.PARENT_ID ,
 	NM.MENU_NAME ,
 	NM.URL,
@@ -177,7 +177,8 @@ module.exports.MenuHome = async function (req, res) {
     APP_ID = '16'
     AND VISIBLE_FLAG = 'N'
     AND ACTIVE_FLAG <> 'N'
-    AND PARENT_ID IS NOT NULL`;
+    AND PARENT_ID IS NOT NULL
+     ORDER BY NM.SEQ`;
     const result = await connect.execute(query);
     DisconnectOracleDB(connect);
     // res.json(result.rows);
